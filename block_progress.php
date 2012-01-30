@@ -1,0 +1,147 @@
+<?php
+
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+
+/**
+ * Progress Bar block definition
+ *
+ * @package    contrib
+ * @subpackage block_progress
+ * @copyright  2010 Michael de Raadt
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->dirroot.'/blocks/progress/lib.php');
+
+/**
+ * Progress Bar block class
+ *
+ * @copyright 2010 Michael de Raadt
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class block_progress extends block_base {
+
+    /**
+     * Sets the block title
+     *
+     * @return none
+     */
+    function init() {
+        $this->title = get_string('config_default_title', 'block_progress');
+    }
+
+    /**
+     * Constrols the block title based on instance configuration
+     *
+     * @return bool
+     */
+    function specialization() {
+        if (isset($this->config->progressTitle)) {
+            $this->title = format_string($this->config->progressTitle);
+        }
+    }
+
+    /**
+     * Controls whether multiple instances of the block are allowed on a page
+     *
+     * @return bool
+     */
+    function instance_allow_multiple() {
+        return true;
+    }
+
+    /**
+     * Defines where the block can be added
+     *
+     * @return array
+     */
+    function applicable_formats() {
+        return array('course-view' => true);
+    }
+
+    /**
+     * Creates the blocks main content
+     *
+     * @return string
+     */
+    function get_content() {
+
+        // Access to settings needed
+        global $USER, $COURSE, $CFG, $DB, $OUTPUT;
+        global $MODULES;
+
+        // If content has already been generated, don't waste time generating it again
+        if ($this->content !== NULL) {
+            return $this->content;
+        }
+        $this->content = new stdClass;
+        $this->content->text = '';
+        $this->content->footer = '';
+
+        // Check if any activities/resources have been created
+        $modules = modules_in_use();
+        if (empty($modules)) {
+            $this->content->text .= get_string('no_events_config_message', 'block_progress');
+            return $this->content;
+        }
+
+        // Check if activities/resources have been selected in config
+        $events = event_information($this->config, $modules);
+        if ($events==null) {
+            $this->content->text .= get_string('no_events_message', 'block_progress');
+            return $this->content;
+        }
+        else if (empty($events)) {
+            $this->content->text .= get_string('no_visible_events_message', 'block_progress');
+            return $this->content;
+        }
+
+        // Display progress bar
+        else {
+            $attempts = get_attempts($modules, $this->config, $events, $USER->id,
+                $this->instance->id);
+            $this->content->text =
+                progress_bar($modules, $this->config, $events, $USER->id,
+                             $this->instance->id, $attempts);
+        }
+
+        // Organise access to JS
+        $jsmodule = array(
+            'name' => 'block_progress',
+            'fullpath' => '/blocks/progress/module.js',
+            'requires' => array(),
+            'strings' => array(
+                array('time_expected', 'block_progress'),
+            ),
+        );
+        $displayDate = !isset($this->config->displayNow) || $this->config->displayNow==1;
+        $arguments = array($CFG->wwwroot, array_keys($modules), $displayDate);
+        $this->page->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
+
+        // Allow teachers to access the overview page
+        if (has_capability('block/progress:viewoverview', $this->context)) {
+            $parameters = array('id' => $this->instance->id, 'courseid' => $COURSE->id);
+            $url = new moodle_url('/blocks/progress/overview.php', $parameters);
+            $label = get_string('overview', 'block_progress');
+            $this->content->text .= $OUTPUT->spacer(array('height'=>5), true);
+            $this->content->text .= $OUTPUT->single_button($url, $label);
+        }
+
+        return $this->content;
+    }
+}
