@@ -26,4 +26,4 @@ Once the progress bar is installed, you can use it in a course as follows.
 9. Save changes 
 
 Hidden items will not appear in the Progress Bar until they are unhidden. This is useful for a
-scheduled release of activities. 
+scheduled release of activities.

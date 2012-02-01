@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -73,13 +72,13 @@ class block_progress_edit_form extends block_edit_form {
 
         // Go through each type of activity/resource that can be monitored
         $modules = get_monitorable_modules();
-        foreach ($modules as $module=>$details) {
+        foreach ($modules as $module => $details) {
 
             // Get data about activities/resources of this type
             unset($instances);
             if ($dbmanager->table_exists($module)) {
                 $sql = 'SELECT id, name';
-                if($module == 'assignment') {
+                if ($module == 'assignment') {
                     $sql .= ', assignmenttype';
                 }
                 if (array_key_exists('defaultTime', $details)) {
@@ -92,14 +91,13 @@ class block_progress_edit_form extends block_edit_form {
             // If there are activities/resources of this type, show them
             if (!empty($instances)) {
 
-
                 // Display each monitorable activity/resource as a row
-                foreach ($instances as $i=>$instance) {
+                foreach ($instances as $i => $instance) {
                     $count++;
 
                     // Start of module border
                     $mform->addElement('html', '<div class="progressConfigBox">');
-                    
+
                     // Find type labels for assignment types
                     $asslabel = '';
                     if (isset($instance->assignmenttype)) {
@@ -112,9 +110,9 @@ class block_progress_edit_form extends block_edit_form {
                         }
                         $asslabel = ' ('.$asslabel.')';
                     }
-                    
+
                     // Icon, module type and name
-                    $mform->addElement('html', $OUTPUT->pix_icon('icon', 
+                    $mform->addElement('html', $OUTPUT->pix_icon('icon',
                                        get_string('pluginname', $module), 'mod_'.$module).
                                        '&nbsp;<strong>'.get_string($module, 'block_progress').
                                        $asslabel.
@@ -148,11 +146,11 @@ class block_progress_edit_form extends block_edit_form {
                                         'config_monitor_'.$module.$instance->id, 'eq', 0);
 
                     // Assume a time/date for a activity/resource
-                    $expected = NULL;
+                    $expected = null;
                     $datetimepropery = 'date_time_'.$module.$instance->id;
                     if (
                         isset($this->block->config) &&
-                        property_exists($this->block->config,$datetimepropery)
+                        property_exists($this->block->config, $datetimepropery)
                     ) {
                         $expected = $this->block->config->$datetimepropery;
                     }
@@ -165,7 +163,7 @@ class block_progress_edit_form extends block_edit_form {
 
                         // If in positioned in a weekly format, use 5min before end of week
                         else if ($usingweeklyformat) {
-                            $cm = get_coursemodule_from_instance($module, $instance->id, 
+                            $cm = get_coursemodule_from_instance($module, $instance->id,
                                                                  $COURSE->id);
                             $params = array('id'=>$cm->section);
                             $section = $DB->get_field('course_sections', 'section', $params);
@@ -192,7 +190,7 @@ class block_progress_edit_form extends block_edit_form {
 
                     // Print the action selector for the event
                     $actions = array();
-                    foreach ($details['actions'] as $action=>$sql) {
+                    foreach ($details['actions'] as $action => $sql) {
                         $actions[$action] = get_string($action, 'block_progress');
                     }
                     if (isset($CFG->enablecompletion) && $CFG->enablecompletion==1) {

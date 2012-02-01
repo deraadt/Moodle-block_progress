@@ -1,13 +1,14 @@
-.block_progress .content {
+﻿.block_progress .content {
     text-align: center;
 }
 
 .block_progress table {
     margin: 0 auto;
+    padding: 0;
 }
 
 .block_progress .progressBarProgressTable {
-    width: 98%;
+    width: 100%;
     margin: 0 0 2px 0;
 	height: 17px;
 }
@@ -22,14 +23,26 @@
 }
 
 .block_progress .progressBarCell img {
-    max-width: 70%;
-	height: 15px;
+    width: 100%;
+    height: 15px;
     margin: 1px 0 0 0;
+    padding: 0;
 }
 
 .block_progress .progressEventInfo {
     font-size: x-small;
     text-align: left;
+    white-space: pre;
+    overflow: hidden;
+}
+
+.block_progress .progressEventInfo img {
+    vertical-align: middle;
+}
+
+.block_progress .moduleIcon {
+    float: left;
+    margin-right: 5px;
 }
 
 .block_progress .progressBarHeader {

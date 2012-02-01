@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -39,9 +38,9 @@ class block_progress extends block_base {
     /**
      * Sets the block title
      *
-     * @return none
+     * @return void
      */
-    function init() {
+    public function init() {
         $this->title = get_string('config_default_title', 'block_progress');
     }
 
@@ -50,7 +49,7 @@ class block_progress extends block_base {
      *
      * @return bool
      */
-    function specialization() {
+    public function specialization() {
         if (isset($this->config->progressTitle)) {
             $this->title = format_string($this->config->progressTitle);
         }
@@ -61,7 +60,7 @@ class block_progress extends block_base {
      *
      * @return bool
      */
-    function instance_allow_multiple() {
+    public function instance_allow_multiple() {
         return true;
     }
 
@@ -70,7 +69,7 @@ class block_progress extends block_base {
      *
      * @return array
      */
-    function applicable_formats() {
+    public function applicable_formats() {
         return array('course-view' => true);
     }
 
@@ -79,14 +78,13 @@ class block_progress extends block_base {
      *
      * @return string
      */
-    function get_content() {
+    public function get_content() {
 
         // Access to settings needed
         global $USER, $COURSE, $CFG, $DB, $OUTPUT;
-        global $MODULES;
 
         // If content has already been generated, don't waste time generating it again
-        if ($this->content !== NULL) {
+        if ($this->content !== null) {
             return $this->content;
         }
         $this->content = new stdClass;
@@ -129,8 +127,8 @@ class block_progress extends block_base {
                 array('time_expected', 'block_progress'),
             ),
         );
-        $displayDate = !isset($this->config->displayNow) || $this->config->displayNow==1;
-        $arguments = array($CFG->wwwroot, array_keys($modules), $displayDate);
+        $displaydate = !isset($this->config->displayNow) || $this->config->displayNow==1;
+        $arguments = array($CFG->wwwroot, array_keys($modules), $displaydate);
         $this->page->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 
         // Allow teachers to access the overview page

@@ -13,7 +13,7 @@ M.block_progress = {
 
         // Rember whether the now indicator is displayed (also hides date)
         this.displayDate = date;
-        
+
         // Preload icons for modules in use
         for(i=0; i<modulesInUse.length; i++) {
             this.preLoadArray[i] = new Image();
@@ -27,9 +27,9 @@ M.block_progress = {
 
         // Dynamically update the content of the information window below the progress bar
         var content  = '<a href="'+this.wwwroot+'/mod/'+mod+'/view.php?id='+id+'">';
-            content += '<img src="'+M.util.image_url('icon', mod)+'" alt="Module icon" />';
+            content += '<img src="'+M.util.image_url('icon', mod)+'" alt="Module icon" class="moduleIcon" />';
             content += name+'</a><br />'+type+' '+message+'&nbsp;';
-            content += '<img align="absmiddle" src="'+M.util.image_url(icon, 'block_progress')+'" alt="Cross or tick icon" /><br />';
+            content += '<img src="'+M.util.image_url(icon, 'block_progress')+'" alt="Cross or tick icon" /><br />';
             if (this.displayDate) {
                 content += M.str.block_progress.time_expected+': '+dateTime+'<br />';
             }

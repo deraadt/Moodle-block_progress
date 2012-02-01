@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,9 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * Progress Bar block common configuration
+ * Progress Bar block common configuration and helper functions
  *
  * Instructions for adding new modules so they can be monitored
  * ================================================================================================
@@ -34,11 +32,12 @@
  * Queries need to produce at least one result for completeness to go green, ie there is a record
  * in the DB that indicates the user's completion.
  *
- * Queries may include the following terms that are substituted before the query is run:
- *  - #EVENTID# (the id of the activity in the DB table that relates to it, eg., an assignment id)
- *  - #CMID# (the course module id that identifies the instance of the module within the course),
- *  - #USERID# (the current user's id) and
- *  - $COURSEID# (the current course id)
+ * Queries may include the following placeholders that are substituted when the query is run. Note
+ * that each placeholder can only be used once in each query.
+ *  :eventid (the id of the activity in the DB table that relates to it, eg., an assignment id)
+ *  :cmid (the course module id that identifies the instance of the module within the course),
+ *  :userid (the current user's id) and
+ *  :courseid (the current course id)
  *
  * When you add a new module, you need to add a translation for it in the lang files.
  * If you add new action names, you need to add a translation for these in the lang files.
@@ -48,6 +47,7 @@
  *
  * If you have added a new module to this array and think other's may benefit from the query you
  * have created, please share it by sending it to michaeld@moodle.com
+ * ================================================================================================
  *
  * @package    contrib
  * @subpackage block_progress
@@ -65,181 +65,267 @@ function get_monitorable_modules() {
         'assignment' => array(
             'defaultTime'=>'timedue',
             'actions'=>array(
-                'submitted'    => 'SELECT id FROM {assignment_submissions} '.
-                                  'WHERE assignment=\'#EVENTID#\' AND userid=\'#USERID#\' '.
-                                  'AND (numfiles=\'1\' OR data2=\'submitted\' OR data2=\'1\' OR grade!=\'-1\')',
-                'marked'       => 'SELECT id FROM {assignment_submissions} '.
-                                  'WHERE assignment=\'#EVENTID#\' AND userid=\'#USERID#\' '.
-                                  'AND grade!=\'-1\''
+                'submitted'    => "SELECT id
+                                     FROM {assignment_submissions}
+                                    WHERE assignment = :eventid
+                                      AND userid = :userid
+                                      AND (
+                                          numfiles = 1
+                                          OR data2 = 'submitted'
+                                          OR data2 = 1
+                                          OR grade <> -1
+                                      )",
+                'marked'       => "SELECT id
+                                     FROM {assignment_submissions}
+                                    WHERE assignment = :eventid
+                                      AND userid = :userid
+                                      AND grade <> -1"
             ),
             'defaultAction' => 'submitted'
         ),
         'book' => array(
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'book\' '.
-                                  'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'book'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'certificate' => array(
             'actions'=>array(
-                'awarded'    => 'SELECT id FROM {certificate_issues} '.
-                                'WHERE certificateid=\'#EVENTID#\' AND userid=\'#USERID#\''
+                'awarded'    => "SELECT id
+                                   FROM {certificate_issues}
+                                  WHERE certificateid = :eventid
+                                    AND userid = :userid"
             ),
             'defaultAction' => 'awarded'
         ),
         'chat' => array(
             'actions'=>array(
-                'posted_to'    => 'SELECT id FROM {chat_messages} '.
-                                  'WHERE chatid=\'#EVENTID#\' AND userid=\'#USERID#\''
+                'posted_to'    => "SELECT id
+                                     FROM {chat_messages}
+                                    WHERE chatid = :eventid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'posted_to'
         ),
         'choice' => array(
             'defaultTime'=>'timeclose',
             'actions'=>array(
-                'answered'     => 'SELECT id FROM {choice_answers} '.
-                                  'WHERE choiceid=\'#EVENTID#\' AND userid=\'#USERID#\''
+                'answered'     => "SELECT id
+                                     FROM {choice_answers}
+                                    WHERE choiceid = :eventid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'answered'
         ),
         'data' => array(
             'defaultTime'=>'timeviewto',
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'data\' '.
-                                  'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'data'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'feedback' => array(
             'defaultTime'=>'timeclose',
             'actions'=>array(
-                'responded_to' => 'SELECT id FROM {feedback_completed} '.
-                                  'WHERE feedback=\'#EVENTID#\' AND userid=\'#USERID#\''
+                'responded_to' => "SELECT id
+                                     FROM {feedback_completed}
+                                    WHERE feedback = :eventid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'responded_to'
         ),
         'resource' => array(  // AKA file
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'resource\' '.
-                                  'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'resource'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'flashcardtrainer' => array(
             'actions'=>array(
-                'viewed' => 'SELECT id FROM {log} '.
-                            'WHERE course=\'#COURSEID#\' AND module=\'flashcardtrainer\' '.
-                            'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'flashcardtrainer'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'folder' => array(
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'folder\' '.
-                                  'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'folder'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'forum' => array(
             'defaultTime'=>'assesstimefinish',
             'actions'=>array(
-                'posted_to'    => 'SELECT id FROM {forum_posts} '.
-                                  'WHERE userid=\'#USERID#\' AND discussion IN '.
-                                  '(SELECT id FROM {forum_discussions} WHERE forum=\'#EVENTID#\')'
+                'posted_to'    => "SELECT id
+                                     FROM {forum_posts}
+                                    WHERE userid = :userid AND discussion IN (
+                                          SELECT id
+                                            FROM {forum_discussions}
+                                           WHERE forum = :eventid
+                                    )"
             ),
             'defaultAction' => 'posted_to'
         ),
         'glossary' => array(
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'glossary\' '.
-                                  'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                  'WHERE course = :courseid
+                                     AND module = 'glossary'
+                                     AND action = 'view'
+                                     AND cmid = :cmid
+                                     AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'hotpot' => array(
             'defaultTime'=>'timeclose',
             'actions'=>array(
-                'attempted'    => 'SELECT id FROM {hotpot_attempts} WHERE hotpot=\'#EVENTID#\' AND userid=\'#USERID#\'',
-                'finished'     => 'SELECT id FROM {hotpot_attempts} WHERE hotpot=\'#EVENTID#\' AND userid=\'#USERID#\' AND timefinish!=\'0\'',
+                'attempted'    => "SELECT id
+                                    FROM {hotpot_attempts}
+                                   WHERE hotpot = :eventid
+                                     AND userid = :userid",
+                'finished'     => "SELECT id
+                                     FROM {hotpot_attempts}
+                                    WHERE hotpot = :eventid
+                                      AND userid = :userid
+                                      AND timefinish <> 0",
             ),
             'defaultAction' => 'finished'
         ),
         'imscp' => array(
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'imscp\' '.
-                                  'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                    FROM {log}
+                                   WHERE course = :courseid
+                                     AND module = 'imscp'
+                                     AND action = 'view'
+                                     AND cmid = :cmid
+                                     AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'journal' => array(
             'actions'=>array(
-                'posted_to'    => 'SELECT id FROM {journal_entries} '.
-                                  'WHERE journal=\'#EVENTID#\' AND userid=\'#USERID#\''
+                'posted_to'    => "SELECT id
+                                     FROM {journal_entries}
+                                    WHERE journal = :eventid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'posted_to'
         ),
         'lesson' => array(
             'defaultTime'=>'deadline',
             'actions'=>array(
-                'attempted'    => 'SELECT id FROM {lesson_attempts} '.
-                                  'WHERE lessonid=\'#EVENTID#\' AND userid=\'#USERID#\''
+                'attempted'    => "SELECT id
+                                     FROM {lesson_attempts}
+                                    WHERE lessonid = :eventid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'attempted'
         ),
         'page' => array(
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'page\' AND '.
-                                  'action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'page'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'quiz' => array(
             'defaultTime'=>'timeclose',
             'actions'=>array(
-                'attempted'    => 'SELECT id FROM {quiz_attempts} '.
-                                  'WHERE quiz=\'#EVENTID#\' AND userid=\'#USERID#\'',
-                'finished'     => 'SELECT id FROM {quiz_attempts} '.
-                                  'WHERE quiz=\'#EVENTID#\' AND userid=\'#USERID#\' '.
-                                  'AND timefinish!=\'0\'',
-                'graded'       => 'SELECT id FROM {quiz_grades} '.
-                                  'WHERE quiz=\'#EVENTID#\' AND userid=\'#USERID#\''
+                'attempted'    => "SELECT id
+                                     FROM {quiz_attempts}
+                                    WHERE quiz = :eventid
+                                      AND userid = :userid",
+                'finished'     => "SELECT id
+                                     FROM {quiz_attempts}
+                                    WHERE quiz = :eventid
+                                      AND userid = :userid
+                                      AND timefinish <> 0",
+                'graded'       => "SELECT id
+                                     FROM {quiz_grades}
+                                    WHERE quiz = :eventid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'finished'
         ),
         'scorm' => array(
             'actions'=>array(
-                'attempted'    => 'SELECT id FROM {scorm_scoes_track} '.
-                                  'WHERE scormid=\'#EVENTID#\' AND userid=\'#USERID#\'',
-                'completed'    => 'SELECT id FROM {scorm_scoes_track} '.
-                                  'WHERE scormid=\'#EVENTID#\' AND userid=\'#USERID#\' '.
-                                  'AND element=\'cmi.core.lesson_status\' AND value=\'completed\'',
-                'passed'       => 'SELECT id FROM {scorm_scoes_track} '.
-                                  'WHERE scormid=\'#EVENTID#\' AND userid=\'#USERID#\' '.
-                                  'AND element=\'cmi.core.lesson_status\' AND value=\'passed\''
+                'attempted'    => "SELECT id
+                                     FROM {scorm_scoes_track}
+                                    WHERE scormid = :eventid
+                                      AND userid = :userid",
+                'completed'    => "SELECT id
+                                     FROM {scorm_scoes_track}
+                                    WHERE scormid = :eventid
+                                      AND userid = :userid
+                                      AND element = 'cmi.core.lesson_status'
+                                      AND value = 'completed'",
+                'passed'       => "SELECT id
+                                     FROM {scorm_scoes_track}
+                                    WHERE scormid = :eventid
+                                      AND userid = :userid
+                                      AND element = 'cmi.core.lesson_status'
+                                      AND value = 'passed'"
             ),
             'defaultAction' => 'attempted'
         ),
         'url' => array(
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'url\' '.
-                                  'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'url'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
         'wiki' => array(
             'actions'=>array(
-                'viewed'       => 'SELECT id FROM {log} '.
-                                  'WHERE course=\'#COURSEID#\' AND module=\'wiki\' '.
-                                  'AND action=\'view\' AND cmid=\'#CMID#\' AND userid=\'#USERID#\''
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'wiki'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         )
@@ -268,7 +354,7 @@ function modules_in_use() {
     $modules = get_monitorable_modules();
     $modulesinuse = array();
 
-    foreach ($modules as $module=>$details) {
+    foreach ($modules as $module => $details) {
         if (
             $dbmanager->table_exists($module) &&
             $DB->record_exists($module, array('course'=>$COURSE->id))
@@ -293,7 +379,7 @@ function event_information($config, $modules) {
     $numevents = 0;
 
     // Check each know module (described in lib.php
-    foreach ($modules as $module=>$details) {
+    foreach ($modules as $module => $details) {
         $fields = 'id, name';
         if (array_key_exists('defaultTime', $details)) {
             $fields .= ', '.$details['defaultTime'].' as due';
@@ -349,11 +435,11 @@ function event_information($config, $modules) {
 /**
  * Checked if a user has attempted/viewed/etc. an activity/resource
  *
- * @param string $type The plugin type name, eg forum
- * @param int    $id   The id of the instance of the plugin
- * @param int    $cmid The course module id for the instance
- * @param int    $user The user's id
- * @return bool
+ * @param array    $modules The modules used in the course
+ * @param stdClass $config  The blocks configuration settings
+ * @param array    $events  The possible events that can occur for modules
+ * @param int      $userid  The user's id
+ * @return array   an describing the user's attempts based on module+instance identifiers
  */
 function get_attempts($modules, $config, $events, $userid, $instance) {
     global $COURSE, $DB;
@@ -361,42 +447,55 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
 
     foreach ($events as $event) {
         $module = $modules[$event['type']];
+        $uniqueid = $event['type'].$event['id'];
 
         // If activity completion is used, check completions table
-        if (isset($config->{'action_'.$event['type'].$event['id']}) &&
-            $config->{'action_'.$event['type'].$event['id']}=='activity_completion'
+        if (isset($config->{'action_'.$uniqueid}) &&
+            $config->{'action_'.$uniqueid}=='activity_completion'
         ) {
             $query = 'SELECT id
                         FROM {course_modules_completion}
-                       WHERE userid='.$userid.'
-                         AND coursemoduleid='.$event['cmid'];
+                       WHERE userid = :userid
+                         AND coursemoduleid = :cmid';
         }
 
-        // Determine the set action and develope a query
+        // Determine the set action and develop a query
         else {
-            $action = isset($config->{'action_'.$event['type'].$event['id']})?
-                      $config->{'action_'.$event['type'].$event['id']}:
+            $action = isset($config->{'action_'.$uniqueid})?
+                      $config->{'action_'.$uniqueid}:
                       $details['defaultAction'];
-            $targetstrings = array('#COURSEID#', '#USERID#', '#EVENTID#', '#CMID#');
-            $replacements = array($COURSE->id, $userid, $event['id'], $event['cmid']);
-            $query = str_replace($targetstrings, $replacements, $module['actions'][$action]);
+            $query =  $module['actions'][$action];
         }
+        $parameters = array('courseid' => $COURSE->id, 'userid' => $userid,
+                            'eventid' => $event['id'], 'cmid' => $event['cmid']);
 
          // Check if the user has attempted the module
-        $attempts[$event['type'].$event['id']] =
-            $DB->record_exists_sql($query)?true:false;
+        $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters)?true:false;
     }
     return $attempts;
 }
 
+/**
+ * Draws a progress bar
+ *
+ * @param array    $modules  The modules used in the course
+ * @param stdClass $config   The blocks configuration settings
+ * @param array    $events   The possible events that can occur for modules
+ * @param int      $userid   The user's id
+ * @param int      instance  The block instance (incase more than one is being displayed)
+ * @param int      $attempts The user's attempts on course activities
+ * @param bool     $simple   Controls whether instructions are shown below a progress bar
+ */
 function progress_bar($modules, $config, $events, $userid, $instance, $attempts, $simple = false) {
     global $OUTPUT, $CFG;
 
     $now = time();
     $numevents = count($events);
     $dateformat = get_string('date_format', 'block_progress');
-
-    $content = '<table class="progressBarProgressTable" cellpadding="0" cellspacing="0">';
+    $tableoptions = array('class' => 'progressBarProgressTable',
+                          'cellpadding' => '0',
+                          'cellspacing' => '0');
+    $content = HTML_WRITER::start_tag('table', $tableoptions);
 
     // Place now arrow
     if ($config->displayNow==1 && !$simple) {
@@ -407,76 +506,83 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
             $nowpos++;
         }
 
-        $content .= '<tr>';
-
+        $content .= HTML_WRITER::start_tag('tr');
         $nowstring = get_string('now_indicator', 'block_progress');
         if ($nowpos<$numevents/2) {
             for ($i=0; $i<$nowpos; $i++) {
-                $content .= '<td class="progressBarHeader">&nbsp;</td>';
+                $content .= HTML_WRITER::tag('td', '&nbsp;', array('class' => 'progressBarHeader'));
             }
-            $content .= '<td colspan="'.($numevents-$nowpos).
-                '" style="text-align:left;" class="progressBarHeader">';
+            $celloptions = array('colspan' => $numevents-$nowpos,
+                                 'class' => 'progressBarHeader',
+                                 'style' => 'text-align:left;');
+            $content .= HTML_WRITER::start_tag('td', $celloptions);
             $content .= $OUTPUT->pix_icon('left', $nowstring, 'block_progress');
-            $content .= $nowstring.'</td>';
+            $content .= $nowstring;
+            $content .= HTML_WRITER::end_tag('td');
         }
         else {
-            $content .= '<td colspan='.($nowpos).' '.
-                                    'style="text-align:right;" class="progressBarHeader">';
+            $celloptions = array('colspan' => $nowpos,
+                                 'class' => 'progressBarHeader',
+                                 'style' => 'text-align:right;');
+            $content .= HTML_WRITER::start_tag('td', $celloptions);
             $content .= $nowstring;
             $content .= $OUTPUT->pix_icon('right', $nowstring, 'block_progress');
-            $content .= '</td>';
+            $content .= HTML_WRITER::end_tag('td');
             for ($i=$nowpos; $i<$numevents; $i++) {
-                $content .= '<td class="progressBarHeader">&nbsp;</td>';
+                $content .= HTML_WRITER::tag('td', '&nbsp;', array('class' => 'progressBarHeader'));
             }
         }
-        $content .= '</tr>';
+        $content .= HTML_WRITER::end_tag('tr');
     }
 
     // Start progress bar
     $width = 100/$numevents;
-    $content .= '<tr>';
+    $content .= HTML_WRITER::start_tag('tr');
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
 
-	// A block in the progress bar
-        $content .= '<td class="progressBarCell" width="'.$width.'%"';
-        $content .= ' onclick="document.location=\''.$CFG->wwwroot.'/mod/';
-        $content .= $event['type'].'/view.php?'.'id='.$event['cmid'].'\';"';
-        $content .= ' onmouseover="M.block_progress.showInfo(\''.$event['type'].'\', \'';
-        $content .= get_string($event['type'], 'block_progress').'\', \'';
-        $content .= $event['cmid'].'\', \''.addSlashes($event['name']).'\', \'';
-        $content .= get_string($config->{'action_'.$event['type'].$event['id']}, 'block_progress');
-        $content .= '\', \'';
-        $content .= userdate($event['expected'], $dateformat, $CFG->timezone);
-        $content .= '\', \'';
-        $content .= $instance.'\', \''.$userid.'\', \''.($attempted?'tick':'cross').'\');"';
-        $content .= ' style="background-color:';
+        // A cell in the progress bar
+        $celloptions = array(
+            'class' => 'progressBarCell',
+            'width' => $width.'%',
+            'onclick' => 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].
+                '/view.php?id='.$event['cmid'].'\';',
+            'onmouseover' => 'M.block_progress.showInfo(\''.$event['type'].'\', \''.
+                get_string($event['type'], 'block_progress').'\', \''.$event['cmid'].'\', \''.
+                addslashes($event['name']).'\', \''.
+                get_string($config->{'action_'.$event['type'].$event['id']}, 'block_progress').
+                '\', \''.userdate($event['expected'], $dateformat, $CFG->timezone).'\', \''.
+                $instance.'\', \''.$userid.'\', \''.($attempted?'tick':'cross').'\');',
+             'style' => 'background-color:');
         if ($attempted) {
-            $content.= get_string('attempted_colour', 'block_progress').'" />';
-            $content.= $OUTPUT->pix_icon(
-                           isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
-                           'tick' : 'blank', '', 'block_progress');
+            $celloptions['style'] .= get_string('attempted_colour', 'block_progress').';';
+            $cellcontent = $OUTPUT->pix_icon(
+                               isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
+                               'tick' : 'blank', '', 'block_progress');
         }
         else if ($event['expected'] < $now) {
-            $content .= get_string('notAttempted_colour', 'block_progress').'" />';
-            $content .= $OUTPUT->pix_icon(
-                            isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
-                            'cross':'blank', '', 'block_progress');
+            $celloptions['style'] .= get_string('notAttempted_colour', 'block_progress').';';
+            $cellcontent = $OUTPUT->pix_icon(
+                               isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
+                               'cross':'blank', '', 'block_progress');
         }
         else {
-            $content .= get_string('futureNotAttempted_colour', 'block_progress').'" />';
-            $content .= $OUTPUT->pix_icon('blank', '', 'block_progress');
+            $celloptions['style'] .= get_string('futureNotAttempted_colour', 'block_progress').';';
+            $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
-        $content .= '</a></td>';
+        $content .= HTML_WRITER::tag('td', $cellcontent, $celloptions);
     }
-    $content .= '</tr></table>';
+    $content .= HTML_WRITER::end_tag('tr');
+    $content .= HTML_WRITER::end_tag('table');
 
     // Add the info box below the table
-    $content .= '<div class="progressEventInfo" id="progressBarInfo'.$instance.'user'.$userid.'">';
+    $divoptions = array('class' => 'progressEventInfo',
+                        'id'=>'progressBarInfo'.$instance.'user'.$userid);
+    $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
         $content .= get_string('mouse_over_prompt', 'block_progress');
     }
-    $content .= '</div>';
+    $content .= HTML_WRITER::end_tag('div');
 
     return $content;
 }

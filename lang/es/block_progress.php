@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 
 /**
  * Progress Bar block English language translation
@@ -123,7 +121,7 @@ $string['what_actions_can_be_monitored_help'] = '
 
 // Other terms
 $string['date_format'] = '%a %d %b, %I:%M %p';
-$string['mouse_over_prompt'] = 'para informaci&oacute;n sobreponer cursor' ;
+$string['mouse_over_prompt'] = 'para informaci&oacute;n sobreponer cursor';
 $string['no_events_config_message'] = 'No hay actividades ni los recursos para monitorear en la barra de progreso. Cree algunas actividades y / o recursos a continuaci&oacute;n, configure este bloque.';
 $string['no_events_message'] = 'No hay eventos para seguir el progreso. Use config para agregar eventos.';
 $string['no_visible_events_message'] = 'Ninguno de los eventos seleccionados son visibles en este momento.';
@@ -141,3 +139,6 @@ $string['lastonline'] = 'Last online';
 $string['overview'] = 'Overview of students';
 $string['progress'] = 'Progress';
 $string['progressbar'] = 'Progress Bar';
+
+// For cabailities
+$string['progress:viewoverview'] = 'View course overview of Progress bars for all students';

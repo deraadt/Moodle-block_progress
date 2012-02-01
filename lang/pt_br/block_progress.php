@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -130,3 +129,6 @@ $string['lastonline'] = 'Last online';
 $string['overview'] = 'Overview of students';
 $string['progress'] = 'Progress';
 $string['progressbar'] = 'Progress Bar';
+
+// For cabailities
+$string['progress:viewoverview'] = 'View course overview of Progress bars for all students';

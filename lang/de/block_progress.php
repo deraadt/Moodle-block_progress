@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 
 /**
  * Progress Bar block German language translation
@@ -142,3 +140,6 @@ $string['lastonline'] = 'Zuletzt online';
 $string['overview'] = 'Teilnehmer&uuml;berblick';
 $string['progress'] = 'Fortschritt';
 $string['progressbar'] = 'Fortschrittsbalken';
+
+// For cabailities
+$string['progress:viewoverview'] = 'View course overview of Progress bars for all students';

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -46,7 +45,7 @@ $PAGE->set_course($course);
 $PAGE->requires->css('/blocks/progress/styles.css');
 $PAGE->set_url('/blocks/progress/overview.php', array('id'=>$id, 'courseid'=>$courseid));
 $PAGE->set_context($context);
-$title = get_string('overview','block_progress');
+$title = get_string('overview', 'block_progress');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 $PAGE->navbar->add($title);
@@ -125,7 +124,7 @@ $table->no_sorting('progressbar');
 $table->define_baseurl($PAGE->url);
 $table->setup();
 
-// Build table of submissions as they are marked
+// Build table of progress bars as they are marked
 for ($i=0; $i<$numberofusers; $i++) {
     $picture = $OUTPUT->user_picture($users[$i], array('course'=>$course->id));
     $name = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$users[$i]->id.'&course='.
@@ -209,9 +208,15 @@ function compare_rows ($a, $b) {
 
         // Compensate for presented vs actual
         switch ($aspect) {
-            case 'name':       $aspect='lastname';       break;
-            case 'lastonline': $aspect='lastonlinetime'; break;
-            case 'progress':   $aspect='progressvalue';  break;
+            case 'name':
+                $aspect='lastname';
+                break;
+            case 'lastonline':
+                $aspect='lastonlinetime';
+                break;
+            case 'progress':
+                $aspect='progressvalue';
+                break;
         }
 
         // Check of order can be established
