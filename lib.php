@@ -199,7 +199,7 @@ function get_monitorable_modules() {
             'actions'=>array(
                 'viewed'       => "SELECT id
                                      FROM {log}
-                                  'WHERE course = :courseid
+                                   WHERE course = :courseid
                                      AND module = 'glossary'
                                      AND action = 'view'
                                      AND cmid = :cmid
