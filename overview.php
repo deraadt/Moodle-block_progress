@@ -62,7 +62,7 @@ $config = unserialize(base64_decode($block->configdata));
 // Start page output
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title, 2);
-echo '<div class="block_progress">';
+echo HTML_WRITER::start_tag('div', array('class' => 'block_progress'));
 
 // Get the modules to check progress on
 $modules = modules_in_use();
@@ -160,18 +160,20 @@ for ($i=0; $i<$numberofusers; $i++) {
     );
 }
 
-// Sort the table rows
+// Build the table content and output
 if (!$sort = $table->get_sql_sort()) {
      $sort = 'name DESC';
 }
-usort($rows, 'compare_rows');
+if ($numberofusers > 0) {
+    usort($rows, 'compare_rows');
 
-foreach ($rows as $row) {
-    $table->add_data(array($row['picture'], $row['name'], $row['lastonline'],
-        $row['progressbar'], $row['progress']));
+    foreach ($rows as $row) {
+        $table->add_data(array($row['picture'], $row['name'], $row['lastonline'],
+            $row['progressbar'], $row['progress']));
+    }
 }
 $table->print_html();
-echo '</div>';
+echo HTML_WRITER::end_tag('div');
 
 // Organise access to JS
 $jsmodule = array(
