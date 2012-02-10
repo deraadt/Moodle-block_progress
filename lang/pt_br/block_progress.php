@@ -131,4 +131,4 @@ $string['progress'] = 'Progress';
 $string['progressbar'] = 'Progress Bar';
 
 // For cabailities
-$string['progress:viewoverview'] = 'View course overview of Progress bars for all students';
+$string['progress:overview'] = 'View course overview of Progress bars for all students';

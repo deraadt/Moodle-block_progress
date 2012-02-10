@@ -53,7 +53,7 @@ $PAGE->set_pagelayout('standard');
 
 // Check user is logged in and capable of grading
 require_login($courseid, false);
-require_capability('block/progress:viewoverview', $context);
+require_capability('block/progress:overview', $context);
 
 // Get specific block config
 $block = $DB->get_record('block_instances', array('id' => $id));

@@ -132,7 +132,7 @@ class block_progress extends block_base {
         $this->page->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 
         // Allow teachers to access the overview page
-        if (has_capability('block/progress:viewoverview', $this->context)) {
+        if (has_capability('block/progress:overview', $this->context)) {
             $parameters = array('id' => $this->instance->id, 'courseid' => $COURSE->id);
             $url = new moodle_url('/blocks/progress/overview.php', $parameters);
             $label = get_string('overview', 'block_progress');

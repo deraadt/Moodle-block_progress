@@ -25,23 +25,16 @@
 
 defined('MOODLE_INTERNAL') or die("Direct access to this location is not allowed.");
 
-// Only define the capability if it doesn't already exist
-if (!defined('BLOCK_PROGRESS_VIEW_OVERVIEW')) {
-    define('BLOCK_PROGRESS_VIEW_OVERVIEW', 'block/progress:viewoverview');
-}
-
 $capabilities = array (
-    BLOCK_PROGRESS_VIEW_OVERVIEW => array (
+    'block/progress:overview' => array (
         'riskbitmask'   => RISK_PERSONAL,
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_COURSE,
-        'legecy'        => array (
-            'guest'             => CAP_PROHIBIT,
-            'student'           => CAP_PREVENT,
+        'archetypes'    => array (
             'teacher'           => CAP_ALLOW,
             'editingteacher'    => CAP_ALLOW,
-            'coursecreator'     => CAP_INHERIT,
-            'admin'             => CAP_ALLOW
+            'manager'           => CAP_ALLOW,
+            'coursecreator'     => CAP_ALLOW
         )
     )
 );
