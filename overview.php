@@ -52,7 +52,7 @@ $PAGE->navbar->add($title);
 $PAGE->set_pagelayout('standard');
 
 // Check user is logged in and capable of grading
-require_login($courseid, false);
+require_login($course, false);
 require_capability('block/progress:overview', $context);
 
 // Get specific block config

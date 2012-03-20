@@ -61,6 +61,8 @@
  * @return array
  */
 function get_monitorable_modules() {
+    global $DB;
+
     return array(
         'assignment' => array(
             'defaultTime'=>'timedue',
@@ -71,8 +73,8 @@ function get_monitorable_modules() {
                                       AND userid = :userid
                                       AND (
                                           numfiles = 1
-                                          OR data2 = 'submitted'
-                                          OR data2 = 1
+                                          OR {$DB->sql_compare_text('data2')} = 'submitted'
+                                          OR {$DB->sql_compare_text('data2')} = '1'
                                           OR grade <> -1
                                       )",
                 'marked'       => "SELECT id
@@ -295,13 +297,13 @@ function get_monitorable_modules() {
                                     WHERE scormid = :eventid
                                       AND userid = :userid
                                       AND element = 'cmi.core.lesson_status'
-                                      AND value = 'completed'",
+                                      AND {$DB->sql_compare_text('value')} = 'completed'",
                 'passed'       => "SELECT id
                                      FROM {scorm_scoes_track}
                                     WHERE scormid = :eventid
                                       AND userid = :userid
                                       AND element = 'cmi.core.lesson_status'
-                                      AND value = 'passed'"
+                                      AND {$DB->sql_compare_text('value')} = 'passed'"
             ),
             'defaultAction' => 'attempted'
         ),
