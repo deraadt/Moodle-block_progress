@@ -72,10 +72,8 @@ function get_monitorable_modules() {
                                     WHERE assignment = :eventid
                                       AND userid = :userid
                                       AND (
-                                          numfiles = 1
-                                          OR {$DB->sql_compare_text('data2')} = 'submitted'
-                                          OR {$DB->sql_compare_text('data2')} = '1'
-                                          OR grade <> -1
+                                          numfiles >= 1
+                                          OR {$DB->sql_compare_text('data2')} <> ''
                                       )",
                 'marked'       => "SELECT id
                                      FROM {assignment_submissions}
