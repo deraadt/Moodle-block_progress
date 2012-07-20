@@ -94,18 +94,34 @@ class block_progress extends block_base {
         // Check if any activities/resources have been created
         $modules = modules_in_use();
         if (empty($modules)) {
-            $this->content->text .= get_string('no_events_config_message', 'block_progress');
+            if (has_capability('moodle/block:edit', $this->context)) {
+                $this->content->text .= get_string('no_events_config_message', 'block_progress');
+            }
             return $this->content;
         }
 
         // Check if activities/resources have been selected in config
         $events = event_information($this->config, $modules);
-        if ($events==null) {
-            $this->content->text .= get_string('no_events_message', 'block_progress');
+        if ($events===null || $events===0) {
+            if (has_capability('moodle/block:edit', $this->context)) {
+                $this->content->text .= get_string('no_events_message', 'block_progress');
+                $parameters = array('id'=>$COURSE->id, 'sesskey'=>sesskey(),
+                                    'bui_editid'=>$this->instance->id);
+                $url = new moodle_url('/course/view.php', $parameters);
+                $label = get_string('selectitemstobeadded', 'block_progress');
+                $this->content->text .= $OUTPUT->single_button($url, $label);
+                if ($events===0) {
+                    $url->param('turnallon', '1');
+                    $label = get_string('addallcurrentitems', 'block_progress');
+                    $this->content->text .= $OUTPUT->single_button($url, $label);
+                }
+            }
             return $this->content;
         }
         else if (empty($events)) {
-            $this->content->text .= get_string('no_visible_events_message', 'block_progress');
+            if (has_capability('moodle/block:edit', $this->context)) {
+                $this->content->text .= get_string('no_visible_events_message', 'block_progress');
+            }
             return $this->content;
         }
 
@@ -136,7 +152,6 @@ class block_progress extends block_base {
             $parameters = array('id' => $this->instance->id, 'courseid' => $COURSE->id);
             $url = new moodle_url('/blocks/progress/overview.php', $parameters);
             $label = get_string('overview', 'block_progress');
-            $this->content->text .= $OUTPUT->spacer(array('height'=>5), true);
             $this->content->text .= $OUTPUT->single_button($url, $label);
         }
 

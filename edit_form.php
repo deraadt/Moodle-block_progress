@@ -37,6 +37,7 @@ class block_progress_edit_form extends block_edit_form {
     protected function specific_definition($mform) {
         global $CFG, $COURSE, $DB, $OUTPUT;
         include_once($CFG->dirroot.'/blocks/progress/lib.php');
+        $turnallon = optional_param('turnallon', 0, PARAM_INT);
         $dbmanager = $DB->get_manager(); // loads ddl manager and xmldb classes
         $count = 0;
         $usingweeklyformat = $COURSE->format=='weeks' || $COURSE->format=='weekscss' ||
@@ -45,7 +46,7 @@ class block_progress_edit_form extends block_edit_form {
         // Start block specific section in config form
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
-        // Clock block instance title
+        // Progress block instance title
         $mform->addElement('text', 'config_progressTitle',
                            get_string('config_title', 'block_progress'));
         $mform->setDefault('config_progressTitle',
@@ -68,6 +69,13 @@ class block_progress_edit_form extends block_edit_form {
                            get_string('now_indicator', 'block_progress'));
         $mform->setDefault('config_displayNow', 1);
         $mform->addHelpButton('config_displayNow', 'why_display_now', 'block_progress');
+
+        // Allow progress percentage to be turned on for students
+        $mform->addElement('selectyesno', 'config_showpercentage',
+                           get_string('config_percentage', 'block_progress'));
+        $mform->setDefault('config_showpercentage', 0);
+        $mform->addHelpButton('config_showpercentage', 'why_show_precentage', 'block_progress');
+
         $mform->addElement('header', '', get_string('config_monitored', 'block_progress'));
 
         // Go through each type of activity/resource that can be monitored
@@ -121,7 +129,7 @@ class block_progress_edit_form extends block_edit_form {
                     // Allow monitoring turned on or off
                     $mform->addElement('selectyesno', 'config_monitor_'.$module.$instance->id,
                                        get_string('config_header_monitored', 'block_progress'));
-                    $mform->setDefault('config_monitor_'.$module.$instance->id, 0);
+                    $mform->setDefault('config_monitor_'.$module.$instance->id, $turnallon);
                     $mform->addHelpButton('config_monitor_'.$module.$instance->id,
                                           'what_does_monitored_mean', 'block_progress');
 
@@ -191,7 +199,18 @@ class block_progress_edit_form extends block_edit_form {
                     // Print the action selector for the event
                     $actions = array();
                     foreach ($details['actions'] as $action => $sql) {
-                        $actions[$action] = get_string($action, 'block_progress');
+
+                        // Before allowing pass marks, see that Grade to pass value is set
+                        if ($action == 'passed') {
+                            $params = array('itemmodule'=>$module, 'iteminstance'=>$instance->id);
+                            $gradetopass = $DB->get_record('grade_items', $params, 'gradepass');
+                            if ($gradetopass->gradepass > 0) {
+                                $actions[$action] = get_string($action, 'block_progress');
+                            }
+                        }
+                        else {
+                            $actions[$action] = get_string($action, 'block_progress');
+                        }
                     }
                     if (isset($CFG->enablecompletion) && $CFG->enablecompletion==1) {
                         $cm = get_coursemodule_from_instance($module, $instance->id, $COURSE->id);

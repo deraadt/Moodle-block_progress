@@ -24,6 +24,7 @@
  */
 
 // Module names
+$string['assign'] = 'Assignment';
 $string['assignment'] = 'Assignment';
 $string['book'] = 'Book';
 $string['certificate'] = 'Certificate';

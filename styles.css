@@ -29,6 +29,12 @@
     padding: 0;
 }
 
+.block_progress .progressBarCell .smallicon {
+    width: 85%;
+    height: auto;
+    vertical-align: middle;
+}
+
 .block_progress .progressEventInfo {
     font-size: x-small;
     text-align: left;
@@ -55,4 +61,8 @@
     border:1px dashed #cccccc;
     padding: 5px;
     margin:5px 0 !important;
+}
+
+.block_progress .groupselector {
+    text-align: center;
 }

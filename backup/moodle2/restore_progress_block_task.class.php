@@ -66,10 +66,14 @@ class restore_progress_block_task extends restore_block_task {
                         $newinstance = $newcm->instance;
 
                         // Set new config
-                        $config["monitor_$module$newinstance"]   = $config["monitor_$module$instance"];
-                        $config["locked_$module$newinstance"]    = $config["locked_$module$instance"];
-                        $config["date_time_$module$newinstance"] = $config["date_time_$module$instance"];
-                        $config["action_$module$newinstance"]    = $config["action_$module$instance"];
+                        $config["monitor_$module$newinstance"] =
+                            $config["monitor_$module$instance"];
+                        $config["locked_$module$newinstance"] =
+                            $config["locked_$module$instance"];
+                        $config["date_time_$module$newinstance"] =
+                            $config["date_time_$module$instance"];
+                        $config["action_$module$newinstance"] =
+                            $config["action_$module$instance"];
 
                         // Unset old config
                         unset($config["monitor_$module$instance"]);

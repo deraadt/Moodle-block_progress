@@ -24,6 +24,7 @@
  */
 
 // Module names
+$string['assign'] = 'Assignment';
 $string['assignment'] = 'Assignment';
 $string['book'] = 'Book';
 $string['certificate'] = 'Certificate';
@@ -69,9 +70,10 @@ $string['config_header_icon'] = 'Icon';
 $string['config_header_locked'] = 'Locked to deadline';
 $string['config_header_monitored'] = 'Monitored';
 $string['config_icons'] = 'Use icons in bar';
-$string['config_monitored'] = 'Monitored Activities/Resources';
+$string['config_monitored'] = 'Monitored activities/resources';
 $string['config_now'] = 'Use';
-$string['config_title'] = 'Block Instance Title';
+$string['config_percentage'] = 'Show percentage to students';
+$string['config_title'] = 'Block instance title';
 
 // Help strings
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';
@@ -116,10 +118,17 @@ $string['what_actions_can_be_monitored'] = 'What actions can be monitored?';
 $string['what_actions_can_be_monitored_help'] = '
 <p>Different activities and resources can be monitored.</p>
 <p>Because different activities and resources are used differently, what is monitored for each module varies. For example, for assignments, submission can be monitored; quizzes can be monitored on attempt; forums can be monitored for student postings; choice activities can monitored for answering and viewing resources is monitored.</p>
-<p>Some activities can have more than one activity associated with them. In such cases, you can select the appropriate activity for each instance of that activity.</p>
+<p>For the assignment and quiz modules, the notion of passed relies on a "Grade to pass" being set for the grade item in the Gradebook. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">More help...</a></p>
+';
+$string['why_show_precentage'] = 'Why show a progress percentage to students?';
+$string['why_show_precentage_help'] = '
+<p>It is possible to show an overall percentage of progress to students.</p>
+<p>This is calculated as the number of items complete divided by the total number of items in the bar.</p>
+<p>The progress percentage appears until the student mouses over an item in the bar.</p>
 ';
 
 // Other terms
+$string['addallcurrentitems'] = 'Add all activities/resources';
 $string['date_format'] = '%a %d %b, %I:%M %p';
 $string['mouse_over_prompt'] = 'Mouse over block for info.';
 $string['no_events_config_message'] = 'There are no activities or resources to monitor the progress of. Create some activities and/or resources then configure this block.';
@@ -127,6 +136,7 @@ $string['no_events_message'] = 'No activities or resources are being monitored. 
 $string['no_visible_events_message'] = 'None of the monitored events are currently visible.';
 $string['now_indicator'] = 'NOW';
 $string['pluginname'] = 'Progress Bar';
+$string['selectitemstobeadded'] = 'Select activities/resources';
 $string['time_expected'] = 'Expected';
 
 // Default colours that may have different cultural meanings

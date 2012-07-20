@@ -25,6 +25,7 @@
  */
 
 // Module names
+$string['assign'] = 'Tarefa';
 $string['assignment'] = 'Tarefa';
 $string['book'] = 'Livro';
 $string['chat'] = 'Chat';
@@ -72,6 +73,7 @@ $string['config_header_monitored'] = 'Monitorado';
 $string['config_icons'] = 'Usar ícones';
 $string['config_monitored'] = 'Monitored Activities/Resources';
 $string['config_now'] = 'Usar';
+$string['config_percentage'] = 'Mostrar porcentagem de alunos';
 $string['config_title'] = 'Título desta instância de bloco';
 
 // Help strings
@@ -108,8 +110,15 @@ $string['what_actions_can_be_monitored'] = 'Quais as ações podem ser monitorad
 $string['what_actions_can_be_monitored_help'] = '
 <p>O fato de diferentes atividades e recursos serem utilizados de forma diferente, o que é monitorado para cada módulo varia. Por exemplo, para as Tarefas, a submissão é monitorada; Questionários são monitorados pela tentativa realizada; Fóruns são monitorados para postagens colocadas pelo estudante; a atividade Escolha é monitorada pela seleção de uma alternativa e recursos são monitorados pelo acesso/visualização.</p>
 ';
+$string ['why_show_precentage'] = 'Por que mostrar uma porcentagem de progresso para os alunos?';
+$string ['why_show_precentage_help'] = '
+<p>É possível mostrar uma percentagem global dos progressos realizados para os alunos.</p>
+<p>Este é calculado como o número de itens completar dividido pelo número total de itens na barra.</p>
+<p>O progresso percentual parece até que os mouses dos alunos sobre um item na barra.</p>
+';
 
 // Other terms
+$string['addallcurrentitems'] = 'Adicione todas as atividades/recursos';
 $string['date_format'] = '%a %d %b, %I:%M %p';
 $string['mouse_over_prompt'] = 'Passe com o mouse para obter informações';
 $string['no_events_config_message'] = 'Não existem atividades ou recursos a serem monitorados. Crie primeiro atividades e/ou recursos e retorne depois a este bloco.';
@@ -117,6 +126,7 @@ $string['no_events_message'] = 'Sem eventos a serem monitorados. Use a Configura
 $string['no_visible_events_message'] = 'Nenhum dos eventos selecionados se encontra atualmente visível.';
 $string['now_indicator'] = 'AGORA';
 $string['pluginname'] = 'Barra de Progresso';
+$string['selectitemstobeadded'] = 'Selecione as actividades/recursos';
 $string['time_expected'] = 'Esperado';
 
 // Default colours that may have different cultural meanings

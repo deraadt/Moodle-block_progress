@@ -24,6 +24,7 @@
  */
 
 // Module names
+$string['assign'] = 'Devoir';
 $string['assignment'] = 'Devoir';
 $string['book'] = 'Livre';
 $string['certificate'] = 'Certificat';
@@ -71,6 +72,7 @@ $string['config_header_monitored'] = 'Surveillé';
 $string['config_icons'] = 'Utiliser les icônes de la barre';
 $string['config_monitored'] = 'Activités/Ressources surveillées';
 $string['config_now'] = 'Utiliser';
+$string['config_percentage'] = 'Montrer pourcentage pour les étudiants';
 $string['config_title'] = 'Titre du bloc';
 
 // Help strings
@@ -117,9 +119,17 @@ $string['what_actions_can_be_monitored_help'] = '
 <p>Différentes activités et ressources peuvent être surveillées.</p>
 <p>Du fait que les activités et les ressources fonctionnent différement, ce qui est surveillé varie pour chaque module. Par exemple, pour les devoirs, une soumission est surveillée; pour les questionnaires, des réponses sont attendues; pour les forums, ce sont les posts qui sont surveillés; pour les activités avec des choix, les réponses ou la visulalisation des ressources sont surveillées.</p>
 <p>Certaines activités peuvent avoir plus d\'une activité associée. Dans ce cas, vous pouvez choisir l\'activité appropriée pour chaque instance de l\'activité.</p>
+<p>Pour les modules Devoir et de Questionnaire, la notion de passé repose sur un "Grade de passer" d\'être défini pour l\'élément de qualité dans le bulletin de notes. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">Plus d\'aide...</a></p>
+';
+$string['why_show_precentage'] = 'Pourquoi montrer un pourcentage de progression pour les étudiants?';
+$string['why_show_precentage_help'] = '
+<p>Il est possible de montrer un pourcentage global de progrès pour les étudiants.</p>
+<p>Elle est calculée comme le nombre d\'articles compléter divisé par le nombre total d\'éléments dans la barre.</p>
+<p>Le pourcentage de progression s\'affiche jusqu\'à ce que l\'étudiant souris sur un élément dans la barre.</p>
 ';
 
 // Other terms
+$string['addallcurrentitems'] = 'Ajouter toutes les activités/ressources';
 $string['date_format'] = '%a %d %b, %H:%M';
 $string['mouse_over_prompt'] = 'Placez la souris sur le bloc pour plus d\'info.';
 $string['no_events_config_message'] = 'Il n\'y a aucune activité ou ressource à surveiller. Créez des activités et/ou des ressources et configurer ensuite ce bloc.';
@@ -127,6 +137,7 @@ $string['no_events_message'] = 'Aucun événement à suivre. Ajoutez un événem
 $string['no_visible_events_message'] = 'Aucun événement sélectionné n\'est visible en ce moment.';
 $string['now_indicator'] = 'MAINTENANT';
 $string['pluginname'] = 'Barre de progression';
+$string['selectitemstobeadded'] = 'Choisissez des activités/ressources';
 $string['time_expected'] = 'Attendu le';
 
 // Default colours that may have different cultural meanings

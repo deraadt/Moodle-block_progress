@@ -24,6 +24,7 @@
  */
 
 // Module names
+$string['assign'] = 'Asignaci&oacute;n';
 $string['assignment'] = 'Asignaci&oacute;n';
 $string['book'] = 'Libro';
 $string['certificate'] = 'Certificado';
@@ -71,6 +72,7 @@ $string['config_header_monitored'] = 'Monitorear';
 $string['config_icons'] = '&iacute;conos en uso';
 $string['config_monitored'] = 'Supervisa las actividades/Recursos';
 $string['config_now'] = 'Uso';
+$string['config_percentage'] = 'Mostrar el porcentaje de estudiantes';
 $string['config_title'] = 'Instancia del t&iacute;tulo';
 
 // Help strings
@@ -117,9 +119,17 @@ $string['what_actions_can_be_monitored_help'] = '
 <p>Different activities and resources can be monitored.</p>
 <p>Because different activities and resources are used differently, what is monitored for each module varies. For example, for assignments, submission can be monitored; quizzes can be monitored on attempt; forums can be monitored for student postings; choice activities can monitored for answering and viewing resources is monitored.</p>
 <p>Some activities can have more than one activity associated with them. In such cases, you can select the appropriate activity for each instance of that activity.</p>
+<p>Para los módulos de asignación y de prueba, la noción de pasado se basa en una "Calificación para aprobar" está establecido para el elemento de calificación en el libro de calificaciones. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">More help...</a></p>
+';
+$string['why_show_precentage'] = 'Why show a progress percentage to students?';
+$string['why_show_precentage_help'] = '
+<p>It is possible to show an overall percentage of progress to students.</p>
+<p>This is calculated as the number of items complete divided by the total number of items in the bar.</p>
+<p>The progress percentage appears until the student mouses over an item in the bar.</p>
 ';
 
 // Other terms
+$string['addallcurrentitems'] = 'Añadir todas las actividades y recursos';
 $string['date_format'] = '%a %d %b, %I:%M %p';
 $string['mouse_over_prompt'] = 'para informaci&oacute;n sobreponer cursor';
 $string['no_events_config_message'] = 'No hay actividades ni los recursos para monitorear en la barra de progreso. Cree algunas actividades y / o recursos a continuaci&oacute;n, configure este bloque.';
@@ -127,6 +137,7 @@ $string['no_events_message'] = 'No hay eventos para seguir el progreso. Use conf
 $string['no_visible_events_message'] = 'Ninguno de los eventos seleccionados son visibles en este momento.';
 $string['now_indicator'] = 'AHORA';
 $string['pluginname'] = 'Barra de Progreso';
+$string['selectitemstobeadded'] = 'Seleccione las actividades y recursos';
 $string['time_expected'] = 'Se esperaba para el';
 
 // Default colours that may have different cultural meanings

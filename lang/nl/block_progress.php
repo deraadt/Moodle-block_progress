@@ -24,6 +24,7 @@
  */
 
 // Module names
+$string['assign'] = 'Opdracht';
 $string['assignment'] = 'Opdracht';
 $string['book'] = 'Boek';
 $string['certificate'] = 'Certificaat';
@@ -71,6 +72,7 @@ $string['config_header_monitored'] = 'Gevolgd';
 $string['config_icons'] = 'Gebruik Iconen';
 $string['config_monitored'] = 'Gemonitorde Activiteiten en Bronnen'; /* Aangepast */
 $string['config_now'] = 'Gebruik'; /* Aangepast */
+$string['config_percentage'] = 'Toon percentage aan studenten';
 $string['config_title'] = 'Block Titel';
 
 // Help strings
@@ -106,9 +108,17 @@ $string['what_expected_by_means_help'] = '
 $string['what_actions_can_be_monitored'] = 'Welke lesonderdelen kunnen worden gevolgd?';
 $string['what_actions_can_be_monitored_help'] = '
 <p>Verschillende lesonderdelen kunnen worden gevolgd. Omdat de verschillende activiteiten en bronnen ook verschillende worden gebruikt is hetgeen wordt gevolgd ook verschillend voor elk lesonderdeel. Bijvoorbeeld, voor opdrachten, wordt het insturen gevolgd; testen worden gevolgd op het starten; forums worden gevolgd op forumposts van studenten; keuzes worden gevolgd op het beantwoorden van de vraag en het bekijken van bronnen wordt gevolgd.</p>
+<p>Voor de Opdracht en Test modules, de notie van genomen is gebaseerd op een "Grade door te geven" is vastgelegd voor de kwaliteit item in de cijferlijst. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">Meer hulp...</a></p>
+';
+$string['why_show_precentage'] = 'Waarom tonen een vooruitgang percentage aan studenten?';
+$string['why_show_precentage_help'] = '
+<p>Het is mogelijk om een totale percentage vooruitgang tonen student.</p>
+<p>Dit wordt berekend als het aantal voorwerpen vullen gedeeld door het totale aantal punten in de bar.</p>
+<p>De voortgang percentage wordt weergegeven totdat de student muis over een item in de bar.</p>
 ';
 
 // Other terms
+$string['addallcurrentitems'] = 'Voeg alle lesonderdelen/bronnen';
 $string['date_format'] = '%a %d %b, %I:%M %p';
 $string['mouse_over_prompt'] = 'Laat uw muis over een blok zweven voor informatie.';
 $string['no_events_config_message'] = 'Er zijn geen lesonderdelen aanwezig om te laten zien. Creëer lesonderdelen en configureer daarna dit blok.';
@@ -116,6 +126,7 @@ $string['no_events_message'] = 'Er zijn geen lesonderdelen om te laten zien. Geb
 $string['no_visible_events_message'] = 'Geen van de geselecteerde lesonderdelen zijn zichtbaar.';
 $string['now_indicator'] = 'NU';
 $string['pluginname'] = 'Voortgangs balk';
+$string['selectitemstobeadded'] = 'Selecteer lesonderdelen/bronnen';
 $string['time_expected'] = 'Verwacht';
 
 // Default colours that may have different cultural meanings

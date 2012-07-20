@@ -62,7 +62,13 @@ $config = unserialize(base64_decode($block->configdata));
 // Start page output
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title, 2);
-echo HTML_WRITER::start_tag('div', array('class' => 'block_progress'));
+echo $OUTPUT->container_start('block_progress');
+
+// Output group selector if ther are groups in the course
+if ($groups = groups_get_all_groups($course->id)) {
+    $course->groupmode = 1;
+    groups_print_course_menu($course, $PAGE->url);
+}
 
 // Get the modules to check progress on
 $modules = modules_in_use();
@@ -85,18 +91,30 @@ if (empty($events)) {
     die();
 }
 $numevents = count($events);
+$params = array();
+
+// Apply group restrictions
+$groupwhere = '';
+$groupsfrom = '';
+$groupselected = groups_get_course_group($course);
+if ($groupselected && $groupselected != 0) {
+    $groupsfrom = ', {groups_members} g ';
+    $groupwhere = " AND g.groupid = :groupselected AND g.userid = u.id";
+    $params['groupselected'] = $groupselected;
+}
 
 // Get the list of users enrolled in the course
-$sql = 'SELECT u.id, firstname, lastname, lastaccess, picture, imagealt, email '.
-       'FROM {role_assignments} r, {user} u '.
-       'WHERE r.contextid = '.$context->id.' '.
-       'AND r.userid = u.id';
-$users = array_values($DB->get_records_sql($sql));
+$sql = "SELECT u.id, u.firstname, u.lastname, u.lastaccess, u.picture, u.imagealt, u.email
+         FROM {user} u, {role_assignments} r $groupsfrom
+        WHERE r.contextid = :contextid
+          AND r.userid = u.id $groupwhere";
+$params['contextid'] = $context->id;
+$users = array_values($DB->get_records_sql($sql, $params));
 $numberofusers = count($users);
 
 // Setup submissions table
 $table = new flexible_table('mod-block-progress-overview');
-$tablecolumns = array('picture', 'name', 'lastonline', 'progressbar', 'progress');
+$tablecolumns = array('picture', 'fullname', 'lastonline', 'progressbar', 'progress');
 $table->define_columns($tablecolumns);
 $tableheaders = array(
                   '',
@@ -107,10 +125,6 @@ $tableheaders = array(
                 );
 $table->define_headers($tableheaders);
 $table->sortable(true);
-$table->pageable(false);
-$table->collapsible(false);
-$table->initialbars(true);
-$table->collapsible(true);
 
 $table->set_attribute('class', 'generalbox');
 $table->column_style_all('padding', '5px 10px');
@@ -138,20 +152,14 @@ for ($i=0; $i<$numberofusers; $i++) {
     $attempts = get_attempts($modules, $config, $events, $users[$i]->id, $course->id);
     $progressbar = progress_bar($modules, $config, $events, $users[$i]->id, $course->id, $attempts,
                                 true);
-    $attemptcount = 0;
-    foreach ($events as $event) {
-        if ($attempts[$event['type'].$event['id']]==1) {
-            $attemptcount++;
-        }
-    }
-    $progressvalue = $attemptcount==0?0:$attemptcount/$numevents;
-    $progress = (int)($progressvalue*100).'%';
+    $progressvalue = get_progess_percentage($events, $attempts);
+    $progress = $progressvalue.'%';
 
     $rows[] = array(
         'firstname'=>$users[$i]->firstname,
         'lastname'=>strtoupper($users[$i]->lastname),
         'picture'=>$picture,
-        'name'=>$name,
+        'fullname'=>$name,
         'lastonlinetime'=>$users[$i]->lastaccess,
         'lastonline'=>$lastonline,
         'progressbar'=>$progressbar,
@@ -162,18 +170,19 @@ for ($i=0; $i<$numberofusers; $i++) {
 
 // Build the table content and output
 if (!$sort = $table->get_sql_sort()) {
-     $sort = 'name DESC';
+     $sort = 'lastname DESC';
 }
 if ($numberofusers > 0) {
     usort($rows, 'compare_rows');
 
     foreach ($rows as $row) {
-        $table->add_data(array($row['picture'], $row['name'], $row['lastonline'],
+        $table->add_data(array($row['picture'], $row['fullname'], $row['lastonline'],
             $row['progressbar'], $row['progress']));
     }
 }
+$table->print_initials_bar();
 $table->print_html();
-echo HTML_WRITER::end_tag('div');
+echo $OUTPUT->container_end();
 
 // Organise access to JS
 $jsmodule = array(

@@ -24,6 +24,7 @@
  */
 
 // Modul Namen
+$string['assign'] = 'Aufgabe';
 $string['assignment'] = 'Aufgabe';
 $string['book'] = 'Buch';
 $string['certificate'] = 'Zertifikat';
@@ -72,6 +73,7 @@ $string['config_icons'] = 'Symbole benutzen';
 $string['config_now'] = 'Nutzen';
 $string['config_monitored'] = '&Uuml;berwachte Aktivit&auml;ten/Dateien';
 $string['config_title'] = 'Block Titel';
+$string['config_percentage'] = 'Zeige Prozentsatz an Studenten';
 
 // Help strings
 $string['why_set_the_title'] = 'Warum sollten Sie einen Block Titel vergeben?';
@@ -118,9 +120,17 @@ $string['what_actions_can_be_monitored_help'] = '
 <p>Da diese sehr unterschiedlich sind, ist auch sehr verschieden, was jeweils &uuml;berwacht wird. Bei Aufgaben k&ouml;nnen z.B. die Einreichungen durch Teilnehmer beobachtet werden, Tests werden auf einen Abschluss hin gepr&uuml;ft, bei Foren wird gemeldet ob ein Eintrag get&auml;tigt wurde usw. </p>
 <p>Ãœberwachte Elemente m&uuml;ssen sichtbar sein um im Fortschrittsbalken angezeigt zu werden. Ausblenden einer Aktivit&auml;t oder Quelle versteckt das Ereignis im Fortschrittsbalken.</p>
 <p>Einige Aktivit&auml;ten k&ouml;nnen mehrmals vorkommen. In solchen F&auml;llen k&ouml;nnen Sie die entsprechende T&auml;tigkeit f&uuml;r jede Instanz der betreffenden Aktivit&auml;t ausw&auml;hlen.</p>
+<p>Für die Aufgabe und Test-Module, setzt der Begriff der Weitergabe einer "Grade zu passieren" wird für die Sorte Artikel im Notenbuch gesetzt. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">Mehr hilfe...</a></p>
+';
+$string['why_show_precentage'] = 'Warum zeigen einen fortschritt prozentsatz an Studenten?';
+$string['why_show_precentage_help'] = '
+<p>Es ist möglich, eine allgemeine Prozentsatz der Fortschritt den Studierenden aufzeigen.</p>
+<p>Dies wird als die Anzahl der Elemente abgeschlossen durch die Gesamtzahl von Elementen in der Bar geteilt wird.</p>
+<p>Der Fortschritt Prozentsatz scheint, bis der Schüler die Maus über ein Element in der bar.</p>
 ';
 
 // Other terms
+$string['addallcurrentitems'] = 'Fügen Sie alle Aktivitäten/Dateien';
 $string['date_format'] = '%a %d %b, %I:%M %p';
 $string['mouse_over_prompt'] = 'Mauszeiger &uuml;ber Block bewegen f&uuml;r Info.';
 $string['no_events_config_message'] = 'Es gibt keine Aktivit&auml;ten oder Dateien, um den Fortschritt zu &uuml;berwachen. Erstellen Sie einige Aktivit&auml;ten und / oder Dateien und konfigurieren dann diesen Block.';
@@ -128,6 +138,7 @@ $string['no_events_message'] = 'Keine Veranstaltungen um den Fortschritt zu verf
 $string['no_visible_events_message'] = 'Keine der ausgew&auml;hlten Ereignisse sind derzeit sichtbar.';
 $string['now_indicator'] = 'JETZT';
 $string['pluginname'] = 'Fortschrittsbalken';
+$string['selectitemstobeadded'] = 'Wählen Sie Aktivitäten/Dateien';
 $string['time_expected'] = 'Erwartet';
 
 // Default colours that may have different cultural meanings
@@ -137,7 +148,7 @@ $string['futureNotAttempted_colour'] = '#3366FF';
 
 // Overview page strings
 $string['lastonline'] = 'Zuletzt online';
-$string['overview'] = 'Teilnehmer&uuml;berblick';
+$string['overview'] = 'Teilnehmerü berblick';
 $string['progress'] = 'Fortschritt';
 $string['progressbar'] = 'Fortschrittsbalken';
 

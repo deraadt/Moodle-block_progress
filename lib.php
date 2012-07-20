@@ -64,6 +64,29 @@ function get_monitorable_modules() {
     global $DB;
 
     return array(
+        'assign' => array(
+            'defaultTime'=>'duedate',
+            'actions'=>array(
+                'submitted'    => "SELECT id
+                                     FROM {assign_submission}
+                                    WHERE assignment = :eventid
+                                      AND userid = :userid
+                                      AND status = 'submitted'",
+                'marked'       => "SELECT id
+                                     FROM {assign_grades}
+                                    WHERE assignment = :eventid
+                                      AND userid = :userid
+                                      AND grade > -1",
+                'passed'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND g.rawgrade >= i.gradepass"
+            ),
+            'defaultAction' => 'submitted'
+        ),
         'assignment' => array(
             'defaultTime'=>'timedue',
             'actions'=>array(
@@ -79,7 +102,14 @@ function get_monitorable_modules() {
                                      FROM {assignment_submissions}
                                     WHERE assignment = :eventid
                                       AND userid = :userid
-                                      AND grade <> -1"
+                                      AND grade <> -1",
+                'passed'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assignment'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND g.rawgrade >= i.gradepass"
             ),
             'defaultAction' => 'submitted'
         ),
@@ -280,7 +310,14 @@ function get_monitorable_modules() {
                 'graded'       => "SELECT id
                                      FROM {quiz_grades}
                                     WHERE quiz = :eventid
-                                      AND userid = :userid"
+                                      AND userid = :userid",
+                'passed'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'quiz'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND g.rawgrade >= i.gradepass"
             ),
             'defaultAction' => 'finished'
         ),
@@ -370,15 +407,19 @@ function modules_in_use() {
  *
  * @param stdClass $config  The block instance configuration values
  * @param array    $modules The modules used in the course
- * @return array
+ * @return mixed   returns array of visible events monitored,
+ *                 empty array if none of the events are visible,
+ *                 null if all events are configured to "no" monitoring and
+ *                 0 if events are available but no cofig is set
  */
 function event_information($config, $modules) {
     global $COURSE, $DB;
     $dbmanager = $DB->get_manager(); // used to check if tables exist
     $events = array();
     $numevents = 0;
+    $numeventsconfigured = 0;
 
-    // Check each know module (described in lib.php
+    // Check each known module (described in lib.php)
     foreach ($modules as $module => $details) {
         $fields = 'id, name';
         if (array_key_exists('defaultTime', $details)) {
@@ -390,6 +431,9 @@ function event_information($config, $modules) {
         foreach ($records as $record) {
 
             // Is the module being monitored?
+            if (isset($config->{'monitor_'.$module.$record->id})) {
+                $numeventsconfigured++;
+            }
             if (progress_default_value($config->{'monitor_'.$module.$record->id}, 0)==1) {
                 $numevents++;
 
@@ -422,13 +466,15 @@ function event_information($config, $modules) {
         }
     }
 
+    if ($numeventsconfigured==0) {
+        return 0;
+    }
     if ($numevents==0) {
         return null;
     }
 
     // Sort by first value in each element, which is time due
     sort($events);
-
     return $events;
 }
 
@@ -483,7 +529,7 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
  * @param array    $events   The possible events that can occur for modules
  * @param int      $userid   The user's id
  * @param int      instance  The block instance (incase more than one is being displayed)
- * @param int      $attempts The user's attempts on course activities
+ * @param array    $attempts The user's attempts on course activities
  * @param bool     $simple   Controls whether instructions are shown below a progress bar
  */
 function progress_bar($modules, $config, $events, $userid, $instance, $attempts, $simple = false) {
@@ -580,9 +626,34 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                         'id'=>'progressBarInfo'.$instance.'user'.$userid);
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
+        if ($config->showpercentage==1) {
+            $progress = get_progess_percentage($events, $attempts);
+            $content .= get_string('progress', 'block_progress').': ';
+            $content .= $progress.'%<br />';
+        }
         $content .= get_string('mouse_over_prompt', 'block_progress');
     }
     $content .= HTML_WRITER::end_tag('div');
 
     return $content;
+}
+
+/**
+ * Calculates an overall percentage of progress
+ *
+ * @param array $events   The possible events that can occur for modules
+ * @param array $attempts The user's attempts on course activities
+ */
+function get_progess_percentage($events, $attempts) {
+    $attemptcount = 0;
+
+    foreach ($events as $event) {
+        if ($attempts[$event['type'].$event['id']]==1) {
+            $attemptcount++;
+        }
+    }
+
+    $progressvalue = $attemptcount==0?0:$attemptcount/count($events);
+
+    return (int)($progressvalue*100);
 }
