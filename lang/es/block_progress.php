@@ -73,7 +73,7 @@ $string['config_icons'] = '&iacute;conos en uso';
 $string['config_monitored'] = 'Supervisa las actividades/Recursos';
 $string['config_now'] = 'Uso';
 $string['config_percentage'] = 'Mostrar el porcentaje de estudiantes';
-$string['config_title'] = 'Instancia del t&iacute;tulo';
+$string['config_title'] = 'Título alternativo';
 
 // Help strings
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';

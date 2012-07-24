@@ -50,7 +50,7 @@ class block_progress extends block_base {
      * @return bool
      */
     public function specialization() {
-        if (isset($this->config->progressTitle)) {
+        if (isset($this->config->progressTitle) && trim($this->config->progressTitle)!='') {
             $this->title = format_string($this->config->progressTitle);
         }
     }

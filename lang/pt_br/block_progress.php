@@ -74,7 +74,7 @@ $string['config_icons'] = 'Usar ícones';
 $string['config_monitored'] = 'Monitored Activities/Resources';
 $string['config_now'] = 'Usar';
 $string['config_percentage'] = 'Mostrar porcentagem de alunos';
-$string['config_title'] = 'Título desta instância de bloco';
+$string['config_title'] = 'Título alternativo';
 
 // Help strings
 $string['why_set_the_title'] = 'Por que definir o Título?';

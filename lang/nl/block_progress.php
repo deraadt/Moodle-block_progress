@@ -73,7 +73,7 @@ $string['config_icons'] = 'Gebruik Iconen';
 $string['config_monitored'] = 'Gemonitorde Activiteiten en Bronnen'; /* Aangepast */
 $string['config_now'] = 'Gebruik'; /* Aangepast */
 $string['config_percentage'] = 'Toon percentage aan studenten';
-$string['config_title'] = 'Block Titel';
+$string['config_title'] = 'Alternatieve titel';
 
 // Help strings
 $string['why_set_the_title'] = 'Waarom de Titel wijzigen?';

@@ -72,7 +72,7 @@ $string['config_header_monitored'] = 'モニタリング項目';
 $string['config_icons'] = 'Use icons in bar';
 $string['config_monitored'] = 'Monitored Activities/Resources';
 $string['config_now'] = 'Use';
-$string['config_title'] = 'ブロックのタイトル';
+$string['config_title'] = '代替タイトル';
 
 // Help strings
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';

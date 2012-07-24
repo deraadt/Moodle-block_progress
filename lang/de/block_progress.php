@@ -72,7 +72,7 @@ $string['config_header_monitored'] = '&Uuml;berwacht';
 $string['config_icons'] = 'Symbole benutzen';
 $string['config_now'] = 'Nutzen';
 $string['config_monitored'] = '&Uuml;berwachte Aktivit&auml;ten/Dateien';
-$string['config_title'] = 'Block Titel';
+$string['config_title'] = 'Alternativer Titel';
 $string['config_percentage'] = 'Zeige Prozentsatz an Studenten';
 
 // Help strings

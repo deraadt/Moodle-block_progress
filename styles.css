@@ -31,8 +31,10 @@
 
 .block_progress .progressBarCell .smallicon {
     width: 85%;
+    max-width: 15px;
     height: auto;
-    vertical-align: middle;
+    max-height: 15px;
+    vertical-align: baseline;
 }
 
 .block_progress .progressEventInfo {

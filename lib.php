@@ -629,7 +629,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
         if ($config->showpercentage==1) {
             $progress = get_progess_percentage($events, $attempts);
             $content .= get_string('progress', 'block_progress').': ';
-            $content .= $progress.'%<br />';
+            $content .= $progress.'%'.HTML_WRITER::empty_tag('br');
         }
         $content .= get_string('mouse_over_prompt', 'block_progress');
     }

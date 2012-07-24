@@ -73,7 +73,7 @@ $string['config_icons'] = 'Utiliser les icônes de la barre';
 $string['config_monitored'] = 'Activités/Ressources surveillées';
 $string['config_now'] = 'Utiliser';
 $string['config_percentage'] = 'Montrer pourcentage pour les étudiants';
-$string['config_title'] = 'Titre du bloc';
+$string['config_title'] = 'Autre titre';
 
 // Help strings
 $string['why_set_the_title'] = 'Pourquoi voudriez-vous modifier le titre du bloc?';

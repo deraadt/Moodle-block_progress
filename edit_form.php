@@ -49,8 +49,7 @@ class block_progress_edit_form extends block_edit_form {
         // Progress block instance title
         $mform->addElement('text', 'config_progressTitle',
                            get_string('config_title', 'block_progress'));
-        $mform->setDefault('config_progressTitle',
-                           get_string('config_default_title', 'block_progress'));
+        $mform->setDefault('config_progressTitle', '');
         $mform->setType('config_progressTitle', PARAM_MULTILANG);
         $mform->addHelpButton('config_progressTitle', 'why_set_the_title', 'block_progress');
 
