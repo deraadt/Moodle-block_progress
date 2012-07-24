@@ -68,3 +68,16 @@
 .block_progress .groupselector {
     text-align: center;
 }
+
+.progressoverviewmenus {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.progressoverviewmenus form, .progressoverviewmenus select, .progressoverviewmenus div {
+    display: inline;
+}
+
+.progressoverviewmenus select {
+    margin-left: 2px;
+}

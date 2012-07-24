@@ -105,15 +105,17 @@ class block_progress extends block_base {
         if ($events===null || $events===0) {
             if (has_capability('moodle/block:edit', $this->context)) {
                 $this->content->text .= get_string('no_events_message', 'block_progress');
-                $parameters = array('id'=>$COURSE->id, 'sesskey'=>sesskey(),
-                                    'bui_editid'=>$this->instance->id);
-                $url = new moodle_url('/course/view.php', $parameters);
-                $label = get_string('selectitemstobeadded', 'block_progress');
-                $this->content->text .= $OUTPUT->single_button($url, $label);
-                if ($events===0) {
-                    $url->param('turnallon', '1');
-                    $label = get_string('addallcurrentitems', 'block_progress');
+                if($USER->editing) {
+                    $parameters = array('id'=>$COURSE->id, 'sesskey'=>sesskey(),
+                                        'bui_editid'=>$this->instance->id);
+                    $url = new moodle_url('/course/view.php', $parameters);
+                    $label = get_string('selectitemstobeadded', 'block_progress');
                     $this->content->text .= $OUTPUT->single_button($url, $label);
+                    if ($events===0) {
+                        $url->param('turnallon', '1');
+                        $label = get_string('addallcurrentitems', 'block_progress');
+                        $this->content->text .= $OUTPUT->single_button($url, $label);
+                    }
                 }
             }
             return $this->content;

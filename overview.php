@@ -64,12 +64,6 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($title, 2);
 echo $OUTPUT->container_start('block_progress');
 
-// Output group selector if ther are groups in the course
-if ($groups = groups_get_all_groups($course->id)) {
-    $course->groupmode = 1;
-    groups_print_course_menu($course, $PAGE->url);
-}
-
 // Get the modules to check progress on
 $modules = modules_in_use();
 if (empty($modules)) {
@@ -91,9 +85,48 @@ if (empty($events)) {
     die();
 }
 $numevents = count($events);
-$params = array();
+
+// Determine if a role has been selected
+$sql = "SELECT DISTINCT r.id, r.name
+          FROM {role} r, {role_assignments} a
+         WHERE a.contextid = :contextid
+           AND r.id = a.roleid
+           AND r.shortname = :shortname";
+$params = array('contextid'=>$context->id, 'shortname'=>'student');
+$studentrole = $DB->get_record_sql($sql, $params);
+if($studentrole) {
+    $studentroleid = $studentrole->id;
+}
+else {
+    $studentroleid = 0;
+}
+$roleselected = optional_param('role', $studentroleid, PARAM_INT);
+$rolewhere = $roleselected!=0 ? "AND a.roleid = $roleselected" : '';
+
+// Output group selector if there are groups in the course
+echo $OUTPUT->container_start('progressoverviewmenus');
+if ($groups = groups_get_all_groups($course->id)) {
+    $course->groupmode = 1;
+    groups_print_course_menu($course, $PAGE->url);
+}
+
+// Output the roles menu
+$sql = "SELECT DISTINCT r.id, r.name
+          FROM {role} r, {role_assignments} a
+         WHERE a.contextid = :contextid
+           AND r.id = a.roleid";
+$params = array('contextid'=>$context->id);
+$roles = $DB->get_records_sql($sql, $params);
+$rolestodisplay = array(0=>get_string('allparticipants'));
+foreach ($roles as $role) {
+    $rolestodisplay[$role->id] = $role->name;
+}
+echo '&nbsp;'.get_string('role');
+echo $OUTPUT->single_select($PAGE->url, 'role', $rolestodisplay, $roleselected);
+echo $OUTPUT->container_end();
 
 // Apply group restrictions
+$params = array();
 $groupwhere = '';
 $groupsfrom = '';
 $groupselected = groups_get_course_group($course);
@@ -104,10 +137,12 @@ if ($groupselected && $groupselected != 0) {
 }
 
 // Get the list of users enrolled in the course
-$sql = "SELECT u.id, u.firstname, u.lastname, u.lastaccess, u.picture, u.imagealt, u.email
-         FROM {user} u, {role_assignments} r $groupsfrom
-        WHERE r.contextid = :contextid
-          AND r.userid = u.id $groupwhere";
+$sql = "SELECT DISTINCT u.id, u.firstname, u.lastname, u.lastaccess, u.picture, u.imagealt, u.email
+         FROM {user} u, {role_assignments} a $groupsfrom
+        WHERE a.contextid = :contextid
+          AND a.userid = u.id
+          $rolewhere
+          $groupwhere";
 $params['contextid'] = $context->id;
 $users = array_values($DB->get_records_sql($sql, $params));
 $numberofusers = count($users);
