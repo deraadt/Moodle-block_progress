@@ -203,7 +203,7 @@ class block_progress_edit_form extends block_edit_form {
                         if ($action == 'passed') {
                             $params = array('itemmodule'=>$module, 'iteminstance'=>$instance->id);
                             $gradetopass = $DB->get_record('grade_items', $params, 'gradepass');
-                            if ($gradetopass->gradepass > 0) {
+                            if ($gradetopass && $gradetopass->gradepass > 0) {
                                 $actions[$action] = get_string($action, 'block_progress');
                             }
                         }
