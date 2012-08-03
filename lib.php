@@ -626,7 +626,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                         'id'=>'progressBarInfo'.$instance.'user'.$userid);
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
-        if ($config->showpercentage==1) {
+        if (isset($config->showpercentage) && $config->showpercentage==1) {
             $progress = get_progess_percentage($events, $attempts);
             $content .= get_string('progress', 'block_progress').': ';
             $content .= $progress.'%'.HTML_WRITER::empty_tag('br');

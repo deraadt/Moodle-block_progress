@@ -24,7 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version  = 2012072600;
+$plugin->version  = 2012080300;
 $plugin->requires = 2010112400;
 $plugin->maturity = 200;
 $plugin->release  = 'Version for Moodle 2.x';
