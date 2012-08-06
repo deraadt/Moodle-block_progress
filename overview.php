@@ -138,7 +138,6 @@ if ($groupselected && $groupselected != 0) {
 
 // Get the list of users enrolled in the course
 $picturefields = user_picture::fields('u');
-echo $picturefields;
 $sql = "SELECT DISTINCT $picturefields, u.lastaccess
          FROM {user} u, {role_assignments} a $groupsfrom
         WHERE a.contextid = :contextid
