@@ -70,7 +70,12 @@ class block_progress extends block_base {
      * @return array
      */
     public function applicable_formats() {
-        return array('course-view' => true);
+        return array(
+			'course-view'    => true,
+			'site'           => false,
+			'mod'            => false,
+			'my'             => false
+		);
     }
 
     /**
