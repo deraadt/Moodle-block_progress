@@ -72,11 +72,12 @@ function get_monitorable_modules() {
                                     WHERE assignment = :eventid
                                       AND userid = :userid
                                       AND status = 'submitted'",
-                'marked'       => "SELECT id
-                                     FROM {assign_grades}
-                                    WHERE assignment = :eventid
-                                      AND userid = :userid
-                                      AND grade > -1",
+                'marked'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid",
                 'passed'       => "SELECT g.rawgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'assign'
@@ -98,11 +99,12 @@ function get_monitorable_modules() {
                                           numfiles >= 1
                                           OR {$DB->sql_compare_text('data2')} <> ''
                                       )",
-                'marked'       => "SELECT id
-                                     FROM {assignment_submissions}
-                                    WHERE assignment = :eventid
-                                      AND userid = :userid
-                                      AND grade <> -1",
+                'marked'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assignment'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid",
                 'passed'       => "SELECT g.rawgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'assignment'
@@ -242,11 +244,11 @@ function get_monitorable_modules() {
             'actions'=>array(
                 'attempted'    => "SELECT id
                                     FROM {hotpot_attempts}
-                                   WHERE hotpot = :eventid
+                                   WHERE hotpotid = :eventid
                                      AND userid = :userid",
                 'finished'     => "SELECT id
                                      FROM {hotpot_attempts}
-                                    WHERE hotpot = :eventid
+                                    WHERE hotpotid = :eventid
                                       AND userid = :userid
                                       AND timefinish <> 0",
             ),
@@ -279,7 +281,13 @@ function get_monitorable_modules() {
                 'attempted'    => "SELECT id
                                      FROM {lesson_attempts}
                                     WHERE lessonid = :eventid
-                                      AND userid = :userid"
+                                      AND userid = :userid",                                      
+                'graded'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'lesson'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid"
             ),
             'defaultAction' => 'attempted'
         ),
@@ -307,10 +315,12 @@ function get_monitorable_modules() {
                                     WHERE quiz = :eventid
                                       AND userid = :userid
                                       AND timefinish <> 0",
-                'graded'       => "SELECT id
-                                     FROM {quiz_grades}
-                                    WHERE quiz = :eventid
-                                      AND userid = :userid",
+                'graded'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'quiz'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid",
                 'passed'       => "SELECT g.rawgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'quiz'
@@ -365,7 +375,29 @@ function get_monitorable_modules() {
                                       AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
-        )
+        ),
+        'workshop' => array(
+            'defaultTime'=>'assessmentend',
+            'actions'=>array(
+                'submitted'    => "SELECT id
+                                     FROM {workshop_submissions}
+                                    WHERE workshopid = :eventid
+                                      AND authorid = :userid",
+                'assessed'     => "SELECT s.id
+                                     FROM {workshop_assessments} a, {workshop_submissions} s
+                                    WHERE s.workshopid = :eventid
+                                      AND s.id = a.submissionid
+                                      AND a.reviewerid = :userid
+                                      AND a.grade IS NOT NULL",
+                'graded'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'workshop'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid"
+            ),
+            'defaultAction' => 'submitted'
+        ),
     );
 }
 

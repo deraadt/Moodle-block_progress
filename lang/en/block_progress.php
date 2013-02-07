@@ -46,10 +46,12 @@ $string['resource'] = 'File';
 $string['scorm'] = 'SCORM';
 $string['url'] = 'URL';
 $string['wiki'] = 'Wiki';
+$string['workshop'] = 'Workshop';
 
 // Actions
 $string['activity_completion'] = 'activity completion';
 $string['answered'] = 'answered';
+$string['assessed'] = 'assessed';
 $string['attempted'] = 'attempted';
 $string['awarded'] = 'awarded';
 $string['completed'] = 'completed';
@@ -78,7 +80,7 @@ $string['config_title'] = 'Alternate title';
 // Help strings
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';
 $string['why_set_the_title_help'] = '
-<p>There can be multiple instances of the Progress Bar block. You may use different Progress Bar blocks to monitor different sets of activities or resources. For instnace you could track progress in assignments in one block and quizzes in another. For this reason you can override the default title and set a more appropriate block title for each instance.</p>
+<p>There can be multiple instances of the Progress Bar block. You may use different Progress Bar blocks to monitor different sets of activities or resources. For instance you could track progress in assignments in one block and quizzes in another. For this reason you can override the default title and set a more appropriate block title for each instance.</p>
 ';
 $string['why_use_icons'] = 'Why you might want to use icons?';
 $string['why_use_icons_help'] = '
@@ -87,12 +89,12 @@ $string['why_use_icons_help'] = '
 ';
 $string['why_display_now'] = 'Why you might want to hide/show the NOW indicator?';
 $string['why_display_now_help'] = '
-<p>Not all course are focussed on completion of tasks by specific times. Some courses may have an open-enrollment, allowing students to enrol and complete when they can.</p>
-<p>To use the Progess Bar as a tool in such courses, create "Expected by" dates in the far-future and set the "Use NOW" setting to No.</p>
+<p>Not all course are focussed on completion of tasks by specific times. Some courses may have an open-enrolment, allowing students to enrol and complete when they can.</p>
+<p>To use the Progress Bar as a tool in such courses, create "Expected by" dates in the far-future and set the "Use NOW" setting to No.</p>
 ';
 $string['what_does_monitored_mean'] = 'What monitored means?';
 $string['what_does_monitored_mean_help'] = '
-<p>The purpose of this block is to encourage students to manage their time effectively. Each student can monitor their progress in completing the activies and resources you have created.</p>
+<p>The purpose of this block is to encourage students to manage their time effectively. Each student can monitor their progress in completing the activities and resources you have created.</p>
 <p>On the configuration page you will see a list of all the modules that you have created which can be monitored by the Progress Bar block. Modules will only be monitored and appear as a small square in the progress bar if you select Yes to monitor the module.</p>
 ';
 $string['what_locked_means'] = 'What locked to deadline means?';
@@ -103,8 +105,8 @@ $string['what_locked_means_help'] = '
 ';
 $string['what_expected_by_means'] = 'What expected by means?';
 $string['what_expected_by_means_help'] = '
-<p>The <em>Expected by</em> date-time is when the related activity/resource is expected to be completed (viewed, sumbitted, posted-to, etc...).</p>
-<p>If there is already a deadline associated with an activity, like an assignment deadline, this deadline can be used as the expected time for the event as long as the "Locked to Deadline" checkbox is checked. By unselecting locking an independant expected time can be created, and altering this will not affect the actual deadline of the activity.</p>
+<p>The <em>Expected by</em> date-time is when the related activity/resource is expected to be completed (viewed, submitted, posted-to, etc...).</p>
+<p>If there is already a deadline associated with an activity, like an assignment deadline, this deadline can be used as the expected time for the event as long as the "Locked to Deadline" checkbox is checked. By deselecting locking an independent expected time can be created, and altering this will not affect the actual deadline of the activity.</p>
 <p>When you first visit the configuration page for the Progress Bar, or if you create a new activity/resource and return to the configuration page, a guess will be made about the expected date-time for the activity/resource.
 <ul>
     <li>For an activity with an existing deadline, this deadline will used.</li>
@@ -112,7 +114,7 @@ $string['what_expected_by_means_help'] = '
     <li>For an activity/resource not used in a weekly course format, the end of the current week (just before midnight next Sunday) is used.</li>
 </ul>
 </p>
-<p>Once an expected date-time is set, it is independant of any deadline or other information for that activity/resource.</p>
+<p>Once an expected date-time is set, it is independent of any deadline or other information for that activity/resource.</p>
 ';
 $string['what_actions_can_be_monitored'] = 'What actions can be monitored?';
 $string['what_actions_can_be_monitored_help'] = '

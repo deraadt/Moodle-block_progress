@@ -105,21 +105,26 @@ $rolewhere = $roleselected!=0 ? "AND a.roleid = $roleselected" : '';
 
 // Output group selector if there are groups in the course
 echo $OUTPUT->container_start('progressoverviewmenus');
-if ($groups = groups_get_all_groups($course->id)) {
+$groupuserid = 0;
+if (!has_capability('moodle/site:accessallgroups', $context)) {
+    $groupuserid = $USER->id;
+}
+$groups = groups_get_all_groups($course->id);
+if (!empty($groups)) {
     $course->groupmode = 1;
     groups_print_course_menu($course, $PAGE->url);
 }
 
 // Output the roles menu
-$sql = "SELECT DISTINCT r.id, r.name
+$sql = "SELECT DISTINCT r.id, r.name, r.shortname
           FROM {role} r, {role_assignments} a
          WHERE a.contextid = :contextid
            AND r.id = a.roleid";
 $params = array('contextid'=>$context->id);
-$roles = $DB->get_records_sql($sql, $params);
+$roles = role_fix_names($DB->get_records_sql($sql, $params), $context);
 $rolestodisplay = array(0=>get_string('allparticipants'));
 foreach ($roles as $role) {
-    $rolestodisplay[$role->id] = $role->name;
+    $rolestodisplay[$role->id] = $role->localname;
 }
 echo '&nbsp;'.get_string('role');
 echo $OUTPUT->single_select($PAGE->url, 'role', $rolestodisplay, $roleselected);
