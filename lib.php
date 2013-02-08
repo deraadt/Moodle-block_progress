@@ -281,7 +281,12 @@ function get_monitorable_modules() {
                 'attempted'    => "SELECT id
                                      FROM {lesson_attempts}
                                     WHERE lessonid = :eventid
-                                      AND userid = :userid",                                      
+                                      AND userid = :userid
+                                UNION ALL
+                                   SELECT id
+                                     FROM {lesson_branch}
+                                    WHERE lessonid = :eventid1
+                                      AND userid = :userid1",
                 'graded'       => "SELECT g.rawgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'lesson'
@@ -544,8 +549,11 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
                       $details['defaultAction'];
             $query =  $module['actions'][$action];
         }
-        $parameters = array('courseid' => $COURSE->id, 'userid' => $userid,
-                            'eventid' => $event['id'], 'cmid' => $event['cmid']);
+        $parameters = array('courseid' => $COURSE->id, 'courseid1' => $COURSE->id,
+                            'userid' => $userid, 'userid1' => $userid,
+                            'eventid' => $event['id'], 'eventid1' => $event['id'],
+                            'cmid' => $event['cmid'], 'cmid1' => $event['cmid'],
+                      );
 
          // Check if the user has attempted the module
         $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters)?true:false;
