@@ -539,7 +539,8 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
             $query = 'SELECT id
                         FROM {course_modules_completion}
                        WHERE userid = :userid
-                         AND coursemoduleid = :cmid';
+                         AND coursemoduleid = :cmid
+                         AND completionstate = 1';
         }
 
         // Determine the set action and develop a query
