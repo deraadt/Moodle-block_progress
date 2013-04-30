@@ -685,7 +685,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                                isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
                                'tick' : 'blank', '', 'block_progress');
         }
-        else if ($event['expected'] < $now) {
+        else if (isset($config->orderby) && $config->orderby=='orderbytime' && $event['expected'] < $now) {
             $celloptions['style'] .= get_string('notAttempted_colour', 'block_progress').';';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
