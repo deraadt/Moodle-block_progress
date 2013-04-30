@@ -150,7 +150,8 @@ class block_progress extends block_base {
                 array('time_expected', 'block_progress'),
             ),
         );
-        $displaydate = !isset($this->config->displayNow) || $this->config->displayNow==1;
+        $displaydate = (!isset($this->config->orderby) || $this->config->orderby=='orderbytime') &&
+                       (!isset($this->config->displayNow) || $this->config->displayNow==1);
         $arguments = array($CFG->wwwroot, array_keys($modules), $displaydate);
         $this->page->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 

@@ -76,6 +76,9 @@ $string['config_monitored'] = 'Monitored activities/resources';
 $string['config_now'] = 'Use';
 $string['config_percentage'] = 'Show percentage to students';
 $string['config_title'] = 'Alternate title';
+$string['config_orderby'] = 'Order bar items by';
+$string['config_orderby_due_time'] = '"Expected by" date-time';
+$string['config_orderby_course_order'] = 'Ordering in course';
 
 // Help strings
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';
@@ -127,6 +130,18 @@ $string['why_show_precentage_help'] = '
 <p>It is possible to show an overall percentage of progress to students.</p>
 <p>This is calculated as the number of items complete divided by the total number of items in the bar.</p>
 <p>The progress percentage appears until the student mouses over an item in the bar.</p>
+';
+$string['how_ordering_works'] = 'How ordering works';
+$string['how_ordering_works_help'] = '
+<p>There are two ways items in the Progress Bar can be ordered.</p>
+<ul>
+    <li><em>"Expected by" date-time</em> (default)<br />
+    The due dates or manually set dates of activities/resources are used to order items shown in the Progress Bar.
+    </li>
+    <li><em>Ordering in course</em><br />
+    Activities/resources are presented in the same order as they are on the course page. When this option is used, time-related aspects are disabled.
+    </li>
+</ul>
 ';
 
 // Other terms

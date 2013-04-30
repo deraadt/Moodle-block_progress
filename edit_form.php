@@ -61,6 +61,16 @@ class block_progress_edit_form extends block_edit_form {
         $mform->setDefault('config_progressBarIcons', 0);
         $mform->addHelpButton('config_progressBarIcons', 'why_use_icons', 'block_progress');
 
+        // Control order of items in Progress Bar
+        $orderingoptions = array(
+            'orderbytime'   => get_string('config_orderby_due_time', 'block_progress'),
+            'orderbycourse' => get_string('config_orderby_course_order', 'block_progress'),
+        );
+        $orderbylabel = get_string('config_orderby', 'block_progress');
+        $mform->addElement('select', 'config_orderby', $orderbylabel, $orderingoptions);
+        $mform->setDefault('config_orderby', 'orderbytime');
+        $mform->addHelpButton('config_orderby', 'how_ordering_works', 'block_progress');
+
         // Allow NOW to be turned on or off
         $mform->addElement('selectyesno', 'config_displayNow',
                            get_string('config_now', 'block_progress').'&nbsp;'.
@@ -68,6 +78,7 @@ class block_progress_edit_form extends block_edit_form {
                            get_string('now_indicator', 'block_progress'));
         $mform->setDefault('config_displayNow', 1);
         $mform->addHelpButton('config_displayNow', 'why_display_now', 'block_progress');
+        $mform->disabledif('config_displayNow', 'config_orderby', 'eq', 'orderbycourse');
 
         // Allow progress percentage to be turned on for students
         $mform->addElement('selectyesno', 'config_showpercentage',
@@ -152,6 +163,10 @@ class block_progress_edit_form extends block_edit_form {
                                         'config_locked_'.$module.$instance->id, 'eq', 1);
                     $mform->disabledif ('config_date_time_'.$module.$instance->id,
                                         'config_monitor_'.$module.$instance->id, 'eq', 0);
+                    $mform->disabledif('config_date_time_'.$module.$instance->id,
+                                       'config_orderby', 'eq', 'orderbycourse');
+                    $mform->disabledif('config_locked_'.$module.$instance->id,
+                                       'config_orderby', 'eq', 'orderbycourse');
 
                     // Assume a time/date for a activity/resource
                     $expected = null;

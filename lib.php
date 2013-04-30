@@ -456,6 +456,13 @@ function event_information($config, $modules) {
     $numevents = 0;
     $numeventsconfigured = 0;
 
+    if(isset($config->orderby) && $config->orderby == 'orderbycourse') {
+        $sections = $DB->get_records('course_sections', array('course'=>$COURSE->id), 'section', 'id,sequence');
+        foreach ($sections as $section) {
+            $section->sequence = explode(',', $section->sequence);
+        }
+    }
+
     // Check each known module (described in lib.php)
     foreach ($modules as $module => $details) {
         $fields = 'id, name';
@@ -491,13 +498,18 @@ function event_information($config, $modules) {
 
                 // Check if the module is visible, and if so, keep a record for it
                 if ($coursemodule->visible==1) {
-                    $events[] = array(
+                    $event = array(
                         'expected'=>$expected,
                         'type'=>$module,
                         'id'=>$record->id,
                         'name'=>format_string($record->name),
                         'cmid'=>$coursemodule->id,
                     );
+                    if(isset($config->orderby) && $config->orderby == 'orderbycourse') {
+                        $event['section'] = $coursemodule->section;
+                        $event['position'] = array_search($coursemodule->id, $sections[$coursemodule->section]->sequence);
+                    }
+                    $events[] = $event;
                 }
             }
         }
@@ -511,8 +523,29 @@ function event_information($config, $modules) {
     }
 
     // Sort by first value in each element, which is time due
-    sort($events);
+    if(isset($config->orderby) && $config->orderby == 'orderbycourse') {
+        usort($events, 'compare_events');
+    }
+    else {
+        sort($events);
+    }
     return $events;
+}
+
+/**
+ * Used to compare two activities/resources based on order on course page
+ *
+ * @param array $a array of event information
+ * @param array $b array of event information
+ * @return <0, 0 or >0 depending on order of activities/resources on course page
+ */
+function compare_events($a, $b) {
+    if($a['section'] != $b['section']) {
+        return $a['section'] - $b['section'];
+    }
+    else {
+        return $a['position'] - $b['position'];
+    }
 }
 
 /**
@@ -585,7 +618,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
     $content = HTML_WRITER::start_tag('table', $tableoptions);
 
     // Place now arrow
-    if ($config->displayNow==1 && !$simple) {
+    if ($config->orderby=='orderbytime' && $config->displayNow==1 && !$simple) {
 
         // Find where to put now arrow
         $nowpos = 0;
@@ -634,12 +667,17 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
             'width' => $width.'%',
             'onclick' => 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].
                 '/view.php?id='.$event['cmid'].'\';',
-            'onmouseover' => 'M.block_progress.showInfo(\''.$event['type'].'\', \''.
-                get_string($event['type'], 'block_progress').'\', \''.$event['cmid'].'\', \''.
-                addslashes($event['name']).'\', \''.
-                get_string($config->{'action_'.$event['type'].$event['id']}, 'block_progress').
-                '\', \''.userdate($event['expected'], $dateformat, $CFG->timezone).'\', \''.
-                $instance.'\', \''.$userid.'\', \''.($attempted?'tick':'cross').'\');',
+            'onmouseover' => 'M.block_progress.showInfo('.
+                '\''.$event['type'].'\', '.
+                '\''.get_string($event['type'], 'block_progress').'\', '.
+                '\''.$event['cmid'].'\', '.
+                '\''.addslashes($event['name']).'\', '.
+                '\''.get_string($config->{'action_'.$event['type'].$event['id']}, 'block_progress').'\', '.
+                '\''.userdate($event['expected'], $dateformat, $CFG->timezone).'\', '.
+                '\''.$instance.'\', '.
+                '\''.$userid.'\', '.
+                '\''.($attempted?'tick':'cross').'\''.
+                ');',
              'style' => 'background-color:');
         if ($attempted) {
             $celloptions['style'] .= get_string('attempted_colour', 'block_progress').';';
