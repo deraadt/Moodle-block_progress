@@ -87,7 +87,9 @@ class block_progress_edit_form extends block_edit_form {
         $mform->addHelpButton('config_showpercentage', 'why_show_precentage', 'block_progress');
 
         $mform->addElement('header', 'monitoredheading', get_string('config_monitored', 'block_progress'));
-        $mform->setExpanded('monitoredheading');
+        if (method_exists($mform, 'setExpanded')) {
+            $mform->setExpanded('monitoredheading');
+        }
 
         // Go through each type of activity/resource that can be monitored
         $modules = get_monitorable_modules();
