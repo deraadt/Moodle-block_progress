@@ -618,7 +618,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
     $content = HTML_WRITER::start_tag('table', $tableoptions);
 
     // Place now arrow
-    if ($config->orderby=='orderbytime' && $config->displayNow==1 && !$simple) {
+    if ((!isset($config->orderby) || $config->orderby=='orderbytime') && $config->displayNow==1 && !$simple) {
 
         // Find where to put now arrow
         $nowpos = 0;
@@ -685,7 +685,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                                isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
                                'tick' : 'blank', '', 'block_progress');
         }
-        else if (isset($config->orderby) && $config->orderby=='orderbytime' && $event['expected'] < $now) {
+        else if ((!isset($config->orderby) || $config->orderby=='orderbytime') && $event['expected'] < $now) {
             $celloptions['style'] .= get_string('notAttempted_colour', 'block_progress').';';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
