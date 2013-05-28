@@ -673,7 +673,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                 '\''.$event['cmid'].'\', '.
                 '\''.addslashes($event['name']).'\', '.
                 '\''.get_string($config->{'action_'.$event['type'].$event['id']}, 'block_progress').'\', '.
-                '\''.userdate($event['expected'], $dateformat, $CFG->timezone).'\', '.
+                '\''.str_replace("'","",userdate($event['expected'], $dateformat, $CFG->timezone)).'\', '.
                 '\''.$instance.'\', '.
                 '\''.$userid.'\', '.
                 '\''.($attempted?'tick':'cross').'\''.
