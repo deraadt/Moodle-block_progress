@@ -27,6 +27,7 @@
 $string['assign'] = 'Assignment';
 $string['assignment'] = 'Assignment';
 $string['book'] = 'Book';
+$string['bigbluebuttonbn'] = 'Big Blue Button';
 $string['certificate'] = 'Certificate';
 $string['chat'] = 'Chat';
 $string['choice'] = 'Choice';

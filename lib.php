@@ -115,6 +115,19 @@ function get_monitorable_modules() {
             ),
             'defaultAction' => 'submitted'
         ),
+        'bigbluebuttonbn' => array(
+            'defaultTime'=>'timedue',
+            'actions'=>array(
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'bigbluebuttonbn'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
+            ),
+            'defaultAction' => 'viewed'
+        ),
         'book' => array(
             'actions'=>array(
                 'viewed'       => "SELECT id
@@ -447,7 +460,7 @@ function modules_in_use() {
  * @return mixed   returns array of visible events monitored,
  *                 empty array if none of the events are visible,
  *                 null if all events are configured to "no" monitoring and
- *                 0 if events are available but no cofig is set
+ *                 0 if events are available but no config is set
  */
 function event_information($config, $modules) {
     global $COURSE, $DB;

@@ -236,13 +236,23 @@ class block_progress_edit_form extends block_edit_form {
                                                                          'block_progress');
                         }
                     }
-                    $mform->addElement('select', 'config_action_'.$module.$instance->id,
-                                       get_string('config_header_action', 'block_progress'),
-                                       $actions );
-                    $mform->setDefault('config_action_'.$module.$instance->id,
-                                       $details['defaultAction']);
-                    $mform->disabledif ('config_action_'.$module.$instance->id,
-                                        'config_monitor_'.$module.$instance->id, 'eq', 0);
+                    if (count($actions) == 1) {
+                        $action = array_keys($actions)[0];
+                        $mform->addElement('static', 'config_action_static_'.$module.$instance->id,
+                                           get_string('config_header_action', 'block_progress'),
+                                           get_string($action, 'block_progress'));
+                        $mform->addElement('hidden', 'config_action_'.$module.$instance->id, $action);
+                    }
+                    else {
+                        $mform->addElement('select', 'config_action_'.$module.$instance->id,
+                                           get_string('config_header_action', 'block_progress'),
+                                           $actions );
+                        $mform->setDefault('config_action_'.$module.$instance->id,
+                                           $details['defaultAction']);
+                        $mform->disabledif ('config_action_'.$module.$instance->id,
+                                            'config_monitor_'.$module.$instance->id, 'eq', 0);
+                    }
+                    $mform->setType('config_action_'.$module.$instance->id, PARAM_ALPHA);
                     $mform->addHelpButton('config_action_'.$module.$instance->id,
                                           'what_actions_can_be_monitored', 'block_progress');
 
