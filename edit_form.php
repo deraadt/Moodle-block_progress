@@ -237,7 +237,8 @@ class block_progress_edit_form extends block_edit_form {
                         }
                     }
                     if (count($actions) == 1) {
-                        $action = array_keys($actions)[0];
+                        $actions = array_keys($actions);
+                        $action = $actions[0];
                         $mform->addElement('static', 'config_action_static_'.$module.$instance->id,
                                            get_string('config_header_action', 'block_progress'),
                                            get_string($action, 'block_progress'));
