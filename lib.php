@@ -128,6 +128,18 @@ function get_monitorable_modules() {
             ),
             'defaultAction' => 'viewed'
         ),
+        'recordingsbn' => array(
+            'actions'=>array(
+                'viewed'       => "SELECT id
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'recordingsbn'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
+            ),
+            'defaultAction' => 'viewed'
+        ),
         'book' => array(
             'actions'=>array(
                 'viewed'       => "SELECT id

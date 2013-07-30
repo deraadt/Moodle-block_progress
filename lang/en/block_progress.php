@@ -44,6 +44,7 @@ $string['lesson'] = 'Lesson';
 $string['page'] = 'Page';
 $string['quiz'] = 'Quiz';
 $string['resource'] = 'File';
+$string['recordingsbn'] = 'BBB Recordings';
 $string['scorm'] = 'SCORM';
 $string['url'] = 'URL';
 $string['wiki'] = 'Wiki';
