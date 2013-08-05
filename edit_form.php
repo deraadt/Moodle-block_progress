@@ -253,7 +253,7 @@ class block_progress_edit_form extends block_edit_form {
                         $mform->disabledif ('config_action_'.$module.$instance->id,
                                             'config_monitor_'.$module.$instance->id, 'eq', 0);
                     }
-                    $mform->setType('config_action_'.$module.$instance->id, PARAM_ALPHA);
+                    $mform->setType('config_action_'.$module.$instance->id, PARAM_ALPHANUMEXT);
                     $mform->addHelpButton('config_action_'.$module.$instance->id,
                                           'what_actions_can_be_monitored', 'block_progress');
 

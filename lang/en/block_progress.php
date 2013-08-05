@@ -46,6 +46,7 @@ $string['quiz'] = 'Quiz';
 $string['resource'] = 'File';
 $string['recordingsbn'] = 'BBB Recordings';
 $string['scorm'] = 'SCORM';
+$string['turnitintool'] = 'Turnitin Tool';
 $string['url'] = 'URL';
 $string['wiki'] = 'Wiki';
 $string['workshop'] = 'Workshop';

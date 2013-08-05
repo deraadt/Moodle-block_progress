@@ -382,6 +382,17 @@ function get_monitorable_modules() {
             ),
             'defaultAction' => 'attempted'
         ),
+        'turnitintool' => array(
+            'defaultTime'=>'defaultdtdue',
+            'actions'=>array(
+                'submitted'    => "SELECT id
+                                     FROM {turnitintool_submissions}
+                                    WHERE turnitintoolid = :eventid
+                                      AND userid = :userid
+                                      AND submission_score IS NOT NULL"
+            ),
+            'defaultAction' => 'submitted'
+        ),
         'url' => array(
             'actions'=>array(
                 'viewed'       => "SELECT id
@@ -685,6 +696,9 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
     $content .= HTML_WRITER::start_tag('tr');
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
+        $action = isset($config->{'action_'.$event['type'].$event['id']})?
+                  $config->{'action_'.$event['type'].$event['id']}:
+                  $modules[$event['type']]['defaultAction'];
 
         // A cell in the progress bar
         $celloptions = array(
@@ -697,7 +711,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                 '\''.get_string($event['type'], 'block_progress').'\', '.
                 '\''.$event['cmid'].'\', '.
                 '\''.addslashes($event['name']).'\', '.
-                '\''.get_string($config->{'action_'.$event['type'].$event['id']}, 'block_progress').'\', '.
+                '\''.get_string($action, 'block_progress').'\', '.
                 '\''.userdate($event['expected'], $dateformat, $CFG->timezone).'\', '.
                 '\''.$instance.'\', '.
                 '\''.$userid.'\', '.
