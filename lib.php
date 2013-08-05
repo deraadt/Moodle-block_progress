@@ -616,7 +616,7 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
         else {
             $action = isset($config->{'action_'.$uniqueid})?
                       $config->{'action_'.$uniqueid}:
-                      $details['defaultAction'];
+                      $module['defaultAction'];
             $query =  $module['actions'][$action];
         }
         $parameters = array('courseid' => $COURSE->id, 'courseid1' => $COURSE->id,
