@@ -77,14 +77,15 @@ function get_monitorable_modules() {
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid",
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL",
                 'passed'       => "SELECT g.rawgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND g.rawgrade >= i.gradepass"
+                                      AND g.finalgrade >= i.gradepass"
             ),
             'defaultAction' => 'submitted'
         ),
@@ -104,14 +105,15 @@ function get_monitorable_modules() {
                                     WHERE i.itemmodule = 'assignment'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid",
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL",
                 'passed'       => "SELECT g.rawgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'assignment'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND g.rawgrade >= i.gradepass"
+                                      AND g.finalgrade >= i.gradepass"
             ),
             'defaultAction' => 'submitted'
         ),
@@ -317,7 +319,8 @@ function get_monitorable_modules() {
                                     WHERE i.itemmodule = 'lesson'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid"
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL"
             ),
             'defaultAction' => 'attempted'
         ),
@@ -350,14 +353,15 @@ function get_monitorable_modules() {
                                     WHERE i.itemmodule = 'quiz'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid",
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL",
                 'passed'       => "SELECT g.rawgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'quiz'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND g.rawgrade >= i.gradepass"
+                                      AND g.finalgrade >= i.gradepass"
             ),
             'defaultAction' => 'finished'
         ),
@@ -435,7 +439,8 @@ function get_monitorable_modules() {
                                     WHERE i.itemmodule = 'workshop'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid"
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL"
             ),
             'defaultAction' => 'submitted'
         ),
