@@ -722,21 +722,21 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                 '\''.$userid.'\', '.
                 '\''.($attempted?'tick':'cross').'\''.
                 ');',
-             'style' => 'background-color:');
+        );
         if ($attempted) {
-            $celloptions['style'] .= get_string('attempted_colour', 'block_progress').';';
+            $celloptions['class'] .= ' attempted';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
                                'tick' : 'blank', '', 'block_progress');
         }
         else if ((!isset($config->orderby) || $config->orderby=='orderbytime') && $event['expected'] < $now) {
-            $celloptions['style'] .= get_string('notAttempted_colour', 'block_progress').';';
+            $celloptions['class'] .= ' notAttempted';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
                                'cross':'blank', '', 'block_progress');
         }
         else {
-            $celloptions['style'] .= get_string('futureNotAttempted_colour', 'block_progress').';';
+            $celloptions['class'] .= ' futureNotAttempted';
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
         $content .= HTML_WRITER::tag('td', $cellcontent, $celloptions);
