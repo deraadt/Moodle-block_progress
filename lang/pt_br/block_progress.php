@@ -71,7 +71,7 @@ $string['config_header_icon'] = 'Ícone';
 $string['config_header_locked'] = 'Bloqueio do prazo';
 $string['config_header_monitored'] = 'Monitorado';
 $string['config_icons'] = 'Usar ícones';
-$string['config_monitored'] = 'Monitored Activities/Resources';
+$string['config_monitored'] = 'Atividades/Recursos Monitorados';
 $string['config_now'] = 'Usar';
 $string['config_percentage'] = 'Mostrar porcentagem de alunos';
 $string['config_title'] = 'Título alternativo';
@@ -135,10 +135,10 @@ $string['notAttempted_colour'] = '#FF3300';
 $string['futureNotAttempted_colour'] = '#3366FF';
 
 // Overview page strings
-$string['lastonline'] = 'Last online';
-$string['overview'] = 'Overview of students';
-$string['progress'] = 'Progress';
-$string['progressbar'] = 'Progress Bar';
+$string['lastonline'] = 'Último online';
+$string['overview'] = 'Visão geral dos alunos';
+$string['progress'] = 'Progresso';
+$string['progressbar'] = 'Barra de Progresso';
 
 // For cabailities
-$string['progress:overview'] = 'View course overview of Progress bars for all students';
+$string['progress:overview'] = 'Visão geral do progresso de todos os alunos do curso';
