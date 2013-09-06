@@ -160,7 +160,8 @@ class block_progress extends block_base {
             $parameters = array('id' => $this->instance->id, 'courseid' => $COURSE->id);
             $url = new moodle_url('/blocks/progress/overview.php', $parameters);
             $label = get_string('overview', 'block_progress');
-            $this->content->text .= $OUTPUT->single_button($url, $label);
+            $options = array('class' => 'overviewButton');
+            $this->content->text .= $OUTPUT->single_button($url, $label, 'post', $options);
         }
 
         return $this->content;

@@ -540,11 +540,11 @@ function event_information($config, $modules) {
                 // Check if the module is visible, and if so, keep a record for it
                 if ($coursemodule->visible==1) {
                     $event = array(
-                        'expected'=>$expected,
-                        'type'=>$module,
-                        'id'=>$record->id,
-                        'name'=>format_string($record->name),
-                        'cmid'=>$coursemodule->id,
+                        'expected' => $expected,
+                        'type'     => $module,
+                        'id'       => $record->id,
+                        'name'     => format_string($record->name),
+                        'cmid'     => $coursemodule->id,
                     );
                     if(isset($config->orderby) && $config->orderby == 'orderbycourse') {
                         $event['section'] = $coursemodule->section;
@@ -656,10 +656,11 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
     $tableoptions = array('class' => 'progressBarProgressTable',
                           'cellpadding' => '0',
                           'cellspacing' => '0');
-    $content = HTML_WRITER::start_tag('table', $tableoptions);
 
     // Place now arrow
     if ((!isset($config->orderby) || $config->orderby=='orderbytime') && $config->displayNow==1 && !$simple) {
+
+        $content = HTML_WRITER::start_tag('table', $tableoptions);
 
         // Find where to put now arrow
         $nowpos = 0;
@@ -695,10 +696,15 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
         }
         $content .= HTML_WRITER::end_tag('tr');
     }
+    else {
+        $tableoptions['class'] = 'progressBarProgressTable noNow';
+        $content = HTML_WRITER::start_tag('table', $tableoptions);
+    }
 
     // Start progress bar
     $width = 100/$numevents;
     $content .= HTML_WRITER::start_tag('tr');
+    $counter = 1;
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
         $action = isset($config->{'action_'.$event['type'].$event['id']})?
@@ -708,17 +714,17 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
         // A cell in the progress bar
         $celloptions = array(
             'class' => 'progressBarCell',
+            'id' => '',
             'width' => $width.'%',
             'onclick' => 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].
                 '/view.php?id='.$event['cmid'].'\';',
             'onmouseover' => 'M.block_progress.showInfo('.
                 '\''.$event['type'].'\', '.
-                '\''.get_string($event['type'], 'block_progress').'\', '.
+                '\''.addslashes(get_string($event['type'], 'block_progress')).'\', '.
                 '\''.$event['cmid'].'\', '.
                 '\''.addslashes($event['name']).'\', '.
-                '\''.get_string($action, 'block_progress').'\', '.
-                '\''.addslashes(userdate($event['expected'], $dateformat, $CFG->timezone)).'\', '.
-                '\''.$instance.'\', '.
+                '\''.addslashes(get_string($action, 'block_progress')).'\', '.
+                '\''.addslashes(userdate($event['expected'], $dateformat, $CFG->timezone)).'\', '.                '\''.$instance.'\', '.
                 '\''.$userid.'\', '.
                 '\''.($attempted?'tick':'cross').'\''.
                 ');',
@@ -739,6 +745,13 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
             $celloptions['style'] .= get_string('futureNotAttempted_colour', 'block_progress').';';
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
+        if($counter == 1) {
+            $celloptions['id'] .= 'first';
+        }
+        if($counter == $numevents) {
+            $celloptions['id'] .= 'last';
+        }
+        $counter++;
         $content .= HTML_WRITER::tag('td', $cellcontent, $celloptions);
     }
     $content .= HTML_WRITER::end_tag('tr');

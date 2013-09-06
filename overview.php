@@ -38,7 +38,12 @@ $courseid = required_param('courseid', PARAM_INT);
 
 // Determine course and context
 $course   = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-$context  = get_context_instance(CONTEXT_COURSE, $courseid);
+if(class_exists('context_course')) {
+    $context  = context_course::instance($courseid);
+}
+else {
+    $context  = get_context_instance(CONTEXT_COURSE, $courseid);
+}
 
 // Set up page parameters
 $PAGE->set_course($course);
@@ -68,6 +73,7 @@ echo $OUTPUT->container_start('block_progress');
 $modules = modules_in_use();
 if (empty($modules)) {
     echo get_string('no_events_config_message', 'block_progress');
+    echo $OUTPUT->container_end();
     echo $OUTPUT->footer();
     die();
 }
@@ -76,11 +82,13 @@ if (empty($modules)) {
 $events = event_information($config, $modules);
 if ($events==null) {
     echo get_string('no_events_message', 'block_progress');
+    echo $OUTPUT->container_end();
     echo $OUTPUT->footer();
     die();
 }
 if (empty($events)) {
     echo get_string('no_visible_events_message', 'block_progress');
+    echo $OUTPUT->container_end();
     echo $OUTPUT->footer();
     die();
 }

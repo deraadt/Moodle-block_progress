@@ -160,9 +160,9 @@ $string['selectitemstobeadded'] = 'Select activities/resources';
 $string['time_expected'] = 'Expected';
 
 // Default colours that may have different cultural meanings
-$string['attempted_colour'] = '#33CC00';
-$string['notAttempted_colour'] = '#FF3300';
-$string['futureNotAttempted_colour'] = '#3366FF';
+$string['attempted_colour'] = '#5CD85C';
+$string['notAttempted_colour'] = '#FF5C5C';
+$string['futureNotAttempted_colour'] = '#5C5CFF';
 
 // Overview page strings
 $string['lastonline'] = 'Last online';
