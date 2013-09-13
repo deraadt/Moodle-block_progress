@@ -156,10 +156,10 @@ function get_monitorable_modules() {
         ),
         'certificate' => array(
             'actions'=>array(
-                'awarded'    => "SELECT id
-                                   FROM {certificate_issues}
-                                  WHERE certificateid = :eventid
-                                    AND userid = :userid"
+                'awarded'      => "SELECT id
+                                     FROM {certificate_issues}
+                                    WHERE certificateid = :eventid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'awarded'
         ),
@@ -258,11 +258,11 @@ function get_monitorable_modules() {
             'actions'=>array(
                 'viewed'       => "SELECT id
                                      FROM {log}
-                                   WHERE course = :courseid
-                                     AND module = 'glossary'
-                                     AND action = 'view'
-                                     AND cmid = :cmid
-                                     AND userid = :userid"
+                                    WHERE course = :courseid
+                                      AND module = 'glossary'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
@@ -270,9 +270,9 @@ function get_monitorable_modules() {
             'defaultTime'=>'timeclose',
             'actions'=>array(
                 'attempted'    => "SELECT id
-                                    FROM {hotpot_attempts}
-                                   WHERE hotpotid = :eventid
-                                     AND userid = :userid",
+                                     FROM {hotpot_attempts}
+                                    WHERE hotpotid = :eventid
+                                      AND userid = :userid",
                 'finished'     => "SELECT id
                                      FROM {hotpot_attempts}
                                     WHERE hotpotid = :eventid
@@ -284,12 +284,12 @@ function get_monitorable_modules() {
         'imscp' => array(
             'actions'=>array(
                 'viewed'       => "SELECT id
-                                    FROM {log}
-                                   WHERE course = :courseid
-                                     AND module = 'imscp'
-                                     AND action = 'view'
-                                     AND cmid = :cmid
-                                     AND userid = :userid"
+                                     FROM {log}
+                                    WHERE course = :courseid
+                                      AND module = 'imscp'
+                                      AND action = 'view'
+                                      AND cmid = :cmid
+                                      AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
         ),
@@ -335,6 +335,21 @@ function get_monitorable_modules() {
                                       AND userid = :userid"
             ),
             'defaultAction' => 'viewed'
+        ),
+        'questionnaire' => array(
+            'defaultTime'=>'closedate',
+            'actions'=>array(
+                'attempted'    => "SELECT id
+                                     FROM {questionnaire_attempts}
+                                    WHERE qid = :eventid
+                                      AND userid = :userid",
+                'finished'     => "SELECT id
+                                     FROM {questionnaire_response}
+                                    WHERE complete = 'y'
+                                      AND username = :userid
+                                      AND survey_id = :eventid",
+            ),
+            'defaultAction' => 'finished'
         ),
         'quiz' => array(
             'defaultTime'=>'timeclose',

@@ -42,6 +42,7 @@ $string['imscp'] = 'IMS Content Package';
 $string['journal'] = 'Journal';
 $string['lesson'] = 'Lesson';
 $string['page'] = 'Page';
+$string['questionnaire'] = 'Questionnaire';
 $string['quiz'] = 'Quiz';
 $string['resource'] = 'File';
 $string['recordingsbn'] = 'BBB Recordings';
