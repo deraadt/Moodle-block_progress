@@ -32,23 +32,23 @@
 class restore_progress_block_task extends restore_block_task {
 
     /**
-     * Translates the backed up configuration data for the target course modules
+     * Translates the backed up configuration data for the target course modules.
      *
      * @global type $DB
      */
     public function after_restore() {
         global $DB;
 
-        // Get the blockid
+        // Get the blockid.
         $id = $this->get_blockid();
 
-        //Restored course id
+        // Get restored course id.
         $courseid = $this->get_courseid();
 
         if ($configdata = $DB->get_field('block_instances', 'configdata', array('id' => $id))) {
             $config = (array)unserialize(base64_decode($configdata));
 
-            // Translate the old config information to the target course values
+            // Translate the old config information to the target course values.
             foreach ($config as $key => $value) {
                 $matches = array();
                 preg_match('/monitor_(\D+)(\d+)/', $key, $matches);
@@ -56,16 +56,16 @@ class restore_progress_block_task extends restore_block_task {
                     $module = $matches[1];
                     $instance = $matches[2];
 
-                    // Find a matching module in the target course
+                    // Find a matching module in the target course.
                     if ($cm = get_coursemodule_from_instance($module, $instance)) {
 
-                        // Get new cm and instance
+                        // Get new cm and instance.
                         $newitem = restore_dbops::get_backup_ids_record(
                             $this->get_restoreid(), "course_module", $cm->id);
                         $newcm = get_coursemodule_from_id($module, $newitem->newitemid);
                         $newinstance = $newcm->instance;
 
-                        // Set new config
+                        // Set new config.
                         $config["monitor_$module$newinstance"] =
                             $config["monitor_$module$instance"];
                         $config["locked_$module$newinstance"] =
@@ -75,7 +75,7 @@ class restore_progress_block_task extends restore_block_task {
                         $config["action_$module$newinstance"] =
                             $config["action_$module$instance"];
 
-                        // Unset old config
+                        // Unset old config.
                         unset($config["monitor_$module$instance"]);
                         unset($config["locked_$module$instance"]);
                         unset($config["date_time_$module$instance"]);
@@ -84,7 +84,7 @@ class restore_progress_block_task extends restore_block_task {
                 }
             }
 
-            // Save everything back to DB
+            // Save everything back to DB.
             $configdata = base64_encode(serialize((object)$config));
             $DB->set_field('block_instances', 'configdata', $configdata, array('id' => $id));
         }

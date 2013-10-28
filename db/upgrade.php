@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -46,18 +45,18 @@
 function xmldb_block_progress_upgrade($oldversion, $block) {
     global $DB;
 
-    // Fix bad filtering on posted_to values
-    if($oldversion>=2013073000 && $oldversion<2013080500) {
-        $configs = $DB->get_records('block_instances', array('blockname'=>'progress'));
+    // Fix bad filtering on posted_to values.
+    if ($oldversion >= 2013073000 && $oldversion < 2013080500) {
+        $configs = $DB->get_records('block_instances', array('blockname' => 'progress'));
         foreach ($configs as $blockid => $blockrecord) {
             $config = (array)unserialize(base64_decode($blockrecord->configdata));
             foreach ($config as $key => $value) {
-                if($value == 'postedto') {
+                if ($value == 'postedto') {
                     $config[$key] = 'posted_to';
                 }
             }
             $configdata = base64_encode(serialize((object)$config));
-            $DB->set_field('block_instances', 'configdata', $configdata, array('id'=>$blockid));
+            $DB->set_field('block_instances', 'configdata', $configdata, array('id' => $blockid));
         }
     }
 

@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Module names
+// Module names.
 $string['assign'] = 'Assignment';
 $string['assignment'] = 'Assignment';
 $string['book'] = 'Book';
@@ -52,7 +52,7 @@ $string['url'] = 'URL';
 $string['wiki'] = 'Wiki';
 $string['workshop'] = 'Workshop';
 
-// Actions
+// Actions.
 $string['activity_completion'] = 'activity completion';
 $string['answered'] = 'answered';
 $string['assessed'] = 'assessed';
@@ -68,7 +68,7 @@ $string['responded_to'] = 'responded to';
 $string['submitted'] = 'submitted';
 $string['viewed'] = 'viewed';
 
-// Stings for the Config page
+// Stings for the Config page.
 $string['config_default_title'] = 'Progress Bar';
 $string['config_header_action'] = 'Action';
 $string['config_header_expected'] = 'Expected by';
@@ -84,7 +84,7 @@ $string['config_orderby'] = 'Order bar items by';
 $string['config_orderby_due_time'] = '"Expected by" date-time';
 $string['config_orderby_course_order'] = 'Ordering in course';
 
-// Help strings
+// Help strings.
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';
 $string['why_set_the_title_help'] = '
 <p>There can be multiple instances of the Progress Bar block. You may use different Progress Bar blocks to monitor different sets of activities or resources. For instance you could track progress in assignments in one block and quizzes in another. For this reason you can override the default title and set a more appropriate block title for each instance.</p>
@@ -148,7 +148,7 @@ $string['how_ordering_works_help'] = '
 </ul>
 ';
 
-// Other terms
+// Other terms.
 $string['addallcurrentitems'] = 'Add all activities/resources';
 $string['date_format'] = '%a %d %b, %I:%M %p';
 $string['mouse_over_prompt'] = 'Mouse over block for info.';
@@ -160,17 +160,17 @@ $string['pluginname'] = 'Progress Bar';
 $string['selectitemstobeadded'] = 'Select activities/resources';
 $string['time_expected'] = 'Expected';
 
-// Default colours that may have different cultural meanings
+// Default colours that may have different cultural meanings.
 $string['attempted_colour'] = '#5CD85C';
 $string['notAttempted_colour'] = '#FF5C5C';
 $string['futureNotAttempted_colour'] = '#5C5CFF';
 
-// Overview page strings
+// Overview page strings.
 $string['lastonline'] = 'Last online';
 $string['overview'] = 'Overview of students';
 $string['progress'] = 'Progress';
 $string['progressbar'] = 'Progress Bar';
 
-// For cabailities
+// For cabailities.
 $string['progress:overview'] = 'View course overview of Progress bars for all students';
 $string['progress:addinstance'] = 'Add a new Progress Bar block';

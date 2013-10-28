@@ -45,12 +45,12 @@ class block_progress extends block_base {
     }
 
     /**
-     * Constrols the block title based on instance configuration
+     * Controls the block title based on instance configuration
      *
      * @return bool
      */
     public function specialization() {
-        if (isset($this->config->progressTitle) && trim($this->config->progressTitle)!='') {
+        if (isset($this->config->progressTitle) && trim($this->config->progressTitle) != '') {
             $this->title = format_string($this->config->progressTitle);
         }
     }
@@ -71,11 +71,11 @@ class block_progress extends block_base {
      */
     public function applicable_formats() {
         return array(
-			'course-view'    => true,
-			'site'           => false,
-			'mod'            => false,
-			'my'             => false
-		);
+            'course-view'    => true,
+            'site'           => false,
+            'mod'            => false,
+            'my'             => false
+        );
     }
 
     /**
@@ -84,11 +84,9 @@ class block_progress extends block_base {
      * @return string
      */
     public function get_content() {
+        global $USER, $COURSE, $CFG, $OUTPUT;
 
-        // Access to settings needed
-        global $USER, $COURSE, $CFG, $DB, $OUTPUT;
-
-        // If content has already been generated, don't waste time generating it again
+        // If content has already been generated, don't waste time generating it again.
         if ($this->content !== null) {
             return $this->content;
         }
@@ -96,7 +94,7 @@ class block_progress extends block_base {
         $this->content->text = '';
         $this->content->footer = '';
 
-        // Check if any activities/resources have been created
+        // Check if any activities/resources have been created.
         $modules = modules_in_use();
         if (empty($modules)) {
             if (has_capability('moodle/block:edit', $this->context)) {
@@ -105,18 +103,18 @@ class block_progress extends block_base {
             return $this->content;
         }
 
-        // Check if activities/resources have been selected in config
+        // Check if activities/resources have been selected in config.
         $events = event_information($this->config, $modules);
-        if ($events===null || $events===0) {
+        if ($events === null || $events === 0) {
             if (has_capability('moodle/block:edit', $this->context)) {
                 $this->content->text .= get_string('no_events_message', 'block_progress');
-                if($USER->editing) {
-                    $parameters = array('id'=>$COURSE->id, 'sesskey'=>sesskey(),
-                                        'bui_editid'=>$this->instance->id);
+                if ($USER->editing) {
+                    $parameters = array('id' => $COURSE->id, 'sesskey' => sesskey(),
+                                        'bui_editid' => $this->instance->id);
                     $url = new moodle_url('/course/view.php', $parameters);
                     $label = get_string('selectitemstobeadded', 'block_progress');
                     $this->content->text .= $OUTPUT->single_button($url, $label);
-                    if ($events===0) {
+                    if ($events === 0) {
                         $url->param('turnallon', '1');
                         $label = get_string('addallcurrentitems', 'block_progress');
                         $this->content->text .= $OUTPUT->single_button($url, $label);
@@ -124,24 +122,18 @@ class block_progress extends block_base {
                 }
             }
             return $this->content;
-        }
-        else if (empty($events)) {
+        } else if (empty($events)) {
             if (has_capability('moodle/block:edit', $this->context)) {
                 $this->content->text .= get_string('no_visible_events_message', 'block_progress');
             }
             return $this->content;
         }
 
-        // Display progress bar
-        else {
-            $attempts = get_attempts($modules, $this->config, $events, $USER->id,
-                $this->instance->id);
-            $this->content->text =
-                progress_bar($modules, $this->config, $events, $USER->id,
-                             $this->instance->id, $attempts);
-        }
+        // Display progress bar.
+        $attempts = get_attempts($modules, $this->config, $events, $USER->id, $this->instance->id);
+        $this->content->text = progress_bar($modules, $this->config, $events, $USER->id, $this->instance->id, $attempts);
 
-        // Organise access to JS
+        // Organise access to JS.
         $jsmodule = array(
             'name' => 'block_progress',
             'fullpath' => '/blocks/progress/module.js',
@@ -150,14 +142,14 @@ class block_progress extends block_base {
                 array('time_expected', 'block_progress'),
             ),
         );
-        $displaydate = (!isset($this->config->orderby) || $this->config->orderby=='orderbytime') &&
-                       (!isset($this->config->displayNow) || $this->config->displayNow==1);
+        $displaydate = (!isset($this->config->orderby) || $this->config->orderby == 'orderbytime') &&
+                       (!isset($this->config->displayNow) || $this->config->displayNow == 1);
         $arguments = array($CFG->wwwroot, array_keys($modules), $displaydate);
         $this->page->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 
-        // Allow teachers to access the overview page
+        // Allow teachers to access the overview page.
         if (has_capability('block/progress:overview', $this->context)) {
-            $parameters = array('id' => $this->instance->id, 'courseid' => $COURSE->id);
+            $parameters = array('progressbarid' => $this->instance->id, 'courseid' => $COURSE->id);
             $url = new moodle_url('/blocks/progress/overview.php', $parameters);
             $label = get_string('overview', 'block_progress');
             $options = array('class' => 'overviewButton');

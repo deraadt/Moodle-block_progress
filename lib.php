@@ -18,7 +18,7 @@
  * Progress Bar block common configuration and helper functions
  *
  * Instructions for adding new modules so they can be monitored
- * ================================================================================================
+ * ====================================================================================================================
  * Activies that can be monitored (all resources are treated together) are defined in the $MODULES
  * array.
  *
@@ -47,7 +47,7 @@
  *
  * If you have added a new module to this array and think other's may benefit from the query you
  * have created, please share it by sending it to michaeld@moodle.com
- * ================================================================================================
+ * ====================================================================================================================
  *
  * @package    contrib
  * @subpackage block_progress
@@ -65,8 +65,8 @@ function get_monitorable_modules() {
 
     return array(
         'assign' => array(
-            'defaultTime'=>'duedate',
-            'actions'=>array(
+            'defaultTime' => 'duedate',
+            'actions' => array(
                 'submitted'    => "SELECT id
                                      FROM {assign_submission}
                                     WHERE assignment = :eventid
@@ -90,8 +90,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'submitted'
         ),
         'assignment' => array(
-            'defaultTime'=>'timedue',
-            'actions'=>array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
                 'submitted'    => "SELECT id
                                      FROM {assignment_submissions}
                                     WHERE assignment = :eventid
@@ -118,8 +118,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'submitted'
         ),
         'bigbluebuttonbn' => array(
-            'defaultTime'=>'timedue',
-            'actions'=>array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -131,7 +131,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'recordingsbn' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -143,7 +143,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'book' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -155,7 +155,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'certificate' => array(
-            'actions'=>array(
+            'actions' => array(
                 'awarded'      => "SELECT id
                                      FROM {certificate_issues}
                                     WHERE certificateid = :eventid
@@ -164,7 +164,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'awarded'
         ),
         'chat' => array(
-            'actions'=>array(
+            'actions' => array(
                 'posted_to'    => "SELECT id
                                      FROM {chat_messages}
                                     WHERE chatid = :eventid
@@ -173,8 +173,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'posted_to'
         ),
         'choice' => array(
-            'defaultTime'=>'timeclose',
-            'actions'=>array(
+            'defaultTime' => 'timeclose',
+            'actions' => array(
                 'answered'     => "SELECT id
                                      FROM {choice_answers}
                                     WHERE choiceid = :eventid
@@ -183,8 +183,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'answered'
         ),
         'data' => array(
-            'defaultTime'=>'timeviewto',
-            'actions'=>array(
+            'defaultTime' => 'timeviewto',
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -196,8 +196,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'feedback' => array(
-            'defaultTime'=>'timeclose',
-            'actions'=>array(
+            'defaultTime' => 'timeclose',
+            'actions' => array(
                 'responded_to' => "SELECT id
                                      FROM {feedback_completed}
                                     WHERE feedback = :eventid
@@ -205,8 +205,8 @@ function get_monitorable_modules() {
             ),
             'defaultAction' => 'responded_to'
         ),
-        'resource' => array(  // AKA file
-            'actions'=>array(
+        'resource' => array(  // AKA file.
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -218,7 +218,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'flashcardtrainer' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -230,7 +230,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'folder' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -242,8 +242,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'forum' => array(
-            'defaultTime'=>'assesstimefinish',
-            'actions'=>array(
+            'defaultTime' => 'assesstimefinish',
+            'actions' => array(
                 'posted_to'    => "SELECT id
                                      FROM {forum_posts}
                                     WHERE userid = :userid AND discussion IN (
@@ -255,7 +255,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'posted_to'
         ),
         'glossary' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -267,8 +267,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'hotpot' => array(
-            'defaultTime'=>'timeclose',
-            'actions'=>array(
+            'defaultTime' => 'timeclose',
+            'actions' => array(
                 'attempted'    => "SELECT id
                                      FROM {hotpot_attempts}
                                     WHERE hotpotid = :eventid
@@ -282,7 +282,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'finished'
         ),
         'imscp' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -294,7 +294,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'journal' => array(
-            'actions'=>array(
+            'actions' => array(
                 'posted_to'    => "SELECT id
                                      FROM {journal_entries}
                                     WHERE journal = :eventid
@@ -303,8 +303,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'posted_to'
         ),
         'lesson' => array(
-            'defaultTime'=>'deadline',
-            'actions'=>array(
+            'defaultTime' => 'deadline',
+            'actions' => array(
                 'attempted'    => "SELECT id
                                      FROM {lesson_attempts}
                                     WHERE lessonid = :eventid
@@ -325,7 +325,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'attempted'
         ),
         'page' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -337,8 +337,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'questionnaire' => array(
-            'defaultTime'=>'closedate',
-            'actions'=>array(
+            'defaultTime' => 'closedate',
+            'actions' => array(
                 'attempted'    => "SELECT id
                                      FROM {questionnaire_attempts}
                                     WHERE qid = :eventid
@@ -352,8 +352,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'finished'
         ),
         'quiz' => array(
-            'defaultTime'=>'timeclose',
-            'actions'=>array(
+            'defaultTime' => 'timeclose',
+            'actions' => array(
                 'attempted'    => "SELECT id
                                      FROM {quiz_attempts}
                                     WHERE quiz = :eventid
@@ -381,7 +381,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'finished'
         ),
         'scorm' => array(
-            'actions'=>array(
+            'actions' => array(
                 'attempted'    => "SELECT id
                                      FROM {scorm_scoes_track}
                                     WHERE scormid = :eventid
@@ -402,8 +402,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'attempted'
         ),
         'turnitintool' => array(
-            'defaultTime'=>'defaultdtdue',
-            'actions'=>array(
+            'defaultTime' => 'defaultdtdue',
+            'actions' => array(
                 'submitted'    => "SELECT id
                                      FROM {turnitintool_submissions}
                                     WHERE turnitintoolid = :eventid
@@ -413,7 +413,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'submitted'
         ),
         'url' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -425,7 +425,7 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'wiki' => array(
-            'actions'=>array(
+            'actions' => array(
                 'viewed'       => "SELECT id
                                      FROM {log}
                                     WHERE course = :courseid
@@ -437,8 +437,8 @@ function get_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'workshop' => array(
-            'defaultTime'=>'assessmentend',
-            'actions'=>array(
+            'defaultTime' => 'assessmentend',
+            'actions' => array(
                 'submitted'    => "SELECT id
                                      FROM {workshop_submissions}
                                     WHERE workshopid = :eventid
@@ -480,14 +480,14 @@ function progress_default_value(&$var, $def = null) {
  */
 function modules_in_use() {
     global $COURSE, $DB;
-    $dbmanager = $DB->get_manager(); // used to check if tables exist
+    $dbmanager = $DB->get_manager(); // Used to check if tables exist.
     $modules = get_monitorable_modules();
     $modulesinuse = array();
 
     foreach ($modules as $module => $details) {
         if (
             $dbmanager->table_exists($module) &&
-            $DB->record_exists($module, array('course'=>$COURSE->id))
+            $DB->record_exists($module, array('course' => $COURSE->id))
         ) {
             $modulesinuse[$module] = $details;
         }
@@ -507,53 +507,51 @@ function modules_in_use() {
  */
 function event_information($config, $modules) {
     global $COURSE, $DB;
-    $dbmanager = $DB->get_manager(); // used to check if tables exist
     $events = array();
     $numevents = 0;
     $numeventsconfigured = 0;
 
-    if(isset($config->orderby) && $config->orderby == 'orderbycourse') {
-        $sections = $DB->get_records('course_sections', array('course'=>$COURSE->id), 'section', 'id,sequence');
+    if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
+        $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,sequence');
         foreach ($sections as $section) {
             $section->sequence = explode(',', $section->sequence);
         }
     }
 
-    // Check each known module (described in lib.php)
+    // Check each known module (described in lib.php).
     foreach ($modules as $module => $details) {
         $fields = 'id, name';
         if (array_key_exists('defaultTime', $details)) {
             $fields .= ', '.$details['defaultTime'].' as due';
         }
 
-        // Check if this type of module is used in the course, gather instance info
-        $records = $DB->get_records($module, array('course'=>$COURSE->id), '', $fields);
+        // Check if this type of module is used in the course, gather instance info.
+        $records = $DB->get_records($module, array('course' => $COURSE->id), '', $fields);
         foreach ($records as $record) {
 
             // Is the module being monitored?
             if (isset($config->{'monitor_'.$module.$record->id})) {
                 $numeventsconfigured++;
             }
-            if (progress_default_value($config->{'monitor_'.$module.$record->id}, 0)==1) {
+            if (progress_default_value($config->{'monitor_'.$module.$record->id}, 0) == 1) {
                 $numevents++;
 
-                // Check the time the module is due
+                // Check the time the module is due.
                 if (
                     isset($details['defaultTime']) &&
                     $record->due != 0 &&
                     progress_default_value($config->{'locked_'.$module.$record->id}, 0)
                 ) {
                     $expected = progress_default_value($record->due);
-                }
-                else {
+                } else {
                     $expected = $config->{'date_time_'.$module.$record->id};
                 }
 
-                // Get the course module info
+                // Get the course module info.
                 $coursemodule = get_coursemodule_from_instance($module, $record->id, $COURSE->id);
 
-                // Check if the module is visible, and if so, keep a record for it
-                if ($coursemodule->visible==1) {
+                // Check if the module is visible, and if so, keep a record for it.
+                if ($coursemodule->visible == 1) {
                     $event = array(
                         'expected' => $expected,
                         'type'     => $module,
@@ -561,7 +559,7 @@ function event_information($config, $modules) {
                         'name'     => format_string($record->name),
                         'cmid'     => $coursemodule->id,
                     );
-                    if(isset($config->orderby) && $config->orderby == 'orderbycourse') {
+                    if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
                         $event['section'] = $coursemodule->section;
                         $event['position'] = array_search($coursemodule->id, $sections[$coursemodule->section]->sequence);
                     }
@@ -571,18 +569,17 @@ function event_information($config, $modules) {
         }
     }
 
-    if ($numeventsconfigured==0) {
+    if ($numeventsconfigured == 0) {
         return 0;
     }
-    if ($numevents==0) {
+    if ($numevents == 0) {
         return null;
     }
 
-    // Sort by first value in each element, which is time due
-    if(isset($config->orderby) && $config->orderby == 'orderbycourse') {
+    // Sort by first value in each element, which is time due.
+    if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
         usort($events, 'compare_events');
-    }
-    else {
+    } else {
         sort($events);
     }
     return $events;
@@ -596,10 +593,9 @@ function event_information($config, $modules) {
  * @return <0, 0 or >0 depending on order of activities/resources on course page
  */
 function compare_events($a, $b) {
-    if($a['section'] != $b['section']) {
+    if ($a['section'] != $b['section']) {
         return $a['section'] - $b['section'];
-    }
-    else {
+    } else {
         return $a['position'] - $b['position'];
     }
 }
@@ -621,9 +617,9 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
         $module = $modules[$event['type']];
         $uniqueid = $event['type'].$event['id'];
 
-        // If activity completion is used, check completions table
+        // If activity completion is used, check completions table.
         if (isset($config->{'action_'.$uniqueid}) &&
-            $config->{'action_'.$uniqueid}=='activity_completion'
+            $config->{'action_'.$uniqueid} == 'activity_completion'
         ) {
             $query = 'SELECT id
                         FROM {course_modules_completion}
@@ -632,7 +628,7 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
                          AND completionstate = 1';
         }
 
-        // Determine the set action and develop a query
+        // Determine the set action and develop a query.
         else {
             $action = isset($config->{'action_'.$uniqueid})?
                       $config->{'action_'.$uniqueid}:
@@ -645,8 +641,8 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
                             'cmid' => $event['cmid'], 'cmid1' => $event['cmid'],
                       );
 
-         // Check if the user has attempted the module
-        $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters)?true:false;
+         // Check if the user has attempted the module.
+        $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
     }
     return $attempts;
 }
@@ -672,32 +668,30 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                           'cellpadding' => '0',
                           'cellspacing' => '0');
 
-    // Place now arrow
-    if ((!isset($config->orderby) || $config->orderby=='orderbytime') && $config->displayNow==1 && !$simple) {
+    // Place now arrow.
+    if ((!isset($config->orderby) || $config->orderby == 'orderbytime') && $config->displayNow == 1 && !$simple) {
 
         $content = HTML_WRITER::start_tag('table', $tableoptions);
 
-        // Find where to put now arrow
+        // Find where to put now arrow.
         $nowpos = 0;
-        while ($nowpos<$numevents && $now>$events[$nowpos]['expected']) {
+        while ($nowpos < $numevents && $now > $events[$nowpos]['expected']) {
             $nowpos++;
         }
-
         $content .= HTML_WRITER::start_tag('tr');
         $nowstring = get_string('now_indicator', 'block_progress');
-        if ($nowpos<$numevents/2) {
-            for ($i=0; $i<$nowpos; $i++) {
+        if ($nowpos < $numevents / 2) {
+            for ($i = 0; $i < $nowpos; $i++) {
                 $content .= HTML_WRITER::tag('td', '&nbsp;', array('class' => 'progressBarHeader'));
             }
-            $celloptions = array('colspan' => $numevents-$nowpos,
+            $celloptions = array('colspan' => $numevents - $nowpos,
                                  'class' => 'progressBarHeader',
                                  'style' => 'text-align:left;');
             $content .= HTML_WRITER::start_tag('td', $celloptions);
             $content .= $OUTPUT->pix_icon('left', $nowstring, 'block_progress');
             $content .= $nowstring;
             $content .= HTML_WRITER::end_tag('td');
-        }
-        else {
+        } else {
             $celloptions = array('colspan' => $nowpos,
                                  'class' => 'progressBarHeader',
                                  'style' => 'text-align:right;');
@@ -705,7 +699,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
             $content .= $nowstring;
             $content .= $OUTPUT->pix_icon('right', $nowstring, 'block_progress');
             $content .= HTML_WRITER::end_tag('td');
-            for ($i=$nowpos; $i<$numevents; $i++) {
+            for ($i = $nowpos; $i < $numevents; $i++) {
                 $content .= HTML_WRITER::tag('td', '&nbsp;', array('class' => 'progressBarHeader'));
             }
         }
@@ -716,8 +710,8 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
         $content = HTML_WRITER::start_tag('table', $tableoptions);
     }
 
-    // Start progress bar
-    $width = 100/$numevents;
+    // Start progress bar.
+    $width = 100 / $numevents;
     $content .= HTML_WRITER::start_tag('tr');
     $counter = 1;
     foreach ($events as $event) {
@@ -726,7 +720,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                   $config->{'action_'.$event['type'].$event['id']}:
                   $modules[$event['type']]['defaultAction'];
 
-        // A cell in the progress bar
+        // A cell in the progress bar.
         $celloptions = array(
             'class' => 'progressBarCell',
             'id' => '',
@@ -739,7 +733,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                 '\''.$event['cmid'].'\', '.
                 '\''.addslashes($event['name']).'\', '.
                 '\''.addslashes(get_string($action, 'block_progress')).'\', '.
-                '\''.addslashes(userdate($event['expected'], $dateformat, $CFG->timezone)).'\', '.                '\''.$instance.'\', '.
+                '\''.addslashes(userdate($event['expected'], $dateformat, $CFG->timezone)).'\', '.'\''.$instance.'\', '.
                 '\''.$userid.'\', '.
                 '\''.($attempted?'tick':'cross').'\''.
                 ');',
@@ -747,23 +741,23 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
         if ($attempted) {
             $celloptions['style'] .= get_string('attempted_colour', 'block_progress').';';
             $cellcontent = $OUTPUT->pix_icon(
-                               isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
+                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
                                'tick' : 'blank', '', 'block_progress');
         }
-        else if ((!isset($config->orderby) || $config->orderby=='orderbytime') && $event['expected'] < $now) {
+        else if ((!isset($config->orderby) || $config->orderby == 'orderbytime') && $event['expected'] < $now) {
             $celloptions['style'] .= get_string('notAttempted_colour', 'block_progress').';';
             $cellcontent = $OUTPUT->pix_icon(
-                               isset($config->progressBarIcons) && $config->progressBarIcons==1 ?
+                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
                                'cross':'blank', '', 'block_progress');
         }
         else {
             $celloptions['style'] .= get_string('futureNotAttempted_colour', 'block_progress').';';
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
-        if($counter == 1) {
+        if ($counter == 1) {
             $celloptions['id'] .= 'first';
         }
-        if($counter == $numevents) {
+        if ($counter == $numevents) {
             $celloptions['id'] .= 'last';
         }
         $counter++;
@@ -772,12 +766,12 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
     $content .= HTML_WRITER::end_tag('tr');
     $content .= HTML_WRITER::end_tag('table');
 
-    // Add the info box below the table
+    // Add the info box below the table.
     $divoptions = array('class' => 'progressEventInfo',
-                        'id'=>'progressBarInfo'.$instance.'user'.$userid);
+                        'id' => 'progressBarInfo'.$instance.'user'.$userid);
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
-        if (isset($config->showpercentage) && $config->showpercentage==1) {
+        if (isset($config->showpercentage) && $config->showpercentage == 1) {
             $progress = get_progess_percentage($events, $attempts);
             $content .= get_string('progress', 'block_progress').': ';
             $content .= $progress.'%'.HTML_WRITER::empty_tag('br');
@@ -799,12 +793,12 @@ function get_progess_percentage($events, $attempts) {
     $attemptcount = 0;
 
     foreach ($events as $event) {
-        if ($attempts[$event['type'].$event['id']]==1) {
+        if ($attempts[$event['type'].$event['id']] == 1) {
             $attemptcount++;
         }
     }
 
-    $progressvalue = $attemptcount==0?0:$attemptcount/count($events);
+    $progressvalue = $attemptcount == 0 ? 0 : $attemptcount / count($events);
 
-    return (int)($progressvalue*100);
+    return (int)($progressvalue * 100);
 }
