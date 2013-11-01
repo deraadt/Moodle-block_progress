@@ -63,6 +63,7 @@ $string['finished'] = 'finished';
 $string['graded'] = 'graded';
 $string['marked'] = 'marked';
 $string['passed'] = 'passed';
+$string['passedscorm'] = 'passed';
 $string['posted_to'] = 'posted to';
 $string['responded_to'] = 'responded to';
 $string['submitted'] = 'submitted';

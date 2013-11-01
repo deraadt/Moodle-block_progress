@@ -389,7 +389,7 @@ function get_monitorable_modules() {
                                       AND userid = :userid
                                       AND element = 'cmi.core.lesson_status'
                                       AND {$DB->sql_compare_text('value')} = 'completed'",
-                'passed'       => "SELECT id
+                'passedscorm'  => "SELECT id
                                      FROM {scorm_scoes_track}
                                     WHERE scormid = :eventid
                                       AND userid = :userid
@@ -621,8 +621,7 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
 
         // Check for passing grades as unattempted, passed or failed
         if (isset($config->{'action_'.$uniqueid}) &&
-                 $config->{'action_'.$uniqueid} == 'passed' &&
-                 $event['type'] != 'scorm'
+                 $config->{'action_'.$uniqueid} == 'passed'
         ) {
             $query =  $module['actions'][$config->{'action_'.$uniqueid}];
             $graderesult = $DB->get_record_sql($query, $parameters);
