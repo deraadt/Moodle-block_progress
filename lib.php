@@ -79,13 +79,12 @@ function get_monitorable_modules() {
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
                                       AND g.finalgrade IS NOT NULL",
-                'passed'       => "SELECT g.rawgrade
+                'passed'       => "SELECT g.finalgrade, i.gradepass
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid
-                                      AND g.finalgrade >= i.gradepass"
+                                      AND g.userid = :userid"
             ),
             'defaultAction' => 'submitted'
         ),
@@ -107,13 +106,12 @@ function get_monitorable_modules() {
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
                                       AND g.finalgrade IS NOT NULL",
-                'passed'       => "SELECT g.rawgrade
+                'passed'       => "SELECT g.finalgrade, i.gradepass
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'assignment'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid
-                                      AND g.finalgrade >= i.gradepass"
+                                      AND g.userid = :userid"
             ),
             'defaultAction' => 'submitted'
         ),
@@ -370,13 +368,12 @@ function get_monitorable_modules() {
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
                                       AND g.finalgrade IS NOT NULL",
-                'passed'       => "SELECT g.rawgrade
+                'passed'       => "SELECT g.finalgrade, i.gradepass
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'quiz'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid
-                                      AND g.finalgrade >= i.gradepass"
+                                      AND g.userid = :userid"
             ),
             'defaultAction' => 'finished'
         ),
@@ -616,33 +613,48 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
     foreach ($events as $event) {
         $module = $modules[$event['type']];
         $uniqueid = $event['type'].$event['id'];
-
-        // If activity completion is used, check completions table.
-        if (isset($config->{'action_'.$uniqueid}) &&
-            $config->{'action_'.$uniqueid} == 'activity_completion'
-        ) {
-            $query = 'SELECT id
-                        FROM {course_modules_completion}
-                       WHERE userid = :userid
-                         AND coursemoduleid = :cmid
-                         AND completionstate = 1';
-        }
-
-        // Determine the set action and develop a query.
-        else {
-            $action = isset($config->{'action_'.$uniqueid})?
-                      $config->{'action_'.$uniqueid}:
-                      $module['defaultAction'];
-            $query =  $module['actions'][$action];
-        }
         $parameters = array('courseid' => $COURSE->id, 'courseid1' => $COURSE->id,
                             'userid' => $userid, 'userid1' => $userid,
                             'eventid' => $event['id'], 'eventid1' => $event['id'],
                             'cmid' => $event['cmid'], 'cmid1' => $event['cmid'],
                       );
 
-         // Check if the user has attempted the module.
-        $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+        // Check for passing grades as unattempted, passed or failed
+        if (isset($config->{'action_'.$uniqueid}) &&
+                 $config->{'action_'.$uniqueid} == 'passed' &&
+                 $event['type'] != 'scorm'
+        ) {
+            $query =  $module['actions'][$config->{'action_'.$uniqueid}];
+            $graderesult = $DB->get_record_sql($query, $parameters);
+            if (!$graderesult) {
+                $attempts[$uniqueid] = false;
+            } else {
+                $attempts[$uniqueid] = $graderesult->finalgrade >= $graderesult->gradepass ? true : 'failed';
+            }
+        } else {
+
+          // If activity completion is used, check completions table.
+          if (isset($config->{'action_'.$uniqueid}) &&
+              $config->{'action_'.$uniqueid} == 'activity_completion'
+          ) {
+              $query = 'SELECT id
+                          FROM {course_modules_completion}
+                         WHERE userid = :userid
+                           AND coursemoduleid = :cmid
+                           AND completionstate = 1';
+          }
+
+          // Determine the set action and develop a query.
+          else {
+              $action = isset($config->{'action_'.$uniqueid})?
+                        $config->{'action_'.$uniqueid}:
+                        $module['defaultAction'];
+              $query =  $module['actions'][$action];
+          }
+
+           // Check if the user has attempted the module.
+          $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+        }
     }
     return $attempts;
 }
@@ -735,16 +747,17 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
                 '\''.addslashes(get_string($action, 'block_progress')).'\', '.
                 '\''.addslashes(userdate($event['expected'], $dateformat, $CFG->timezone)).'\', '.'\''.$instance.'\', '.
                 '\''.$userid.'\', '.
-                '\''.($attempted?'tick':'cross').'\''.
+                '\''.($attempted === true ? 'tick' : 'cross').'\''.
                 ');',
              'style' => 'background-color:');
-        if ($attempted) {
+        if ($attempted === true) {
             $celloptions['style'] .= get_string('attempted_colour', 'block_progress').';';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
                                'tick' : 'blank', '', 'block_progress');
         }
-        else if ((!isset($config->orderby) || $config->orderby == 'orderbytime') && $event['expected'] < $now) {
+        else if (((!isset($config->orderby) || $config->orderby == 'orderbytime') && $event['expected'] < $now) ||
+                 ($attempted === 'failed')) {
             $celloptions['style'] .= get_string('notAttempted_colour', 'block_progress').';';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
