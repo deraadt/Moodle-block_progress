@@ -60,7 +60,7 @@
  *
  * @return array
  */
-function get_monitorable_modules() {
+function block_progress_monitorable_modules() {
     global $DB;
 
     return array(
@@ -475,10 +475,10 @@ function progress_default_value(&$var, $def = null) {
  *
  * @return array
  */
-function modules_in_use() {
+function block_progress_modules_in_use() {
     global $COURSE, $DB;
     $dbmanager = $DB->get_manager(); // Used to check if tables exist.
-    $modules = get_monitorable_modules();
+    $modules = block_progress_monitorable_modules();
     $modulesinuse = array();
 
     foreach ($modules as $module => $details) {
@@ -502,7 +502,7 @@ function modules_in_use() {
  *                 null if all events are configured to "no" monitoring and
  *                 0 if events are available but no config is set
  */
-function event_information($config, $modules) {
+function block_progress_event_information($config, $modules) {
     global $COURSE, $DB;
     $events = array();
     $numevents = 0;
@@ -575,7 +575,7 @@ function event_information($config, $modules) {
 
     // Sort by first value in each element, which is time due.
     if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
-        usort($events, 'compare_events');
+        usort($events, 'block_progress_compare_events');
     } else {
         sort($events);
     }
@@ -589,7 +589,7 @@ function event_information($config, $modules) {
  * @param array $b array of event information
  * @return <0, 0 or >0 depending on order of activities/resources on course page
  */
-function compare_events($a, $b) {
+function block_progress_compare_events($a, $b) {
     if ($a['section'] != $b['section']) {
         return $a['section'] - $b['section'];
     } else {
@@ -606,7 +606,7 @@ function compare_events($a, $b) {
  * @param int      $userid  The user's id
  * @return array   an describing the user's attempts based on module+instance identifiers
  */
-function get_attempts($modules, $config, $events, $userid, $instance) {
+function block_progress_attempts($modules, $config, $events, $userid, $instance) {
     global $COURSE, $DB;
     $attempts = array();
 
@@ -669,7 +669,7 @@ function get_attempts($modules, $config, $events, $userid, $instance) {
  * @param array    $attempts The user's attempts on course activities
  * @param bool     $simple   Controls whether instructions are shown below a progress bar
  */
-function progress_bar($modules, $config, $events, $userid, $instance, $attempts, $simple = false) {
+function block_progress_bar($modules, $config, $events, $userid, $instance, $attempts, $simple = false) {
     global $OUTPUT, $CFG;
 
     $now = time();
@@ -784,7 +784,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
         if (isset($config->showpercentage) && $config->showpercentage == 1) {
-            $progress = get_progess_percentage($events, $attempts);
+            $progress = block_progress_percentage($events, $attempts);
             $content .= get_string('progress', 'block_progress').': ';
             $content .= $progress.'%'.HTML_WRITER::empty_tag('br');
         }
@@ -801,7 +801,7 @@ function progress_bar($modules, $config, $events, $userid, $instance, $attempts,
  * @param array $events   The possible events that can occur for modules
  * @param array $attempts The user's attempts on course activities
  */
-function get_progess_percentage($events, $attempts) {
+function block_progress_percentage($events, $attempts) {
     $attemptcount = 0;
 
     foreach ($events as $event) {

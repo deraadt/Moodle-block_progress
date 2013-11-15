@@ -95,7 +95,7 @@ class block_progress extends block_base {
         $this->content->footer = '';
 
         // Check if any activities/resources have been created.
-        $modules = modules_in_use();
+        $modules = block_progress_modules_in_use();
         if (empty($modules)) {
             if (has_capability('moodle/block:edit', $this->context)) {
                 $this->content->text .= get_string('no_events_config_message', 'block_progress');
@@ -104,7 +104,7 @@ class block_progress extends block_base {
         }
 
         // Check if activities/resources have been selected in config.
-        $events = event_information($this->config, $modules);
+        $events = block_progress_event_information($this->config, $modules);
         if ($events === null || $events === 0) {
             if (has_capability('moodle/block:edit', $this->context)) {
                 $this->content->text .= get_string('no_events_message', 'block_progress');
@@ -130,8 +130,8 @@ class block_progress extends block_base {
         }
 
         // Display progress bar.
-        $attempts = get_attempts($modules, $this->config, $events, $USER->id, $this->instance->id);
-        $this->content->text = progress_bar($modules, $this->config, $events, $USER->id, $this->instance->id, $attempts);
+        $attempts = block_progress_attempts($modules, $this->config, $events, $USER->id, $this->instance->id);
+        $this->content->text = block_progress_bar($modules, $this->config, $events, $USER->id, $this->instance->id, $attempts);
 
         // Organise access to JS.
         $jsmodule = array(

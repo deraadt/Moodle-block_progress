@@ -92,7 +92,7 @@ class block_progress_edit_form extends block_edit_form {
         }
 
         // Go through each type of activity/resource that can be monitored.
-        $modules = get_monitorable_modules();
+        $modules = block_progress_monitorable_modules();
         foreach ($modules as $module => $details) {
 
             // Get data about activities/resources of this type.

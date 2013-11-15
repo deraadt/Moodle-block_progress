@@ -71,7 +71,7 @@ echo $OUTPUT->heading($title, 2);
 echo $OUTPUT->container_start('block_progress');
 
 // Get the modules to check progress on.
-$modules = modules_in_use();
+$modules = block_progress_modules_in_use();
 if (empty($modules)) {
     echo get_string('no_events_config_message', 'block_progress');
     echo $OUTPUT->container_end();
@@ -80,7 +80,7 @@ if (empty($modules)) {
 }
 
 // Check if activities/resources have been selected in config.
-$events = event_information($progressconfig, $modules);
+$events = block_progress_event_information($progressconfig, $modules);
 if ($events == null) {
     echo get_string('no_events_message', 'block_progress');
     echo $OUTPUT->container_end();
@@ -197,10 +197,10 @@ for ($i = 0; $i < $numberofusers; $i++) {
     } else {
         $lastonline = userdate($users[$i]->lastaccess);
     }
-    $attempts = get_attempts($modules, $progressconfig, $events, $users[$i]->id, $course->id);
-    $progressbar = progress_bar($modules, $progressconfig, $events, $users[$i]->id, $course->id, $attempts,
+    $attempts = block_progress_attempts($modules, $progressconfig, $events, $users[$i]->id, $course->id);
+    $progressbar = block_progress_bar($modules, $progressconfig, $events, $users[$i]->id, $course->id, $attempts,
                                 true);
-    $progressvalue = get_progess_percentage($events, $attempts);
+    $progressvalue = block_progress_percentage($events, $attempts);
     $progress = $progressvalue.'%';
 
     $rows[] = array(
@@ -221,7 +221,7 @@ if (!$sort = $table->get_sql_sort()) {
      $sort = 'lastname DESC';
 }
 if ($numberofusers > 0) {
-    usort($rows, 'compare_rows');
+    usort($rows, 'block_progress_compare_rows');
     foreach ($rows as $row) {
         $table->add_data(array($row['picture'], $row['fullname'], $row['lastonline'],
             $row['progressbar'], $row['progress']));
@@ -252,7 +252,7 @@ echo $OUTPUT->footer();
  * @param  mixed $b element containing name, online time and progress info
  * @return order of pair expressed as -1, 0, or 1
  */
-function compare_rows ($a, $b) {
+function block_progress_compare_rows($a, $b) {
     global $sort;
 
     // Process each of the one or two orders.
