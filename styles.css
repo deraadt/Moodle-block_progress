@@ -83,6 +83,14 @@
     margin:5px 0 !important;
 }
 
+.progressConfigModuleTitle {
+    font-weight: bold;
+}
+
+.progressConfigModuleTitle img {
+    vertical-align: middle;
+}
+
 .block_progress .groupselector {
     text-align: center;
 }

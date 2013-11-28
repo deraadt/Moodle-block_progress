@@ -86,16 +86,37 @@ class block_progress_edit_form extends block_edit_form {
         $mform->setDefault('config_showpercentage', 0);
         $mform->addHelpButton('config_showpercentage', 'why_show_precentage', 'block_progress');
 
-        $mform->addElement('header', 'monitoredheading', get_string('config_monitored', 'block_progress'));
-        if (method_exists($mform, 'setExpanded')) {
-            $mform->setExpanded('monitoredheading');
+        // Get course section information.
+        $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,section,sequence');
+        foreach ($sections as $section) {
+            if($section->sequence != '') {
+                $section->sequence = explode(',', $section->sequence);
+            }
+            else {
+                $section->sequence = null;
+            }
         }
 
-        // Go through each type of activity/resource that can be monitored.
+        // Determine the time at the end of the week, less 5min.
+        if(!$usingweeklyformat) {
+            $currenttime = time();
+            $timearray = localtime($currenttime, true);
+            $endofweektimearray =
+                localtime($currenttime + (7 - $timearray['tm_wday']) * 86400, true);
+            $endofweektime = mktime(23,
+                                    55,
+                                    0,
+                                    $endofweektimearray['tm_mon'] + 1,
+                                    $endofweektimearray['tm_mday'],
+                                    $endofweektimearray['tm_year'] + 1900);
+        }
+
+        // Go through each type of activity/resource that can be monitored to find instances in the course.
         $modules = block_progress_monitorable_modules();
+        $unsortedmodules = array();
         foreach ($modules as $module => $details) {
 
-            // Get data about activities/resources of this type.
+            // Get data about instances of activities/resources of this type in this course.
             unset($instances);
             if ($dbmanager->table_exists($module)) {
                 $sql = 'SELECT id, name';
@@ -109,15 +130,25 @@ class block_progress_edit_form extends block_edit_form {
                 $instances = $DB->get_records_sql($sql);
             }
 
-            // If there are activities/resources of this type, show them.
+            // If there are instances of activities/resources of this type, get more info about them.
             if (!empty($instances)) {
-
-                // Display each monitorable activity/resource as a row.
                 foreach ($instances as $i => $instance) {
                     $count++;
+                    $moduleinfo = new stdClass();
+                    $moduleinfo->module = $module;
+                    $moduleinfo->instanceid = $instance->id;
+                    $moduleinfo->uniqueid = $module.$instance->id;
+                    $moduleinfo->label = get_string($module, 'block_progress');
+                    $moduleinfo->instancename = $instance->name;
+                    $moduleinfo->lockpossible = isset($details['defaultTime']);
+                    $moduleinfo->instancedue = $moduleinfo->lockpossible && $instance->due;
 
-                    // Start of module border.
-                    $mform->addElement('html', '<div class="progressConfigBox">');
+                    // Get position of activity/resource on course page.
+                    $coursemodule = get_coursemodule_from_instance($module, $instance->id, $COURSE->id);
+                    $moduleinfo->section = $coursemodule->section;
+                    $moduleinfo->position = array_search($coursemodule->id, $sections[$coursemodule->section]->sequence);
+                    $moduleinfo->coursemoduleid = $coursemodule->id;
+                    $moduleinfo->completion = $coursemodule->completion;
 
                     // Find type labels for assignment types.
                     $asslabel = '';
@@ -128,48 +159,10 @@ class block_progress_edit_form extends block_edit_form {
                         } else {
                             $asslabel  = get_string('type'.$type, 'assignment_'.$type);
                         }
-                        $asslabel = ' ('.$asslabel.')';
+                        $moduleinfo->label .= ' ('.$asslabel.')';
                     }
 
-                    // Icon, module type and name.
-                    $mform->addElement('html', $OUTPUT->pix_icon('icon',
-                                       get_string('pluginname', $module), 'mod_'.$module).
-                                       '&nbsp;<strong>'.get_string($module, 'block_progress').
-                                       $asslabel.
-                                       ': <em>'.format_string($instance->name).'</em></strong>');
-
-                    // Allow monitoring turned on or off.
-                    $mform->addElement('selectyesno', 'config_monitor_'.$module.$instance->id,
-                                       get_string('config_header_monitored', 'block_progress'));
-                    $mform->setDefault('config_monitor_'.$module.$instance->id, $turnallon);
-                    $mform->addHelpButton('config_monitor_'.$module.$instance->id,
-                                          'what_does_monitored_mean', 'block_progress');
-
-                    // Allow locking turned on or off.
-                    if (isset($details['defaultTime']) && $instance->due != 0) {
-                        $mform->addElement('selectyesno', 'config_locked_'.$module.$instance->id,
-                                           get_string('config_header_locked', 'block_progress'));
-                        $mform->setDefault('config_locked_'.$module.$instance->id, 1);
-                        $mform->disabledif ('config_locked_'.$module.$instance->id,
-                                            'config_monitor_'.$module.$instance->id, 'eq', 0);
-                        $mform->addHelpButton('config_locked_'.$module.$instance->id,
-                                              'what_locked_means', 'block_progress');
-                    }
-
-                    // Print the date selector.
-                    $mform->addElement('date_time_selector',
-                                       'config_date_time_'.$module.$instance->id,
-                                       get_string('config_header_expected', 'block_progress'));
-                    $mform->disabledif ('config_date_time_'.$module.$instance->id,
-                                        'config_locked_'.$module.$instance->id, 'eq', 1);
-                    $mform->disabledif ('config_date_time_'.$module.$instance->id,
-                                        'config_monitor_'.$module.$instance->id, 'eq', 0);
-                    $mform->disabledif('config_date_time_'.$module.$instance->id,
-                                       'config_orderby', 'eq', 'orderbycourse');
-                    $mform->disabledif('config_locked_'.$module.$instance->id,
-                                       'config_orderby', 'eq', 'orderbycourse');
-
-                    // Assume a time/date for a activity/resource.
+                    // Determine a time/date for a activity/resource.
                     $expected = null;
                     $datetimepropery = 'date_time_'.$module.$instance->id;
                     if (
@@ -185,81 +178,144 @@ class block_progress_edit_form extends block_edit_form {
                             $expected = progress_default_value($instance->due);
                         }
 
-                        // If in positioned in a weekly format, use 5min before end of week.
+                        // If positioned in a weekly format, use 5min before end of week.
                         else if ($usingweeklyformat) {
-                            $cm = get_coursemodule_from_instance($module, $instance->id,
-                                                                 $COURSE->id);
-                            $params = array('id' => $cm->section);
-                            $section = $DB->get_field('course_sections', 'section', $params);
-                            $expected = $COURSE->startdate + ($section > 0 ? $section : 1) * 604800 - 300;
+                            $expected = $COURSE->startdate + ($moduleinfo->section > 0 ? $moduleinfo->section : 1) * 604800 - 300;
                         }
 
                         // Assume 5min before the end of the current week.
                         else {
-                            $currenttime = time();
-                            $timearray = localtime($currenttime, true);
-                            $endofweektimearray =
-                                localtime($currenttime + (7 - $timearray['tm_wday']) * 86400, true);
-                            $expected = mktime(23,
-                                               55,
-                                               0,
-                                               $endofweektimearray['tm_mon'] + 1,
-                                               $endofweektimearray['tm_mday'],
-                                               $endofweektimearray['tm_year'] + 1900);
+                            $expected = $endofweektime;
                         }
                     }
-                    $mform->setDefault('config_date_time_'.$module.$instance->id, $expected);
-                    $mform->addHelpButton('config_date_time_'.$module.$instance->id,
-                                          'what_expected_by_means', 'block_progress');
+                    $moduleinfo->expected = $expected;
 
-                    // Print the action selector for the event.
+                    // Get the list of possible actions for the event.
                     $actions = array();
                     foreach ($details['actions'] as $action => $sql) {
 
                         // Before allowing pass marks, see that Grade to pass value is set.
                         if ($action == 'passed') {
-                            $params = array('itemmodule' => $module, 'iteminstance' => $instance->id);
-                            $gradetopass = $DB->get_record('grade_items', $params, 'gradepass');
+                            $params = array('courseid' => $COURSE->id, 'itemmodule' => $module, 'iteminstance' => $instance->id);
+                            $gradetopass = $DB->get_record('grade_items', $params, 'id,gradepass', IGNORE_MULTIPLE);
                             if ($gradetopass && $gradetopass->gradepass > 0) {
-                                $actions[$action] = get_string($action, 'block_progress');
+                                $actions['passed'] = get_string($action, 'block_progress');
                             }
                         } else {
                             $actions[$action] = get_string($action, 'block_progress');
                         }
                     }
                     if (isset($CFG->enablecompletion) && $CFG->enablecompletion == 1) {
-                        $cm = get_coursemodule_from_instance($module, $instance->id, $COURSE->id);
-                        if ($cm->completion != 0) {
+                        if ($moduleinfo->completion != 0) {
                             $actions['activity_completion'] = get_string('activity_completion', 'block_progress');
                         }
                     }
-                    if (count($actions) == 1) {
-                        $actions = array_keys($actions);
-                        $action = $actions[0];
-                        $mform->addElement('static', 'config_action_static_'.$module.$instance->id,
-                                           get_string('config_header_action', 'block_progress'),
-                                           get_string($action, 'block_progress'));
-                        $mform->addElement('hidden', 'config_action_'.$module.$instance->id, $action);
-                    } else {
-                        $mform->addElement('select', 'config_action_'.$module.$instance->id,
-                                           get_string('config_header_action', 'block_progress'),
-                                           $actions );
-                        $mform->setDefault('config_action_'.$module.$instance->id,
-                                           $details['defaultAction']);
-                        $mform->disabledif ('config_action_'.$module.$instance->id,
-                                            'config_monitor_'.$module.$instance->id, 'eq', 0);
-                    }
-                    $mform->setType('config_action_'.$module.$instance->id, PARAM_ALPHANUMEXT);
-                    $mform->addHelpButton('config_action_'.$module.$instance->id,
-                                          'what_actions_can_be_monitored', 'block_progress');
+                    $moduleinfo->actions = $actions;
 
-                    $mform->addElement('html', '</div>');
+                    // Add the module to the array.
+                    $unsortedmodules[] = $moduleinfo;
+                }
+            }
+        }
+
+        // Sort the array by coursemodule.
+        $modulesinform = array();
+        foreach ($unsortedmodules as $key => $moduleinfo) {
+            $modulesinform[$moduleinfo->coursemoduleid] = $moduleinfo;
+        }
+
+        // Output the form elements for each module.
+        if($count > 0) {
+            foreach ($sections as $i => $section) {
+                if(count($section->sequence) > 0) {
+
+                    // Output the section header.
+                    $sectionname = get_string('section').':&nbsp;'.get_section_name($COURSE, $section->section);
+                    $mform->addElement('header', 'section'.$i, format_string($sectionname));
+                    if (method_exists($mform, 'setExpanded')) {
+                        $mform->setExpanded('section'.$i);
+                    }
+
+                    // Display each monitorable activity/resource as a row.
+                    foreach ($section->sequence as $coursemoduleid) {
+                        if(array_key_exists($coursemoduleid, $modulesinform)) {
+                            $moduleinfo = $modulesinform[$coursemoduleid];
+
+                            // Start of module border.
+                            // $mform->addElement('html', '<div class="progressConfigBox">');
+
+                            // Icon, module type and name.
+                            $modulename = get_string('pluginname', $moduleinfo->module);
+                            $icon = $OUTPUT->pix_icon('icon', $modulename, 'mod_'.$moduleinfo->module);
+                            $text = '&nbsp;'.$moduleinfo->label.':&nbsp;'.format_string($moduleinfo->instancename);
+                            $attributes = array('class' => 'progressConfigModuleTitle');
+                            $moduletitle = HTML_WRITER::tag('div', $icon.$text, $attributes);
+                            $mform->addElement('html', $moduletitle);
+
+                            // // Allow monitoring turned on or off.
+                            $mform->addElement('selectyesno', 'config_monitor_'.$moduleinfo->uniqueid,
+                                               get_string('config_header_monitored', 'block_progress'));
+                            $mform->setDefault('config_monitor_'.$moduleinfo->uniqueid, $turnallon);
+                            $mform->addHelpButton('config_monitor_'.$moduleinfo->uniqueid,
+                                                  'what_does_monitored_mean', 'block_progress');
+
+                            // // Allow locking turned on or off.
+                            if ($moduleinfo->lockpossible && $moduleinfo->instancedue != 0) {
+                                $mform->addElement('selectyesno', 'config_locked_'.$moduleinfo->uniqueid,
+                                                   get_string('config_header_locked', 'block_progress'));
+                                $mform->setDefault('config_locked_'.$moduleinfo->uniqueid, 1);
+                                $mform->disabledif ('config_locked_'.$moduleinfo->uniqueid,
+                                                    'config_monitor_'.$moduleinfo->uniqueid, 'eq', 0);
+                                $mform->addHelpButton('config_locked_'.$moduleinfo->uniqueid,
+                                                      'what_locked_means', 'block_progress');
+                            }
+
+                            // // Print the date selector.
+                            $mform->addElement('date_time_selector',
+                                               'config_date_time_'.$moduleinfo->uniqueid,
+                                               get_string('config_header_expected', 'block_progress'));
+                            $mform->disabledif ('config_date_time_'.$moduleinfo->uniqueid,
+                                                'config_locked_'.$moduleinfo->uniqueid, 'eq', 1);
+                            $mform->disabledif ('config_date_time_'.$moduleinfo->uniqueid,
+                                                'config_monitor_'.$moduleinfo->uniqueid, 'eq', 0);
+                            $mform->disabledif('config_date_time_'.$moduleinfo->uniqueid,
+                                               'config_orderby', 'eq', 'orderbycourse');
+                            $mform->disabledif('config_locked_'.$moduleinfo->uniqueid,
+                                               'config_orderby', 'eq', 'orderbycourse');
+                            $mform->setDefault('config_date_time_'.$moduleinfo->uniqueid, $moduleinfo->expected);
+                            $mform->addHelpButton('config_date_time_'.$moduleinfo->uniqueid,
+                                                  'what_expected_by_means', 'block_progress');
+
+                            // // Print the action selector for the event.
+                            if (count($moduleinfo->actions) == 1) {
+                                $moduleinfo->actions = array_keys($moduleinfo->actions);
+                                $action = $moduleinfo->actions[0];
+                                $mform->addElement('static', 'config_action_static_'.$moduleinfo->uniqueid,
+                                                   get_string('config_header_action', 'block_progress'),
+                                                   get_string($action, 'block_progress'));
+                                $mform->addElement('hidden', 'config_action_'.$moduleinfo->uniqueid, $action);
+                            } else {
+                                $mform->addElement('select', 'config_action_'.$moduleinfo->uniqueid,
+                                                   get_string('config_header_action', 'block_progress'),
+                                                   $moduleinfo->actions );
+                                $mform->setDefault('config_action_'.$moduleinfo->uniqueid,
+                                                   $details['defaultAction']);
+                                $mform->disabledif ('config_action_'.$moduleinfo->uniqueid,
+                                                    'config_monitor_'.$moduleinfo->uniqueid, 'eq', 0);
+                            }
+                            $mform->setType('config_action_'.$moduleinfo->uniqueid, PARAM_ALPHANUMEXT);
+                            $mform->addHelpButton('config_action_'.$moduleinfo->uniqueid,
+                                                  'what_actions_can_be_monitored', 'block_progress');
+
+                            // $mform->addElement('html', '</div>');
+                        }
+                    }
                 }
             }
         }
 
         // When there are no activities that can be monitored, prompt teacher to create some.
-        if ($count == 0) {
+       else {
             $mform->addElement('html', get_string('no_events_config_message', 'block_progress'));
         }
     }

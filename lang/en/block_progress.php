@@ -77,7 +77,6 @@ $string['config_header_icon'] = 'Icon';
 $string['config_header_locked'] = 'Locked to deadline';
 $string['config_header_monitored'] = 'Monitored';
 $string['config_icons'] = 'Use icons in bar';
-$string['config_monitored'] = 'Monitored activities/resources';
 $string['config_now'] = 'Use';
 $string['config_percentage'] = 'Show percentage to students';
 $string['config_title'] = 'Alternate title';

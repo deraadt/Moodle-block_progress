@@ -19,13 +19,13 @@
  *
  * Instructions for adding new modules so they can be monitored
  * ====================================================================================================================
- * Activies that can be monitored (all resources are treated together) are defined in the $MODULES
- * array.
+ * Activities that can be monitored (all resources are treated together) are defined in the
+ * block_progress_monitorable_modules() function.
  *
  * Modules can be added with:
  *  - defaultTime (deadline from module if applicable),
  *  - actions (array if action-query pairs) and
- *  - defaultAction (selected by default in config page and needed for backwards compatability)
+ *  - defaultAction (selected by default in config page and needed for backwards compatibility)
  *
  * The module name needs to be the same as the table name for module in the database.
  *
@@ -39,11 +39,13 @@
  *  :userid (the current user's id) and
  *  :courseid (the current course id)
  *
- * When you add a new module, you need to add a translation for it in the lang files.
- * If you add new action names, you need to add a translation for these in the lang files.
+ * When you add a new module, you need to add a translation for it in the lang file.
+ * If you add new action names, you need to add a translation for these in the lang file.
  *
  * Note: Activity completion is automatically available when enabled (sitewide setting) and set for
  * an activity.
+ *
+ * Passing relies on a passing grade being set for an activity in the Gradebook.
  *
  * If you have added a new module to this array and think other's may benefit from the query you
  * have created, please share it by sending it to michaeld@moodle.com
