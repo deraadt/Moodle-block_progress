@@ -87,7 +87,7 @@ class block_progress_edit_form extends block_edit_form {
         $mform->addHelpButton('config_showpercentage', 'why_show_precentage', 'block_progress');
 
         // Get course section information.
-        $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,section,sequence');
+        $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,section,name,sequence');
         foreach ($sections as $section) {
             if($section->sequence != '') {
                 $section->sequence = explode(',', $section->sequence);
@@ -230,7 +230,7 @@ class block_progress_edit_form extends block_edit_form {
                 if(count($section->sequence) > 0) {
 
                     // Output the section header.
-                    $sectionname = get_string('section').':&nbsp;'.get_section_name($COURSE, $section->section);
+                    $sectionname = get_string('section').':&nbsp;'.get_section_name($COURSE, $section);
                     $mform->addElement('header', 'section'.$i, format_string($sectionname));
                     if (method_exists($mform, 'setExpanded')) {
                         $mform->setExpanded('section'.$i);
