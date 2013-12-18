@@ -38,6 +38,7 @@ $string['folder'] = 'Folder';
 $string['forum'] = 'Forum';
 $string['glossary'] = 'Glossary';
 $string['hotpot'] = 'Hot Potatoes';
+$string['hsuforum'] = 'Advanced Forum';
 $string['imscp'] = 'IMS Content Package';
 $string['journal'] = 'Journal';
 $string['lesson'] = 'Lesson';

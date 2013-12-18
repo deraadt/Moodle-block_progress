@@ -87,15 +87,7 @@ class block_progress_edit_form extends block_edit_form {
         $mform->addHelpButton('config_showpercentage', 'why_show_precentage', 'block_progress');
 
         // Get course section information.
-        $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,section,name,sequence');
-        foreach ($sections as $section) {
-            if($section->sequence != '') {
-                $section->sequence = explode(',', $section->sequence);
-            }
-            else {
-                $section->sequence = null;
-            }
-        }
+        $sections = block_progress_course_sections();
 
         // Determine the time at the end of the week, less 5min.
         if(!$usingweeklyformat) {
@@ -149,6 +141,7 @@ class block_progress_edit_form extends block_edit_form {
                     $moduleinfo->position = array_search($coursemodule->id, $sections[$coursemodule->section]->sequence);
                     $moduleinfo->coursemoduleid = $coursemodule->id;
                     $moduleinfo->completion = $coursemodule->completion;
+                    $moduleinfo->completionexpected = $coursemodule->completionexpected;
 
                     // Find type labels for assignment types.
                     $asslabel = '';
@@ -176,6 +169,11 @@ class block_progress_edit_form extends block_edit_form {
                         // If there is a date associated with the activity/resource, use that.
                         if (isset($details['defaultTime']) && $instance->due != 0) {
                             $expected = progress_default_value($instance->due);
+                        }
+
+                        // If a expected date is set in the activity completion, use that.
+                        else if ($moduleinfo->completion != 0 && $moduleinfo->completionexpected != 0) {
+                            $expected = $moduleinfo->completionexpected;
                         }
 
                         // If positioned in a weekly format, use 5min before end of week.

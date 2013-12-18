@@ -281,6 +281,19 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'finished'
         ),
+        'hsuforum' => array(
+            'defaultTime' => 'assesstimefinish',
+            'actions' => array(
+                'posted_to'    => "SELECT id
+                                     FROM {hsuforum_posts}
+                                    WHERE userid = :userid AND discussion IN (
+                                          SELECT id
+                                            FROM {hsuforum_discussions}
+                                           WHERE forum = :eventid
+                                    )"
+            ),
+            'defaultAction' => 'posted_to'
+        ),
         'imscp' => array(
             'actions' => array(
                 'viewed'       => "SELECT id
@@ -511,10 +524,7 @@ function block_progress_event_information($config, $modules) {
     $numeventsconfigured = 0;
 
     if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
-        $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,sequence');
-        foreach ($sections as $section) {
-            $section->sequence = explode(',', $section->sequence);
-        }
+        $sections = block_progress_course_sections();
     }
 
     // Check each known module (described in lib.php).
@@ -559,7 +569,7 @@ function block_progress_event_information($config, $modules) {
                         'cmid'     => $coursemodule->id,
                     );
                     if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
-                        $event['section'] = $coursemodule->section;
+                        $event['section'] = $sections[$coursemodule->section]->section;
                         $event['position'] = array_search($coursemodule->id, $sections[$coursemodule->section]->sequence);
                     }
                     $events[] = $event;
@@ -670,6 +680,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $instance)
  * @param int      instance  The block instance (incase more than one is being displayed)
  * @param array    $attempts The user's attempts on course activities
  * @param bool     $simple   Controls whether instructions are shown below a progress bar
+ * @return string  Progress Bar HTML content
  */
 function block_progress_bar($modules, $config, $events, $userid, $instance, $attempts, $simple = false) {
     global $OUTPUT, $CFG;
@@ -802,6 +813,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
  *
  * @param array $events   The possible events that can occur for modules
  * @param array $attempts The user's attempts on course activities
+ * @return int  Progress value as a percentage
  */
 function block_progress_percentage($events, $attempts) {
     $attemptcount = 0;
@@ -815,4 +827,25 @@ function block_progress_percentage($events, $attempts) {
     $progressvalue = $attemptcount == 0 ? 0 : $attemptcount / count($events);
 
     return (int)($progressvalue * 100);
+}
+
+/**
+ * Gathers the course section and activity/resource information for ordering
+ *
+ * @return array section information
+ */
+function block_progress_course_sections() {
+    global $COURSE, $DB;
+
+    $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,section,name,sequence');
+    foreach ($sections as $section) {
+        if($section->sequence != '') {
+            $section->sequence = explode(',', $section->sequence);
+        }
+        else {
+            $section->sequence = null;
+        }
+    }
+
+    return $sections;
 }
