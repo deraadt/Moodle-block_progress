@@ -86,7 +86,8 @@ function block_progress_monitorable_modules() {
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid"
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL"
             ),
             'defaultAction' => 'submitted'
         ),
@@ -113,7 +114,8 @@ function block_progress_monitorable_modules() {
                                     WHERE i.itemmodule = 'assignment'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid"
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL"
             ),
             'defaultAction' => 'submitted'
         ),
@@ -388,7 +390,8 @@ function block_progress_monitorable_modules() {
                                     WHERE i.itemmodule = 'quiz'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
-                                      AND g.userid = :userid"
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL"
             ),
             'defaultAction' => 'finished'
         ),
@@ -631,40 +634,40 @@ function block_progress_attempts($modules, $config, $events, $userid, $instance)
                             'cmid' => $event['cmid'], 'cmid1' => $event['cmid'],
                       );
 
-        // Check for passing grades as unattempted, passed or failed
+        // Check for passing grades as unattempted, passed or failed.
         if (isset($config->{'action_'.$uniqueid}) &&
                  $config->{'action_'.$uniqueid} == 'passed'
         ) {
-            $query =  $module['actions'][$config->{'action_'.$uniqueid}];
+            $query = $module['actions'][$config->{'action_'.$uniqueid}];
             $graderesult = $DB->get_record_sql($query, $parameters);
-            if (!$graderesult) {
+            if ($graderesult === false || $graderesult->finalgrade === null) {
                 $attempts[$uniqueid] = false;
             } else {
                 $attempts[$uniqueid] = $graderesult->finalgrade >= $graderesult->gradepass ? true : 'failed';
             }
         } else {
 
-          // If activity completion is used, check completions table.
-          if (isset($config->{'action_'.$uniqueid}) &&
-              $config->{'action_'.$uniqueid} == 'activity_completion'
-          ) {
-              $query = 'SELECT id
-                          FROM {course_modules_completion}
-                         WHERE userid = :userid
-                           AND coursemoduleid = :cmid
-                           AND completionstate = 1';
-          }
+            // If activity completion is used, check completions table.
+            if (isset($config->{'action_'.$uniqueid}) &&
+                $config->{'action_'.$uniqueid} == 'activity_completion'
+            ) {
+                $query = 'SELECT id
+                            FROM {course_modules_completion}
+                           WHERE userid = :userid
+                             AND coursemoduleid = :cmid
+                             AND completionstate = 1';
+            }
 
-          // Determine the set action and develop a query.
-          else {
-              $action = isset($config->{'action_'.$uniqueid})?
-                        $config->{'action_'.$uniqueid}:
-                        $module['defaultAction'];
-              $query =  $module['actions'][$action];
-          }
+            // Determine the set action and develop a query.
+            else {
+                $action = isset($config->{'action_'.$uniqueid})?
+                          $config->{'action_'.$uniqueid}:
+                          $module['defaultAction'];
+                $query = $module['actions'][$action];
+            }
 
-           // Check if the user has attempted the module.
-          $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+             // Check if the user has attempted the module.
+            $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
         }
     }
     return $attempts;
@@ -839,7 +842,7 @@ function block_progress_course_sections() {
 
     $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,section,name,sequence');
     foreach ($sections as $section) {
-        if($section->sequence != '') {
+        if ($section->sequence != '') {
             $section->sequence = explode(',', $section->sequence);
         }
         else {

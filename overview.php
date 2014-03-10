@@ -47,7 +47,7 @@ $progressconfig = unserialize(base64_decode($progressblock->configdata));
 if (class_exists('context_block')) {
     $progressblockcontext = context_block::instance($id);
 } else {
-    $progressblockcontext = get_context_instance(CONTEXT_BLOCK, $courseid);
+    $progressblockcontext = get_context_instance(CONTEXT_BLOCK, $id);
 }
 
 // Set up page parameters.
