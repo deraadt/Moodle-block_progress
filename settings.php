@@ -27,12 +27,13 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
 
-	$settings->add(new admin_setting_configtext('block_progress/attempted_colour', get_string('attempted_colour_title', 'block_progress'),
-				get_string('attempted_colour_descr', 'block_progress'), '#5CD85C', PARAM_RAW, 10 ));
+	$settings->add(new admin_setting_configcolourpicker('block_progress/attempted_colour', get_string('attempted_colour_title', 'block_progress'),
+				get_string('attempted_colour_descr', 'block_progress'), '#5CD85C', NULL ));
 	
-	$settings->add(new admin_setting_configtext('block_progress/notattempted_colour', get_string('notattempted_colour_title', 'block_progress'),
-	        get_string('notattempted_colour_descr', 'block_progress'), '#FF5C5C', PARAM_RAW, 10 ));
+	$settings->add(new admin_setting_configcolourpicker('block_progress/notattempted_colour', get_string('notattempted_colour_title', 'block_progress'),
+	        get_string('notattempted_colour_descr', 'block_progress'), '#FF5C5C', NULL ));
 	
-	$settings->add(new admin_setting_configtext('block_progress/futurenotattempted_colour', get_string('futurenotattempted_colour_title', 'block_progress'),
-	        get_string('futurenotattempted_colour_descr', 'block_progress'), '#5C5CFF', PARAM_RAW, 10 ));
+	$settings->add(new admin_setting_configcolourpicker('block_progress/futurenotattempted_colour', get_string('futurenotattempted_colour_title', 'block_progress'),
+	        get_string('futurenotattempted_colour_descr', 'block_progress'), '#5C5CFF', NULL ));
+	
 }
