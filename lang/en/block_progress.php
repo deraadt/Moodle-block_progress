@@ -166,6 +166,13 @@ $string['attempted_colour'] = '#5CD85C';
 $string['notAttempted_colour'] = '#FF5C5C';
 $string['futureNotAttempted_colour'] = '#5C5CFF';
 
+$string['attempted_colour_title'] = 'Attempted Colour';
+$string['attempted_colour_descr'] = 'HTML Colour code for elements that have been attempted';
+$string['notattempted_colour_title'] = 'Not-attempted Colour';
+$string['notattempted_colour_descr'] = 'HTML Colour code for current elements that have not yet been attempted';
+$string['futurenotattempted_colour_title'] = 'Future Not-attempted Colour';
+$string['futurenotattempted_colour_descr'] = 'HTML Colour code for future elements that have not yet been attemted';
+
 // Overview page strings.
 $string['lastonline'] = 'Last online';
 $string['overview'] = 'Overview of students';

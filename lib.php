@@ -766,20 +766,20 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                 ');',
              'style' => 'background-color:');
         if ($attempted === true) {
-            $celloptions['style'] .= get_string('attempted_colour', 'block_progress').';';
+            $celloptions['style'] .= get_config('block_progress', 'attempted_colour').';';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
                                'tick' : 'blank', '', 'block_progress');
         }
         else if (((!isset($config->orderby) || $config->orderby == 'orderbytime') && $event['expected'] < $now) ||
                  ($attempted === 'failed')) {
-            $celloptions['style'] .= get_string('notAttempted_colour', 'block_progress').';';
+            $celloptions['style'] .= get_config('block_progress', 'notattempted_colour').';';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
                                'cross':'blank', '', 'block_progress');
         }
         else {
-            $celloptions['style'] .= get_string('futureNotAttempted_colour', 'block_progress').';';
+            $celloptions['style'] .= get_config('block_progress', 'futurenotattempted_colour').';';
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
         if ($counter == 1) {
