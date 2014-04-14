@@ -46,14 +46,13 @@ class block_progress extends block_base {
 
     /**
      *  we have global config/settings data
-     *  
-     *  @return bool
+     *
+     * @return bool
      */
-    function has_config() {
+    public function has_config() {
         return true;
     }
-    
-    
+
     /**
      * Controls the block title based on instance configuration
      *
