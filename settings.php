@@ -40,4 +40,7 @@ if ($ADMIN->fulltree) {
         get_string('futurenotattempted_colour_title', 'block_progress'),
         get_string('futurenotattempted_colour_descr', 'block_progress'), '#5C5CFF', null )
     );
+	$settings->add(new admin_setting_configtext('block_progress/defaultrole',
+		get_string('defaultroletitle', 'block_progress'),
+		get_string('defaultroledesc', 'block_progress'), 'student' , PARAM_RAW, 25));
 }

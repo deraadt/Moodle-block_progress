@@ -96,6 +96,8 @@ if (empty($events)) {
 $numevents = count($events);
 
 // Determine if a role has been selected.
+$defaultrole = get_config('block_progress', 'defaultrole')
+
 $sql = "SELECT DISTINCT r.id, r.name
           FROM {role} r, {role_assignments} a
          WHERE a.contextid = :contextid
