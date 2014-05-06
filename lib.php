@@ -671,13 +671,13 @@ function block_progress_event_information($config, $modules) {
                 $coursemodule = get_coursemodule_from_instance($module, $record->id, $COURSE->id);
 
                 // Check if the module is visible, and if so, keep a record for it.
-                if ($coursemodule->visible == 1) {
+                if ($coursemodule->visible) {
                     $event = array(
                         'expected' => $expected,
                         'type'     => $module,
                         'id'       => $record->id,
                         'name'     => format_string($record->name),
-                        'cmid'     => $coursemodule->id,
+                        'cm'       => $coursemodule,
                     );
                     if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
                         $event['section'] = $sections[$coursemodule->section]->section;
@@ -761,7 +761,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $instance)
         $parameters = array('courseid' => $COURSE->id, 'courseid1' => $COURSE->id,
                             'userid' => $userid, 'userid1' => $userid,
                             'eventid' => $event['id'], 'eventid1' => $event['id'],
-                            'cmid' => $event['cmid'], 'cmid1' => $event['cmid'],
+                            'cmid' => $event['cm']->id, 'cmid1' => $event['cm']->id,
                       );
 
         // Check for passing grades as unattempted, passed or failed.
@@ -853,8 +853,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $instance)
  * @return string  Progress Bar HTML content
  */
 function block_progress_bar($modules, $config, $events, $userid, $instance, $attempts, $simple = false) {
-    global $OUTPUT, $CFG;
-
+    global $OUTPUT, $CFG, $COURSE;
     $now = time();
     $numevents = count($events);
     $dateformat = get_string('date_format', 'block_progress');
@@ -920,11 +919,11 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             'id' => '',
             'width' => $width.'%',
             'onclick' => 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].
-                '/view.php?id='.$event['cmid'].'\';',
+                '/view.php?id='.$event['cm']->id.'\';',
             'onmouseover' => 'M.block_progress.showInfo('.
                 '\''.$event['type'].'\', '.
                 '\''.addslashes(get_string($event['type'], 'block_progress')).'\', '.
-                '\''.$event['cmid'].'\', '.
+                '\''.$event['cm']->id.'\', '.
                 '\''.addslashes($event['name']).'\', '.
                 '\''.addslashes(get_string($action, 'block_progress')).'\', '.
                 '\''.addslashes(userdate($event['expected'], $dateformat, $CFG->timezone)).'\', '.'\''.$instance.'\', '.
@@ -996,7 +995,7 @@ function block_progress_percentage($events, $attempts) {
 
     $progressvalue = $attemptcount == 0 ? 0 : $attemptcount / count($events);
 
-    return (int)($progressvalue * 100);
+    return (int)round($progressvalue * 100);
 }
 
 /**
@@ -1018,4 +1017,27 @@ function block_progress_course_sections() {
     }
 
     return $sections;
+}
+
+/**
+ * Filters events that a user cannot see due to grouping constraints
+ *
+ * @param array  $events The possible events that can occur for modules
+ * @param array  $userid The user's id
+ * @return array The array with restricted events removed
+ */
+function block_progress_filter_groupings($events, $userid) {
+    global $CFG;
+    $filteredevents = array();
+
+    if(!$CFG->enablegroupmembersonly) {
+        return $events;
+    }
+
+    foreach ($events as $key => $event) {
+        if (groups_course_module_visible($event['cm'], $userid)) {
+            $filteredevents[] = $event;
+        }
+    }
+    return $filteredevents;
 }

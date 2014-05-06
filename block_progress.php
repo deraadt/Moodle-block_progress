@@ -114,6 +114,7 @@ class block_progress extends block_base {
 
         // Check if activities/resources have been selected in config.
         $events = block_progress_event_information($this->config, $modules);
+        $events = block_progress_filter_groupings($events, $USER->id);
         if ($events === null || $events === 0) {
             if (has_capability('moodle/block:edit', $this->context)) {
                 $this->content->text .= get_string('no_events_message', 'block_progress');

@@ -197,10 +197,11 @@ for ($i = 0; $i < $numberofusers; $i++) {
     } else {
         $lastonline = userdate($users[$i]->lastaccess);
     }
-    $attempts = block_progress_attempts($modules, $progressconfig, $events, $users[$i]->id, $course->id);
-    $progressbar = block_progress_bar($modules, $progressconfig, $events, $users[$i]->id, $course->id, $attempts,
+    $userevents = block_progress_filter_groupings($events, $users[$i]->id);
+    $attempts = block_progress_attempts($modules, $progressconfig, $userevents, $users[$i]->id, $course->id);
+    $progressbar = block_progress_bar($modules, $progressconfig, $userevents, $users[$i]->id, $course->id, $attempts,
                                 true);
-    $progressvalue = block_progress_percentage($events, $attempts);
+    $progressvalue = block_progress_percentage($userevents, $attempts, true);
     $progress = $progressvalue.'%';
 
     $rows[] = array(
