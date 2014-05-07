@@ -1033,6 +1033,14 @@ function block_progress_filter_groupings($events, $userid) {
     global $CFG;
     $filteredevents = array();
 
+    // Check if the events are empty or none are selected.
+    if ($events === 0) {
+        return 0;
+    }
+    if ($events === null) {
+        return null;
+    }
+
     // Check if groupings are enabled.
     if (!isset($CFG->enablegroupmembersonly) || !$CFG->enablegroupmembersonly) {
         return $events;
