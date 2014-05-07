@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') or die("Direct access to this location is not allowed
 
 $definitions = array(
 
-    // Used to store results of queries about views from the logs
+    // Used to store results of queries about views from the logs.
     'cachedlogs' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,

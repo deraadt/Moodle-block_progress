@@ -733,18 +733,18 @@ function block_progress_compare_events($a, $b) {
 function block_progress_attempts($modules, $config, $events, $userid, $instance) {
     global $COURSE, $DB;
     $attempts = array();
-    $logmanager = get_log_manager();
     $modernlogging = false;
     $cachingused = false;
-    
-    // Get readers for 2.7 onwards
-    if ($logmanager) {
+
+    // Get readers for 2.7 onwards.
+    if (function_exists('get_log_manager')) {
         $modernlogging = true;
+        $logmanager = get_log_manager();
         $readers = $logmanager->get_readers();
         $numreaders = count($readers);
     }
 
-    // Get cache store if caching is working 2.4 onwards
+    // Get cache store if caching is working 2.4 onwards.
     if (class_exists('cache')) {
         $cachingused = true;
         $cachedlogs = cache::make('block_progress', 'cachedlogs');
@@ -773,36 +773,39 @@ function block_progress_attempts($modules, $config, $events, $userid, $instance)
             } else {
                 $attempts[$uniqueid] = $graderesult->finalgrade >= $graderesult->gradepass ? true : 'failed';
             }
+        }
 
-        // Checked view actions in the log table/store/cache
-        } else if (isset($config->{'action_'.$uniqueid}) && $config->{'action_'.$uniqueid} == 'viewed') {
+        // Checked view actions in the log table/store/cache.
+        else if (isset($config->{'action_'.$uniqueid}) && $config->{'action_'.$uniqueid} == 'viewed') {
             $attempts[$uniqueid] = false;
 
-            // Check if the value is cached
+            // Check if the value is cached.
             if ($cachingused && array_key_exists($uniqueid, $cachedlogviews) && $cachedlogviews[$uniqueid]) {
                 $attempts[$uniqueid] = true;
+            }
 
-            // Check in the logs
-            } else {
+            // Check in the logs.
+            else {
                 if ($modernlogging) {
-                  foreach ($readers as $logstore => $reader) {
-                      if ($reader instanceof logstore_legacy\log\store) {
-                          $query = $module['actions']['viewed']['logstore_legacy'];
-                      } else if ($reader instanceof \core\log\sql_internal_reader) {
-                          $logtable = '{'.$reader->get_internal_log_table_name().'}';
-                          $query = preg_replace('/\{log\}/', $logtable, $module['actions']['viewed']['sql_internal_reader']);
-                      }
-                      $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
-                      if($attempts[$uniqueid]) {
-                          $cachedlogviews[$uniqueid] = true;
-                          $cachedlogsupdated = true;
-                          break;
-                      }
-                  }
+                    foreach ($readers as $logstore => $reader) {
+                        if ($reader instanceof logstore_legacy\log\store) {
+                            $query = $module['actions']['viewed']['logstore_legacy'];
+                        }
+                        else if ($reader instanceof \core\log\sql_internal_reader) {
+                            $logtable = '{'.$reader->get_internal_log_table_name().'}';
+                            $query = preg_replace('/\{log\}/', $logtable, $module['actions']['viewed']['sql_internal_reader']);
+                        }
+                        $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+                        if ($attempts[$uniqueid]) {
+                            $cachedlogviews[$uniqueid] = true;
+                            $cachedlogsupdated = true;
+                            break;
+                        }
+                    }
                 } else {
                     $query = $module['actions']['viewed']['logstore_legacy'];
                     $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
-                    if($cachingused && $attempts[$uniqueid]) {
+                    if ($cachingused && $attempts[$uniqueid]) {
                         $cachedlogviews[$uniqueid] = true;
                         $cachedlogsupdated = true;
                     }
@@ -832,7 +835,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $instance)
         }
     }
 
-    // Update log cache if new values were added
+    // Update log cache if new values were added.
     if ($cachingused && $cachedlogsupdated) {
         $cachedlogs->set($userid, $cachedlogviews);
     }
@@ -1030,10 +1033,12 @@ function block_progress_filter_groupings($events, $userid) {
     global $CFG;
     $filteredevents = array();
 
-    if(!$CFG->enablegroupmembersonly) {
+    // Check if groupings are enabled.
+    if (!isset($CFG->enablegroupmembersonly) || !$CFG->enablegroupmembersonly) {
         return $events;
     }
 
+    // Remove events that should be hidden due to grouping restrictions.
     foreach ($events as $key => $event) {
         if (groups_course_module_visible($event['cm'], $userid)) {
             $filteredevents[] = $event;
