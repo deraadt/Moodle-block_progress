@@ -179,6 +179,9 @@ $string['overview'] = 'Overview of students';
 $string['progress'] = 'Progress';
 $string['progressbar'] = 'Progress Bar';
 
-// For cabailities.
+// For capabilities.
 $string['progress:overview'] = 'View course overview of Progress bars for all students';
 $string['progress:addinstance'] = 'Add a new Progress Bar block';
+
+// For cache
+$string['cachedef_cachedlogs'] = 'Progress Bar Logs';
