@@ -182,3 +182,6 @@ $string['progressbar'] = 'Progress Bar';
 // For cabailities.
 $string['progress:overview'] = 'View course overview of Progress bars for all students';
 $string['progress:addinstance'] = 'Add a new Progress Bar block';
+
+// For Cache
+$string['cachedef_cachedlogs'] = 'Progress Bar log query caching'; 
