@@ -601,8 +601,9 @@ function progress_default_value(&$var, $def = null) {
  *
  * @return array
  */
-function block_progress_modules_in_use() {
-    global $COURSE, $DB;
+function block_progress_modules_in_use($course) {
+    global $DB;
+
     $dbmanager = $DB->get_manager(); // Used to check if tables exist.
     $modules = block_progress_monitorable_modules();
     $modulesinuse = array();
@@ -610,7 +611,7 @@ function block_progress_modules_in_use() {
     foreach ($modules as $module => $details) {
         if (
             $dbmanager->table_exists($module) &&
-            $DB->record_exists($module, array('course' => $COURSE->id))
+            $DB->record_exists($module, array('course' => $course))
         ) {
             $modulesinuse[$module] = $details;
         }
@@ -628,14 +629,14 @@ function block_progress_modules_in_use() {
  *                 null if all events are configured to "no" monitoring and
  *                 0 if events are available but no config is set
  */
-function block_progress_event_information($config, $modules) {
-    global $COURSE, $DB;
+function block_progress_event_information($config, $modules, $course) {
+    global $DB;
     $events = array();
     $numevents = 0;
     $numeventsconfigured = 0;
 
     if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
-        $sections = block_progress_course_sections();
+        $sections = block_progress_course_sections($course);
     }
 
     // Check each known module (described in lib.php).
@@ -646,7 +647,7 @@ function block_progress_event_information($config, $modules) {
         }
 
         // Check if this type of module is used in the course, gather instance info.
-        $records = $DB->get_records($module, array('course' => $COURSE->id), '', $fields);
+        $records = $DB->get_records($module, array('course' => $course), '', $fields);
         foreach ($records as $record) {
 
             // Is the module being monitored?
@@ -668,7 +669,7 @@ function block_progress_event_information($config, $modules) {
                 }
 
                 // Get the course module info.
-                $coursemodule = get_coursemodule_from_instance($module, $record->id, $COURSE->id);
+                $coursemodule = get_coursemodule_from_instance($module, $record->id, $course);
 
                 // Check if the module is visible, and if so, keep a record for it.
                 if ($coursemodule->visible) {
@@ -730,8 +731,8 @@ function block_progress_compare_events($a, $b) {
  * @param int      $instance The instance of the block
  * @return array   an describing the user's attempts based on module+instance identifiers
  */
-function block_progress_attempts($modules, $config, $events, $userid, $instance) {
-    global $COURSE, $DB;
+function block_progress_attempts($modules, $config, $events, $userid, $course) {
+    global $DB;
     $attempts = array();
     $modernlogging = false;
     $cachingused = false;
@@ -758,7 +759,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $instance)
     foreach ($events as $event) {
         $module = $modules[$event['type']];
         $uniqueid = $event['type'].$event['id'];
-        $parameters = array('courseid' => $COURSE->id, 'courseid1' => $COURSE->id,
+        $parameters = array('courseid' => $course, 'courseid1' => $course,
                             'userid' => $userid, 'userid1' => $userid,
                             'eventid' => $event['id'], 'eventid1' => $event['id'],
                             'cmid' => $event['cm']->id, 'cmid1' => $event['cm']->id,
@@ -850,13 +851,13 @@ function block_progress_attempts($modules, $config, $events, $userid, $instance)
  * @param stdClass $config   The blocks configuration settings
  * @param array    $events   The possible events that can occur for modules
  * @param int      $userid   The user's id
- * @param int      instance  The block instance (incase more than one is being displayed)
+ * @param int      instance  The block instance (in case more than one is being displayed)
  * @param array    $attempts The user's attempts on course activities
  * @param bool     $simple   Controls whether instructions are shown below a progress bar
  * @return string  Progress Bar HTML content
  */
-function block_progress_bar($modules, $config, $events, $userid, $instance, $attempts, $simple = false) {
-    global $OUTPUT, $CFG, $COURSE;
+function block_progress_bar($modules, $config, $events, $userid, $instance, $attempts, $course, $simple = false) {
+    global $OUTPUT, $CFG;
     $now = time();
     $numevents = count($events);
     $dateformat = get_string('date_format', 'block_progress');
@@ -921,18 +922,8 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             'class' => 'progressBarCell',
             'id' => '',
             'width' => $width.'%',
-            'onclick' => 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].
-                '/view.php?id='.$event['cm']->id.'\';',
-            'onmouseover' => 'M.block_progress.showInfo('.
-                '\''.$event['type'].'\', '.
-                '\''.addslashes(get_string($event['type'], 'block_progress')).'\', '.
-                '\''.$event['cm']->id.'\', '.
-                '\''.addslashes($event['name']).'\', '.
-                '\''.addslashes(get_string($action, 'block_progress')).'\', '.
-                '\''.addslashes(userdate($event['expected'], $dateformat, $CFG->timezone)).'\', '.'\''.$instance.'\', '.
-                '\''.$userid.'\', '.
-                '\''.($attempted === true ? 'tick' : 'cross').'\''.
-                ');',
+            'onclick' => 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].'/view.php?id='.$event['cm']->id.'\';',
+            'onmouseover' => 'M.block_progress.showInfo('.$instance.','.$userid.','.$event['cm']->id.');',
              'style' => 'background-color:');
         if ($attempted === true) {
             $celloptions['style'] .= get_config('block_progress', 'attempted_colour').';';
@@ -965,7 +956,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
 
     // Add the info box below the table.
     $divoptions = array('class' => 'progressEventInfo',
-                        'id' => 'progressBarInfo'.$instance.'user'.$userid);
+                        'id' => 'progressBarInfo'.$instance.'-'.$userid.'-info');
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
         if (isset($config->showpercentage) && $config->showpercentage == 1) {
@@ -976,6 +967,38 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $content .= get_string('mouse_over_prompt', 'block_progress');
     }
     $content .= HTML_WRITER::end_tag('div');
+
+    // Add hidden divs for activity information.
+    $displaydate = (!isset($config->orderby) || $config->orderby == 'orderbytime') &&
+                   (!isset($config->displayNow) || $config->displayNow == 1);
+    foreach ($events as $event) {
+        $attempted = $attempts[$event['type'].$event['id']];
+        $action = isset($config->{'action_'.$event['type'].$event['id']})?
+                  $config->{'action_'.$event['type'].$event['id']}:
+                  $modules[$event['type']]['defaultAction'];
+        $divoptions = array('class' => 'progressEventInfo',
+                            'id' => 'progressBarInfo'.$instance.'-'.$userid.'-'.$event['cm']->id,
+                            'style' => 'display: none;');
+        $content .= HTML_WRITER::start_tag('div', $divoptions);
+        $link = '/mod/'.$event['type'].'/view.php?id='.$event['cm']->id;
+        $text = s($event['name']);
+        $linkaction = null;
+        $attributes = array();
+        $modicon = new pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon'));
+        $content .= $OUTPUT->action_link($link, $text, $linkaction, $attributes, $modicon);
+        $content .= HTML_WRITER::empty_tag('br');
+        $content .= get_string($action, 'block_progress').'&nbsp;';
+        $icon = ($attempted ? 'tick' : 'cross');
+        $content .= $OUTPUT->pix_icon($icon, '', 'block_progress');
+        $content .= HTML_WRITER::empty_tag('br');
+        if ($displaydate) {
+            $content .= HTML_WRITER::start_tag('div', array('class' => 'expectedBy'));
+            $content .= get_string('time_expected', 'block_progress').': ';
+            $content .= userdate($event['expected'], $dateformat, $CFG->timezone);
+            $content .= HTML_WRITER::end_tag('div');
+        }
+        $content .= HTML_WRITER::end_tag('div');
+    }
 
     return $content;
 }
@@ -1006,10 +1029,10 @@ function block_progress_percentage($events, $attempts) {
  *
  * @return array section information
  */
-function block_progress_course_sections() {
-    global $COURSE, $DB;
+function block_progress_course_sections($course) {
+    global $DB;
 
-    $sections = $DB->get_records('course_sections', array('course' => $COURSE->id), 'section', 'id,section,name,sequence');
+    $sections = $DB->get_records('course_sections', array('course' => $course), 'section', 'id,section,name,sequence');
     foreach ($sections as $section) {
         if ($section->sequence != '') {
             $section->sequence = explode(',', $section->sequence);
@@ -1053,4 +1076,43 @@ function block_progress_filter_groupings($events, $userid) {
         }
     }
     return $filteredevents;
+}
+
+/**
+ * Checks whether the current page is the My home page.
+ *
+ * @return bool True when on the My home page.
+ */
+function block_progress_on_my_page() {
+    global $SCRIPT;
+
+    return $SCRIPT === '/my/index.php';
+}
+
+/**
+ * Gets the course context, allowing for old and new Moodle instances.
+ *
+ * @param int $courseid The course ID
+ * @return stdClass The context object
+ */
+function block_progress_get_course_context($courseid) {
+    if (class_exists('context_course')) {
+        return context_course::instance($courseid);
+    } else {
+        return get_context_instance(CONTEXT_COURSE, $courseid);
+    }
+}
+
+/**
+ * Gets the block context, allowing for old and new Moodle instances.
+ *
+ * @param int $block The block ID
+ * @return stdClass The context object
+ */
+function block_progress_get_block_context($blockid) {
+    if (class_exists('context_block')) {
+        return context_block::instance($blockid);
+    } else {
+        return get_context_instance(CONTEXT_BLOCK, $blockid);
+    }
 }

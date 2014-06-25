@@ -35,20 +35,12 @@ $courseid = required_param('courseid', PARAM_INT);
 
 // Determine course and context.
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-if (class_exists('context_course')) {
-    $context = context_course::instance($courseid);
-} else {
-    $context = get_context_instance(CONTEXT_COURSE, $courseid);
-}
+$context = block_progress_get_course_context($courseid);
 
 // Get specific block config and context.
 $progressblock = $DB->get_record('block_instances', array('id' => $id), '*', MUST_EXIST);
 $progressconfig = unserialize(base64_decode($progressblock->configdata));
-if (class_exists('context_block')) {
-    $progressblockcontext = context_block::instance($id);
-} else {
-    $progressblockcontext = get_context_instance(CONTEXT_BLOCK, $id);
-}
+$progressblockcontext = block_progress_get_block_context($id);
 
 // Set up page parameters.
 $PAGE->set_course($course);
@@ -71,7 +63,7 @@ echo $OUTPUT->heading($title, 2);
 echo $OUTPUT->container_start('block_progress');
 
 // Get the modules to check progress on.
-$modules = block_progress_modules_in_use();
+$modules = block_progress_modules_in_use($course->id);
 if (empty($modules)) {
     echo get_string('no_events_config_message', 'block_progress');
     echo $OUTPUT->container_end();
@@ -80,7 +72,7 @@ if (empty($modules)) {
 }
 
 // Check if activities/resources have been selected in config.
-$events = block_progress_event_information($progressconfig, $modules);
+$events = block_progress_event_information($progressconfig, $modules, $course->id);
 if ($events == null) {
     echo get_string('no_events_message', 'block_progress');
     echo $OUTPUT->container_end();
@@ -158,7 +150,9 @@ $sql = "SELECT DISTINCT $picturefields, u.lastaccess
           $rolewhere
           $groupwhere";
 $params['contextid'] = $context->id;
-$users = array_values($DB->get_records_sql($sql, $params));
+$userrecords = $DB->get_records_sql($sql, $params);
+$userids = array_keys($userrecords);
+$users = array_values($userrecords);
 $numberofusers = count($users);
 
 // Setup submissions table.
@@ -199,8 +193,8 @@ for ($i = 0; $i < $numberofusers; $i++) {
     }
     $userevents = block_progress_filter_groupings($events, $users[$i]->id);
     $attempts = block_progress_attempts($modules, $progressconfig, $userevents, $users[$i]->id, $course->id);
-    $progressbar = block_progress_bar($modules, $progressconfig, $userevents, $users[$i]->id, $course->id, $attempts,
-                                true);
+    $progressbar = block_progress_bar($modules, $progressconfig, $userevents, $users[$i]->id, $progressblock->id, $attempts,
+        $course->id, true);
     $progressvalue = block_progress_percentage($userevents, $attempts, true);
     $progress = $progressvalue.'%';
 
@@ -237,11 +231,9 @@ $jsmodule = array(
     'name' => 'block_progress',
     'fullpath' => '/blocks/progress/module.js',
     'requires' => array(),
-    'strings' => array(
-        array('time_expected', 'block_progress'),
-    ),
+    'strings' => array(),
 );
-$arguments = array($CFG->wwwroot, array_keys($modules));
+$arguments = array(array($progressblock->id), $userids);
 $PAGE->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 
 echo $OUTPUT->footer();

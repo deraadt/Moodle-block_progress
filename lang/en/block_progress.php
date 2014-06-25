@@ -182,6 +182,10 @@ $string['progressbar'] = 'Progress Bar';
 // For cabailities.
 $string['progress:overview'] = 'View course overview of Progress bars for all students';
 $string['progress:addinstance'] = 'Add a new Progress Bar block';
+$string['progress:myaddinstance'] = 'Add a Progress Bar block to My home page';
 
-// For Cache
-$string['cachedef_cachedlogs'] = 'Progress Bar log query caching'; 
+// For Cache.
+$string['cachedef_cachedlogs'] = 'Progress Bar log query caching';
+
+// For My home page
+$string['no_blocks'] = "No Progress Bar blocks are set up for your courses.";

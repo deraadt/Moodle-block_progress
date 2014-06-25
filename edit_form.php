@@ -28,7 +28,7 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/progress/lib.php');
 
 /**
- * Simple clock block config form class
+ * Progress Bar block config form class
  *
  * @copyright 2010 Michael de Raadt
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,7 +36,13 @@ require_once($CFG->dirroot.'/blocks/progress/lib.php');
 class block_progress_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
-        global $CFG, $COURSE, $DB, $OUTPUT;
+        global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
+
+        // The My home version is not configurable.
+        if (block_progress_on_my_page()) {
+            return;
+        }
+
         $turnallon = optional_param('turnallon', 0, PARAM_INT);
         $dbmanager = $DB->get_manager(); // Loads ddl manager and xmldb classes.
         $count = 0;
@@ -87,7 +93,7 @@ class block_progress_edit_form extends block_edit_form {
         $mform->addHelpButton('config_showpercentage', 'why_show_precentage', 'block_progress');
 
         // Get course section information.
-        $sections = block_progress_course_sections();
+        $sections = block_progress_course_sections($COURSE->id);
 
         // Determine the time at the end of the week, less 5min.
         if (!$usingweeklyformat) {

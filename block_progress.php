@@ -70,7 +70,16 @@ class block_progress extends block_base {
      * @return bool
      */
     public function instance_allow_multiple() {
-        return true;
+        return !block_progress_on_my_page();
+    }
+
+    /**
+     * Controls whether the block is configurable
+     *
+     * @return bool
+     */
+    public function instance_allow_config() {
+        return !block_progress_on_my_page();
     }
 
     /**
@@ -83,7 +92,7 @@ class block_progress extends block_base {
             'course-view'    => true,
             'site'           => false,
             'mod'            => false,
-            'my'             => false
+            'my'             => true
         );
     }
 
@@ -93,7 +102,7 @@ class block_progress extends block_base {
      * @return string
      */
     public function get_content() {
-        global $USER, $COURSE, $CFG, $OUTPUT;
+        global $USER, $COURSE, $CFG, $OUTPUT, $DB;
 
         // If content has already been generated, don't waste time generating it again.
         if ($this->content !== null) {
@@ -102,69 +111,143 @@ class block_progress extends block_base {
         $this->content = new stdClass;
         $this->content->text = '';
         $this->content->footer = '';
+        $blockinstancesonpage = array();
 
-        // Check if any activities/resources have been created.
-        $modules = block_progress_modules_in_use();
-        if (empty($modules)) {
-            if (has_capability('moodle/block:edit', $this->context)) {
-                $this->content->text .= get_string('no_events_config_message', 'block_progress');
-            }
-            return $this->content;
-        }
+        // Draw the multi-bar content for the My home page.
+        if (block_progress_on_my_page()) {
+            $courses = enrol_get_my_courses();
+            $sql = "SELECT bi.id,
+                           bp.id AS blockpositionid,
+                           COALESCE(bp.region, bi.defaultregion) AS region,
+                           COALESCE(bp.weight, bi.defaultweight) AS weight,
+                           COALESCE(bp.visible, 1) AS visible,
+                           bi.configdata
+                      FROM {block_instances} bi
+                 LEFT JOIN {block_positions} bp ON bp.blockinstanceid = bi.id
+                     WHERE bi.blockname = 'progress'
+                       AND bi.parentcontextid = :contextid
+                  ORDER BY region, weight, bi.id";
 
-        // Check if activities/resources have been selected in config.
-        $events = block_progress_event_information($this->config, $modules);
-        $events = block_progress_filter_groupings($events, $USER->id);
-        if ($events === null || $events === 0) {
-            if (has_capability('moodle/block:edit', $this->context)) {
-                $this->content->text .= get_string('no_events_message', 'block_progress');
-                if ($USER->editing) {
-                    $parameters = array('id' => $COURSE->id, 'sesskey' => sesskey(),
-                                        'bui_editid' => $this->instance->id);
-                    $url = new moodle_url('/course/view.php', $parameters);
-                    $label = get_string('selectitemstobeadded', 'block_progress');
-                    $this->content->text .= $OUTPUT->single_button($url, $label);
-                    if ($events === 0) {
-                        $url->param('turnallon', '1');
-                        $label = get_string('addallcurrentitems', 'block_progress');
-                        $this->content->text .= $OUTPUT->single_button($url, $label);
+            foreach ($courses as $courseid => $course) {
+
+                // Get specific block config and context.
+                $modules = block_progress_modules_in_use($course->id);
+                if ($course->visible && !empty($modules)) {
+                    $context = block_progress_get_course_context($course->id);
+                    $params = array('contextid' => $context->id);
+                    $blockinstances = $DB->get_records_sql($sql, $params);
+                    $blockinstancesonpage = array_merge($blockinstancesonpage, array_keys($blockinstances));
+                    foreach ($blockinstances as $blockid => $blockinstance) {
+                        $blockinstance->config = unserialize(base64_decode($blockinstance->configdata));
+                        if (!empty($blockinstance->config)) {
+                            $blockinstance->events = block_progress_event_information(
+                                                         $blockinstance->config,
+                                                         $modules,
+                                                         $course->id);
+                            $blockinstance->events = block_progress_filter_groupings($blockinstance->events, $USER->id);
+                        }
+                        if ($blockinstance->visible == 0 || empty($blockinstance->config) || $blockinstance->events == 0) {
+                            unset($blockinstances[$blockid]);
+                        }
+                    }
+
+                    // Output the Progress Bar.
+                    if (!empty($blockinstances)) {
+                        $this->content->text .= HTML_WRITER::tag('h3', s($course->shortname));
+                    }
+                    foreach ($blockinstances as $blockid => $blockinstance) {
+                        if ($blockinstance->config->progressTitle != '') {
+                            $this->content->text .= HTML_WRITER::tag('p', s($blockinstance->config->progressTitle));
+                        }
+                        $attempts = block_progress_attempts($modules,
+                                                            $blockinstance->config,
+                                                            $blockinstance->events,
+                                                            $USER->id,
+                                                            $course->id);
+                        $this->content->text .= block_progress_bar($modules,
+                                                                   $blockinstance->config,
+                                                                   $blockinstance->events,
+                                                                   $USER->id,
+                                                                   $blockinstance->id,
+                                                                   $attempts,
+                                                                   $course->id);
                     }
                 }
             }
-            return $this->content;
-        } else if (empty($events)) {
-            if (has_capability('moodle/block:edit', $this->context)) {
-                $this->content->text .= get_string('no_visible_events_message', 'block_progress');
+            if ($this->content->text == '') {
+                $this->content->text = get_string('no_blocks', 'block_progress');
             }
-            return $this->content;
         }
 
-        // Display progress bar.
-        $attempts = block_progress_attempts($modules, $this->config, $events, $USER->id, $this->instance->id);
-        $this->content->text = block_progress_bar($modules, $this->config, $events, $USER->id, $this->instance->id, $attempts);
+        // Gather content for block on regular course.
+        else {
+
+            // Check if any activities/resources have been created.
+            $modules = block_progress_modules_in_use($COURSE->id);
+            if (empty($modules)) {
+                if (has_capability('moodle/block:edit', $this->context)) {
+                    $this->content->text .= get_string('no_events_config_message', 'block_progress');
+                }
+                return $this->content;
+            }
+
+            // Check if activities/resources have been selected in config.
+            $events = block_progress_event_information($this->config, $modules, $COURSE->id);
+            $events = block_progress_filter_groupings($events, $USER->id);
+            if ($events === null || $events === 0) {
+                if (has_capability('moodle/block:edit', $this->context)) {
+                    $this->content->text .= get_string('no_events_message', 'block_progress');
+                    if ($USER->editing) {
+                        $parameters = array('id' => $COURSE->id, 'sesskey' => sesskey(),
+                                            'bui_editid' => $this->instance->id);
+                        $url = new moodle_url('/course/view.php', $parameters);
+                        $label = get_string('selectitemstobeadded', 'block_progress');
+                        $this->content->text .= $OUTPUT->single_button($url, $label);
+                        if ($events === 0) {
+                            $url->param('turnallon', '1');
+                            $label = get_string('addallcurrentitems', 'block_progress');
+                            $this->content->text .= $OUTPUT->single_button($url, $label);
+                        }
+                    }
+                }
+                return $this->content;
+            } else if (empty($events)) {
+                if (has_capability('moodle/block:edit', $this->context)) {
+                    $this->content->text .= get_string('no_visible_events_message', 'block_progress');
+                }
+                return $this->content;
+            }
+
+            // Display progress bar.
+            $attempts = block_progress_attempts($modules, $this->config, $events, $USER->id, $COURSE->id);
+            $this->content->text = block_progress_bar($modules,
+                                                      $this->config,
+                                                      $events,
+                                                      $USER->id,
+                                                      $this->instance->id,
+                                                      $attempts,
+                                                      $COURSE->id);
+            $blockinstancesonpage = array($this->instance->id);
+
+            // Allow teachers to access the overview page.
+            if (has_capability('block/progress:overview', $this->context)) {
+                $parameters = array('progressbarid' => $this->instance->id, 'courseid' => $COURSE->id);
+                $url = new moodle_url('/blocks/progress/overview.php', $parameters);
+                $label = get_string('overview', 'block_progress');
+                $options = array('class' => 'overviewButton');
+                $this->content->text .= $OUTPUT->single_button($url, $label, 'post', $options);
+            }
+        }
 
         // Organise access to JS.
         $jsmodule = array(
             'name' => 'block_progress',
             'fullpath' => '/blocks/progress/module.js',
             'requires' => array(),
-            'strings' => array(
-                array('time_expected', 'block_progress'),
-            ),
+            'strings' => array(),
         );
-        $displaydate = (!isset($this->config->orderby) || $this->config->orderby == 'orderbytime') &&
-                       (!isset($this->config->displayNow) || $this->config->displayNow == 1);
-        $arguments = array($CFG->wwwroot, array_keys($modules), $displaydate);
+        $arguments = array($blockinstancesonpage, array($USER->id));
         $this->page->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
-
-        // Allow teachers to access the overview page.
-        if (has_capability('block/progress:overview', $this->context)) {
-            $parameters = array('progressbarid' => $this->instance->id, 'courseid' => $COURSE->id);
-            $url = new moodle_url('/blocks/progress/overview.php', $parameters);
-            $label = get_string('overview', 'block_progress');
-            $options = array('class' => 'overviewButton');
-            $this->content->text .= $OUTPUT->single_button($url, $label, 'post', $options);
-        }
 
         return $this->content;
     }

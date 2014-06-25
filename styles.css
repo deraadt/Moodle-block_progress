@@ -60,6 +60,7 @@
     white-space: pre;
     overflow: hidden;
     padding: 0;
+    margin: 5px auto;
 }
 
 .block_progress .progressEventInfo img {
@@ -75,6 +76,14 @@
     font-size: 90%;
     margin: 0;
     padding: 0;
+}
+
+.block_progress h3 {
+    margin-bottom: 0;
+}
+
+.block_progress .expectedBy {
+    margin: 5px auto;
 }
 
 .progressConfigBox {
