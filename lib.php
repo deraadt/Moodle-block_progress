@@ -1030,12 +1030,12 @@ function block_progress_course_sections($course) {
     global $DB;
 
     $sections = $DB->get_records('course_sections', array('course' => $course), 'section', 'id,section,name,sequence');
-    foreach ($sections as $section) {
+    foreach ($sections as $key => $section) {
         if ($section->sequence != '') {
-            $section->sequence = explode(',', $section->sequence);
+            $sections[$key]->sequence = explode(',', $section->sequence);
         }
         else {
-            $section->sequence = null;
+            $sections[$key]->sequence = null;
         }
     }
 
