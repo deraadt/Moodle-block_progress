@@ -187,5 +187,5 @@ $string['progress:myaddinstance'] = 'Add a Progress Bar block to My home page';
 // For Cache.
 $string['cachedef_cachedlogs'] = 'Progress Bar log query caching';
 
-// For My home page
+// For My home page.
 $string['no_blocks'] = "No Progress Bar blocks are set up for your courses.";

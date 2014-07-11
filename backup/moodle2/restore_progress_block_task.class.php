@@ -38,6 +38,7 @@ class restore_progress_block_task extends restore_block_task {
      */
     public function after_restore() {
         global $DB;
+        $prefixes = array('monitor_', 'date_time_', 'action_', 'locked_');
 
         // Get the blockid.
         $id = $this->get_blockid();
@@ -47,45 +48,41 @@ class restore_progress_block_task extends restore_block_task {
 
         if ($configdata = $DB->get_field('block_instances', 'configdata', array('id' => $id))) {
             $config = (array)unserialize(base64_decode($configdata));
+            $newconfig = $config;
+
+            // Filter module related config information.
+            foreach ($newconfig as $key => $value) {
+                foreach ($prefixes as $prefix) {
+                    if (substr($key, 0, strlen($prefix)) === $prefix) {
+                        unset($newconfig[$key]);
+                    }
+                }
+            }
 
             // Translate the old config information to the target course values.
             foreach ($config as $key => $value) {
                 $matches = array();
                 preg_match('/monitor_(\D+)(\d+)/', $key, $matches);
-                if ($value == 1 && !empty($matches)) {
+                if (!empty($matches)) {
                     $module = $matches[1];
                     $instance = $matches[2];
 
-                    // Find a matching module in the target course.
-                    if ($cm = get_coursemodule_from_instance($module, $instance)) {
+                    // Find the mapped instance ID.
+                    if ($newinstance = restore_dbops::get_backup_ids_record($this->get_restoreid(), $module, $instance)) {
+                        $newinstanceid = $newinstance->newitemid;
 
-                        // Get new cm and instance.
-                        $newitem = restore_dbops::get_backup_ids_record(
-                            $this->get_restoreid(), "course_module", $cm->id);
-                        $newcm = get_coursemodule_from_id($module, $newitem->newitemid);
-                        $newinstance = $newcm->instance;
-
-                        // Set new config.
-                        $config["monitor_$module$newinstance"] =
-                            $config["monitor_$module$instance"];
-                        $config["locked_$module$newinstance"] =
-                            $config["locked_$module$instance"];
-                        $config["date_time_$module$newinstance"] =
-                            $config["date_time_$module$instance"];
-                        $config["action_$module$newinstance"] =
-                            $config["action_$module$instance"];
-
-                        // Unset old config.
-                        unset($config["monitor_$module$instance"]);
-                        unset($config["locked_$module$instance"]);
-                        unset($config["date_time_$module$instance"]);
-                        unset($config["action_$module$instance"]);
+                        // Translate new instance values from old IDs.
+                        foreach ($prefixes as $prefix) {
+                            if (isset($config["$prefix$module$instance"])) {
+                                $newconfig["$prefix$module$newinstanceid"] = $config["$prefix$module$instance"];
+                            }
+                        }
                     }
                 }
             }
 
             // Save everything back to DB.
-            $configdata = base64_encode(serialize((object)$config));
+            $configdata = base64_encode(serialize((object)$newconfig));
             $DB->set_field('block_instances', 'configdata', $configdata, array('id' => $id));
         }
     }

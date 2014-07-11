@@ -981,11 +981,8 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                             'style' => 'display: none;');
         $content .= HTML_WRITER::start_tag('div', $divoptions);
         $link = '/mod/'.$event['type'].'/view.php?id='.$event['cm']->id;
-        $text = s($event['name']);
-        $linkaction = null;
-        $attributes = array();
-        $modicon = new pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon'));
-        $content .= $OUTPUT->action_link($link, $text, $linkaction, $attributes, $modicon);
+        $text = $OUTPUT->pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon')).s($event['name']);
+        $content .= $OUTPUT->action_link($link, $text);
         $content .= HTML_WRITER::empty_tag('br');
         $content .= get_string($action, 'block_progress').'&nbsp;';
         $icon = ($attempted ? 'tick' : 'cross');
