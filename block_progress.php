@@ -111,15 +111,15 @@ class block_progress extends block_base {
         $this->content = new stdClass;
         $this->content->text = '';
         $this->content->footer = '';
+        $blockinstancesonpage = array();
 
         // Guests do not have any progress. Don't show them the block.
-        if (isguestuser()) {
+        if (!isloggedin() or isguestuser()) {
             return $this->content;
         }
 
         // Draw the multi-bar content for the My home page.
         if (block_progress_on_my_page()) {
-            $blockinstancesonpage = array();
             $courses = enrol_get_my_courses();
             $sql = "SELECT bi.id,
                            bp.id AS blockpositionid,

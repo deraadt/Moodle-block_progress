@@ -176,12 +176,12 @@ class block_progress_edit_form extends block_edit_form {
                     if (isset($details['defaultTime']) && $instance->due != 0 && (
                             (
                                 isset($this->block->config) &&
-                                property_exists($this->block->config, $lockedproperty &&
+                                property_exists($this->block->config, $lockedproperty) &&
                                 $this->block->config->$lockedproperty == 1
                             ) ||
                             empty($expected)
                         )
-                    )) {
+                    ) {
                         $expected = progress_default_value($instance->due);
                         if (
                             isset($this->block->config) &&
