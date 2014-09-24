@@ -225,7 +225,7 @@ class block_progress_edit_form extends block_edit_form {
                             $actions[$action] = get_string($action, 'block_progress');
                         }
                     }
-                    if (isset($CFG->enablecompletion) && $CFG->enablecompletion == 1) {
+                    if (!empty($CFG->enablecompletion)) {
                         if ($moduleinfo->completion != 0) {
                             $actions['activity_completion'] = get_string('activity_completion', 'block_progress');
                         }
@@ -315,8 +315,15 @@ class block_progress_edit_form extends block_edit_form {
                                 $mform->addElement('select', 'config_action_'.$moduleinfo->uniqueid,
                                                    get_string('config_header_action', 'block_progress'),
                                                    $moduleinfo->actions );
-                                $mform->setDefault('config_action_'.$moduleinfo->uniqueid,
-                                                   $details['defaultAction']);
+                                if(
+                                    (!$moduleinfo->lockpossible || $moduleinfo->instancedue == 0) &&
+                                    array_key_exists('activity_completion', $moduleinfo->actions)
+                                ) {
+                                    $defaultaction = 'activity_completion';
+                                } else {
+                                    $defaultaction = $details['defaultAction'];
+                                }
+                                $mform->setDefault('config_action_'.$moduleinfo->uniqueid, $defaultaction);
                                 $mform->disabledif ('config_action_'.$moduleinfo->uniqueid,
                                                     'config_monitor_'.$moduleinfo->uniqueid, 'eq', 0);
                             }

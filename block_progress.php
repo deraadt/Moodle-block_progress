@@ -149,7 +149,7 @@ class block_progress extends block_base {
                                                          $blockinstance->config,
                                                          $modules,
                                                          $course->id);
-                            $blockinstance->events = block_progress_filter_groupings($blockinstance->events, $USER->id);
+                            $blockinstance->events = block_progress_filter_visibility($blockinstance->events, $USER->id, $context);
                         }
                         if ($blockinstance->visible == 0 || empty($blockinstance->config) || $blockinstance->events == 0) {
                             unset($blockinstances[$blockid]);
@@ -200,7 +200,8 @@ class block_progress extends block_base {
 
             // Check if activities/resources have been selected in config.
             $events = block_progress_event_information($this->config, $modules, $COURSE->id);
-            $events = block_progress_filter_groupings($events, $USER->id);
+            $context = block_progress_get_course_context($COURSE->id);
+            $events = block_progress_filter_visibility($events, $USER->id, $context);
             if ($events === null || $events === 0) {
                 if (has_capability('moodle/block:edit', $this->context)) {
                     $this->content->text .= get_string('no_events_message', 'block_progress');

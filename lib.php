@@ -624,16 +624,22 @@ function block_progress_modules_in_use($course) {
  *
  * @param stdClass $config  The block instance configuration values
  * @param array    $modules The modules used in the course
+ * @param stdClass $course  The current course
+ * @param int      $userid  The user's ID
  * @return mixed   returns array of visible events monitored,
  *                 empty array if none of the events are visible,
  *                 null if all events are configured to "no" monitoring and
  *                 0 if events are available but no config is set
  */
-function block_progress_event_information($config, $modules, $course) {
-    global $DB;
+function block_progress_event_information($config, $modules, $course, $userid = 0) {
+    global $DB, $USER;
     $events = array();
     $numevents = 0;
     $numeventsconfigured = 0;
+
+    if($userid === 0) {
+        $userid = $USER->id;
+    }
 
     if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
         $sections = block_progress_course_sections($course);
@@ -656,7 +662,6 @@ function block_progress_event_information($config, $modules, $course) {
             }
             if (progress_default_value($config->{'monitor_'.$module.$record->id}, 0) == 1) {
                 $numevents++;
-
                 // Check the time the module is due.
                 if (
                     isset($details['defaultTime']) &&
@@ -668,24 +673,20 @@ function block_progress_event_information($config, $modules, $course) {
                     $expected = $config->{'date_time_'.$module.$record->id};
                 }
 
-                // Get the course module info.
-                $coursemodule = get_coursemodule_from_instance($module, $record->id, $course);
-
-                // Check if the module is visible, and if so, keep a record for it.
-                if ($coursemodule->visible) {
-                    $event = array(
-                        'expected' => $expected,
-                        'type'     => $module,
-                        'id'       => $record->id,
-                        'name'     => format_string($record->name),
-                        'cm'       => $coursemodule,
-                    );
-                    if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
-                        $event['section'] = $sections[$coursemodule->section]->section;
-                        $event['position'] = array_search($coursemodule->id, $sections[$coursemodule->section]->sequence);
-                    }
-                    $events[] = $event;
+                // Gather together module information.
+                $coursemodule = block_progress_get_coursemodule($module, $record->id, $course);
+                $event = array(
+                    'expected' => $expected,
+                    'type'     => $module,
+                    'id'       => $record->id,
+                    'name'     => format_string($record->name),
+                    'cm'       => $coursemodule,
+                );
+                if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
+                    $event['section'] = $sections[$coursemodule->section]->section;
+                    $event['position'] = array_search($coursemodule->id, $sections[$coursemodule->section]->sequence);
                 }
+                $events[] = $event;
             }
         }
     }
@@ -820,7 +821,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
                             FROM {course_modules_completion}
                            WHERE userid = :userid
                              AND coursemoduleid = :cmid
-                             AND completionstate = 1';
+                             AND completionstate >= 1';
             }
 
             // Determine the set action and develop a query.
@@ -922,7 +923,6 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             'class' => 'progressBarCell',
             'id' => '',
             'width' => $width.'%',
-            'onclick' => 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].'/view.php?id='.$event['cm']->id.'\';',
             'onmouseover' => 'M.block_progress.showInfo('.$instance.','.$userid.','.$event['cm']->id.');',
              'style' => 'background-color:');
         if ($attempted === true) {
@@ -941,6 +941,9 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         else {
             $celloptions['style'] .= get_config('block_progress', 'futurenotattempted_colour').';';
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
+        }
+        if (!empty($event['cm']->available)) {
+            $celloptions['onclick'] = 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].'/view.php?id='.$event['cm']->id.'\';';
         }
         if ($counter == 1) {
             $celloptions['id'] .= 'first';
@@ -982,7 +985,11 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $content .= HTML_WRITER::start_tag('div', $divoptions);
         $link = '/mod/'.$event['type'].'/view.php?id='.$event['cm']->id;
         $text = $OUTPUT->pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon')).s($event['name']);
-        $content .= $OUTPUT->action_link($link, $text);
+        if(!empty($event['cm']->available)) {
+            $content .= $OUTPUT->action_link($link, $text);
+        } else {
+            $content .= $text;
+        }
         $content .= HTML_WRITER::empty_tag('br');
         $content .= get_string($action, 'block_progress').'&nbsp;';
         $icon = ($attempted ? 'tick' : 'cross');
@@ -1043,13 +1050,55 @@ function block_progress_course_sections($course) {
 }
 
 /**
+ * Determines if a single activity/resource is visible to the given user.
+ *
+ * @param stdClass $coursemodule  the object with course module information
+ * @param int      $userid        the user's ID (from the user table)
+ * @param string   $coursecontext the context value of the course
+ * @return bool whether the activity/resource is visible to the user
+ */
+function block_progress_is_visible($coursemodule, $userid, $coursecontext) {
+    global $CFG;
+
+    // Check visibility in course.
+    if (!$coursemodule->visible && !has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid)) {
+        return false;
+    }
+
+    // Check availability, allowing for visible, but not accessible items.
+    if (!empty($CFG->enableavailability)) {
+        if (
+            !$coursemodule->available && empty($coursemodule->availableinfo) &&
+            !has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid)
+        ) {
+            return false;
+        }
+    }
+
+    // Check visibility by grouping constraints (includes capability check).
+    if (!empty($CFG->enablegroupmembersonly)) {
+        if (isset($coursemodule->uservisible)) {
+            if ($coursemodule->uservisible != 1) {
+                return false;
+            }
+        }
+        else if (!groups_course_module_visible($coursemodule, $userid)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
  * Filters events that a user cannot see due to grouping constraints
  *
  * @param array  $events The possible events that can occur for modules
  * @param array  $userid The user's id
+ * @param string $coursecontext the context value of the course
  * @return array The array with restricted events removed
  */
-function block_progress_filter_groupings($events, $userid) {
+function block_progress_filter_visibility($events, $userid, $coursecontext) {
     global $CFG;
     $filteredevents = array();
 
@@ -1061,14 +1110,9 @@ function block_progress_filter_groupings($events, $userid) {
         return null;
     }
 
-    // Check if groupings are enabled.
-    if (!isset($CFG->enablegroupmembersonly) || !$CFG->enablegroupmembersonly) {
-        return $events;
-    }
-
-    // Remove events that should be hidden due to grouping restrictions.
+    // Keep only events that are visible.
     foreach ($events as $key => $event) {
-        if (groups_course_module_visible($event['cm'], $userid)) {
+        if (block_progress_is_visible($event['cm'], $userid, $coursecontext)) {
             $filteredevents[] = $event;
         }
     }
@@ -1111,5 +1155,22 @@ function block_progress_get_block_context($blockid) {
         return context_block::instance($blockid);
     } else {
         return get_context_instance(CONTEXT_BLOCK, $blockid);
+    }
+}
+
+/**
+ * Gets the course module in a backwards compatible way.
+ *
+ * @param int $module   the type of module (eg, assign, quiz...)
+ * @param int $recordid the instance ID (from its table)
+ * @param int $courseid the course ID
+ * @return stdClass The course module object
+ */
+function block_progress_get_coursemodule($module, $recordid, $courseid) {
+    if (function_exists('get_fast_modinfo')) {
+        return get_fast_modinfo($courseid)->instances[$module][$recordid];
+    }
+    else {
+        return get_coursemodule_from_instance($module, $recordid, $courseid);
     }
 }

@@ -174,7 +174,7 @@ $string['futurenotattempted_colour_title'] = 'Future Not-attempted Colour';
 $string['futurenotattempted_colour_descr'] = 'HTML Colour code for future elements that have not yet been attemted';
 
 // Overview page strings.
-$string['lastonline'] = 'Last online';
+$string['lastonline'] = 'Last in course';
 $string['overview'] = 'Overview of students';
 $string['progress'] = 'Progress';
 $string['progressbar'] = 'Progress Bar';

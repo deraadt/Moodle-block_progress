@@ -132,24 +132,22 @@ echo $OUTPUT->container_end();
 
 // Apply group restrictions.
 $params = array();
-$groupwhere = '';
-$groupsfrom = '';
+$groupjoin = '';
 $groupselected = groups_get_course_group($course);
 if ($groupselected && $groupselected != 0) {
-    $groupsfrom = ', {groups_members} g ';
-    $groupwhere = " AND g.groupid = :groupselected AND g.userid = u.id";
+    $groupjoin = 'JOIN {groups_members} g ON (g.groupid = :groupselected AND g.userid = u.id)';
     $params['groupselected'] = $groupselected;
 }
 
 // Get the list of users enrolled in the course.
 $picturefields = user_picture::fields('u');
-$sql = "SELECT DISTINCT $picturefields, u.lastaccess
-         FROM {user} u, {role_assignments} a $groupsfrom
-        WHERE a.contextid = :contextid
-          AND a.userid = u.id
-          $rolewhere
-          $groupwhere";
+$sql = "SELECT DISTINCT $picturefields, l.timeaccess as lastseen
+         FROM {user} u
+         JOIN {role_assignments} a ON (a.contextid = :contextid AND a.userid = u.id $rolewhere)
+         $groupjoin
+    LEFT JOIN {user_lastaccess} l ON (l.courseid = :courseid AND l.userid = u.id)";
 $params['contextid'] = $context->id;
+$params['courseid'] = $course->id;
 $userrecords = $DB->get_records_sql($sql, $params);
 $userids = array_keys($userrecords);
 $users = array_values($userrecords);
@@ -186,12 +184,12 @@ for ($i = 0; $i < $numberofusers; $i++) {
     $picture = $OUTPUT->user_picture($users[$i], array('course' => $course->id));
     $name = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$users[$i]->id.'&course='.
             $course->id.'">'.fullname($users[$i]).'</a>';
-    if ($users[$i]->lastaccess == 0) {
+    if (empty($users[$i]->lastseen)) {
         $lastonline = get_string('never');
     } else {
-        $lastonline = userdate($users[$i]->lastaccess);
+        $lastonline = userdate($users[$i]->lastseen);
     }
-    $userevents = block_progress_filter_groupings($events, $users[$i]->id);
+    $userevents = block_progress_filter_visibility($events, $users[$i]->id, $context);
     $attempts = block_progress_attempts($modules, $progressconfig, $userevents, $users[$i]->id, $course->id);
     $progressbar = block_progress_bar($modules, $progressconfig, $userevents, $users[$i]->id, $progressblock->id, $attempts,
         $course->id, true);
@@ -203,7 +201,7 @@ for ($i = 0; $i < $numberofusers; $i++) {
         'lastname' => strtoupper($users[$i]->lastname),
         'picture' => $picture,
         'fullname' => $name,
-        'lastonlinetime' => $users[$i]->lastaccess,
+        'lastonlinetime' => (empty($users[$i]->lastseen) ? 0 : $users[$i]->lastseen),
         'lastonline' => $lastonline,
         'progressbar' => $progressbar,
         'progressvalue' => $progressvalue,
