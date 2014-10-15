@@ -1074,11 +1074,10 @@ function block_progress_is_visible($coursemodule, $userid, $coursecontext) {
             return false;
         }
     }
-
     // Check visibility by grouping constraints (includes capability check).
     if (!empty($CFG->enablegroupmembersonly)) {
         if (isset($coursemodule->uservisible)) {
-            if ($coursemodule->uservisible != 1) {
+            if ($coursemodule->groupingid != 0 && $coursemodule->uservisible != 1) {
                 return false;
             }
         }
