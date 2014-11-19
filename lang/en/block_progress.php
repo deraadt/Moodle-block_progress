@@ -173,6 +173,11 @@ $string['notattempted_colour_descr'] = 'HTML Colour code for current elements th
 $string['futurenotattempted_colour_title'] = 'Future Not-attempted Colour';
 $string['futurenotattempted_colour_descr'] = 'HTML Colour code for future elements that have not yet been attemted';
 
+// Default role strings
+$string['defaultrole'] = 'Default Role';
+$string['defaultroletitle'] = 'Default Role';
+$string['defaultroledesc'] = 'Set the role shortname that the overview page will use by default';
+
 // Overview page strings.
 $string['lastonline'] = 'Last in course';
 $string['overview'] = 'Overview of students';
