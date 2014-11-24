@@ -153,11 +153,18 @@ $userids = array_keys($userrecords);
 $users = array_values($userrecords);
 $numberofusers = count($users);
 
+// Form for messaging selected participants.
+$formattributes = array('action' => $CFG->wwwroot.'/user/action_redir.php', 'method' => 'post', 'id' => 'participantsform');
+echo html_writer::start_tag('form', $formattributes);
+echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'returnto', 'value' => s($PAGE->url->out(false))));
+
 // Setup submissions table.
 $table = new flexible_table('mod-block-progress-overview');
-$tablecolumns = array('picture', 'fullname', 'lastonline', 'progressbar', 'progress');
+$tablecolumns = array('select', 'picture', 'fullname', 'lastonline', 'progressbar', 'progress');
 $table->define_columns($tablecolumns);
 $tableheaders = array(
+                  '',
                   '',
                   get_string('fullname'),
                   get_string('lastonline', 'block_progress'),
@@ -168,12 +175,15 @@ $table->define_headers($tableheaders);
 $table->sortable(true);
 
 $table->set_attribute('class', 'generalbox');
-$table->column_style_all('padding', '5px 10px');
+$table->column_style_all('padding', '5px');
 $table->column_style_all('text-align', 'left');
 $table->column_style_all('vertical-align', 'middle');
+$table->column_style('select', 'text-align', 'right');
+$table->column_style('select', 'padding', '5px 0 5px 5px');
 $table->column_style('progressbar', 'width', '200px');
 $table->column_style('progress', 'text-align', 'center');
 
+$table->no_sorting('select');
 $table->no_sorting('picture');
 $table->no_sorting('progressbar');
 $table->define_baseurl($PAGE->url);
@@ -181,9 +191,10 @@ $table->setup();
 
 // Build table of progress bars as they are marked.
 for ($i = 0; $i < $numberofusers; $i++) {
+    $selectattributes = array('type' => 'checkbox', 'class' => 'usercheckbox', 'name' => 'user'.$users[$i]->id);
+    $select = html_writer::empty_tag('input', $selectattributes);
     $picture = $OUTPUT->user_picture($users[$i], array('course' => $course->id));
-    $name = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$users[$i]->id.'&course='.
-            $course->id.'">'.fullname($users[$i]).'</a>';
+    $name = html_writer::link($CFG->wwwroot.'/user/view.php?id='.$users[$i]->id.'&course='.$course->id, fullname($users[$i]));
     if (empty($users[$i]->lastseen)) {
         $lastonline = get_string('never');
     } else {
@@ -199,6 +210,7 @@ for ($i = 0; $i < $numberofusers; $i++) {
     $rows[] = array(
         'firstname' => $users[$i]->firstname,
         'lastname' => strtoupper($users[$i]->lastname),
+        'select' => $select,
         'picture' => $picture,
         'fullname' => $name,
         'lastonlinetime' => (empty($users[$i]->lastseen) ? 0 : $users[$i]->lastseen),
@@ -216,24 +228,44 @@ if (!$sort = $table->get_sql_sort()) {
 if ($numberofusers > 0) {
     usort($rows, 'block_progress_compare_rows');
     foreach ($rows as $row) {
-        $table->add_data(array($row['picture'], $row['fullname'], $row['lastonline'],
+        $table->add_data(array($row['select'], $row['picture'],
+            $row['fullname'], $row['lastonline'],
             $row['progressbar'], $row['progress']));
     }
 }
 $table->print_initials_bar();
 $table->print_html();
-echo $OUTPUT->container_end();
 
-// Organise access to JS.
-$jsmodule = array(
-    'name' => 'block_progress',
-    'fullpath' => '/blocks/progress/module.js',
-    'requires' => array(),
-    'strings' => array(),
-);
+// Output messaging controls.
+echo html_writer::start_tag('div', array('class' => 'buttons'));
+echo html_writer::empty_tag('input', array('type' => 'button', 'id' => 'checkall', 'value' => get_string('selectall')));
+echo html_writer::empty_tag('input', array('type' => 'button', 'id' => 'checknone', 'value' => get_string('deselectall')));
+$displaylist = array();
+$displaylist['messageselect.php'] = get_string('messageselectadd');
+if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context)) {
+    $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
+    $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
+}
+echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
+echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
+echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $course->id));
+echo html_writer::start_tag('noscript', array('style' => 'display:inline;'));
+echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('ok')));
+echo html_writer::end_tag('noscript');
+echo $OUTPUT->help_icon('withselectedusers');
+echo html_writer::end_tag('div');
+echo html_writer::end_tag('form');
+
+// Organise access to JS for messaging.
+$module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
+$PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
+
+// Organise access to JS for progress bars.
+$jsmodule = array('name' => 'block_progress', 'fullpath' => '/blocks/progress/module.js');
 $arguments = array(array($progressblock->id), $userids);
 $PAGE->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 
+echo $OUTPUT->container_end();
 echo $OUTPUT->footer();
 
 /**

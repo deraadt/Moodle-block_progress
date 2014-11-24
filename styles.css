@@ -120,3 +120,13 @@
 .overviewButton {
     margin: 10px;
 }
+
+.buttons {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.buttons label {
+    display: inline;
+    margin: 0 5px 0 10px;
+}

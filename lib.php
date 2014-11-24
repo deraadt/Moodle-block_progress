@@ -637,7 +637,7 @@ function block_progress_event_information($config, $modules, $course, $userid = 
     $numevents = 0;
     $numeventsconfigured = 0;
 
-    if($userid === 0) {
+    if ($userid === 0) {
         $userid = $USER->id;
     }
 
@@ -943,7 +943,8 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
         if (!empty($event['cm']->available)) {
-            $celloptions['onclick'] = 'document.location=\''.$CFG->wwwroot.'/mod/'.$event['type'].'/view.php?id='.$event['cm']->id.'\';';
+            $celloptions['onclick'] = 'document.location=\''.
+                $CFG->wwwroot.'/mod/'.$event['type'].'/view.php?id='.$event['cm']->id.'\';';
         }
         if ($counter == 1) {
             $celloptions['id'] .= 'first';
@@ -985,7 +986,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $content .= HTML_WRITER::start_tag('div', $divoptions);
         $link = '/mod/'.$event['type'].'/view.php?id='.$event['cm']->id;
         $text = $OUTPUT->pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon')).s($event['name']);
-        if(!empty($event['cm']->available)) {
+        if (!empty($event['cm']->available)) {
             $content .= $OUTPUT->action_link($link, $text);
         } else {
             $content .= $text;
@@ -1068,7 +1069,7 @@ function block_progress_is_visible($coursemodule, $userid, $coursecontext) {
     // Check availability, allowing for visible, but not accessible items.
     if (!empty($CFG->enableavailability)) {
         if (
-            !$coursemodule->available && empty($coursemodule->availableinfo) &&
+            isset($coursemodule->available) && !$coursemodule->available && empty($coursemodule->availableinfo) &&
             !has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid)
         ) {
             return false;
@@ -1166,7 +1167,9 @@ function block_progress_get_block_context($blockid) {
  * @return stdClass The course module object
  */
 function block_progress_get_coursemodule($module, $recordid, $courseid) {
-    if (function_exists('get_fast_modinfo')) {
+    global $CFG;
+
+    if ($CFG->version >= 2012120300) {
         return get_fast_modinfo($courseid)->instances[$module][$recordid];
     }
     else {

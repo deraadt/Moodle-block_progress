@@ -315,7 +315,7 @@ class block_progress_edit_form extends block_edit_form {
                                 $mform->addElement('select', 'config_action_'.$moduleinfo->uniqueid,
                                                    get_string('config_header_action', 'block_progress'),
                                                    $moduleinfo->actions );
-                                if(
+                                if (
                                     (!$moduleinfo->lockpossible || $moduleinfo->instancedue == 0) &&
                                     array_key_exists('activity_completion', $moduleinfo->actions)
                                 ) {
