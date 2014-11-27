@@ -641,9 +641,8 @@ function block_progress_event_information($config, $modules, $course, $userid = 
         $userid = $USER->id;
     }
 
-    if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
-        $sections = block_progress_course_sections($course);
-    }
+    // Get section information for the course module layout.
+    $sections = block_progress_course_sections($course);
 
     // Check each known module (described in lib.php).
     foreach ($modules as $module => $details) {
@@ -675,18 +674,15 @@ function block_progress_event_information($config, $modules, $course, $userid = 
 
                 // Gather together module information.
                 $coursemodule = block_progress_get_coursemodule($module, $record->id, $course);
-                $event = array(
+                $events[] = array(
                     'expected' => $expected,
                     'type'     => $module,
                     'id'       => $record->id,
                     'name'     => format_string($record->name),
                     'cm'       => $coursemodule,
+                    'section'  => $sections[$coursemodule->section]->section,
+                    'position' => array_search($coursemodule->id, $sections[$coursemodule->section]->sequence),
                 );
-                if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
-                    $event['section'] = $sections[$coursemodule->section]->section;
-                    $event['position'] = array_search($coursemodule->id, $sections[$coursemodule->section]->sequence);
-                }
-                $events[] = $event;
             }
         }
     }
@@ -702,7 +698,7 @@ function block_progress_event_information($config, $modules, $course, $userid = 
     if (isset($config->orderby) && $config->orderby == 'orderbycourse') {
         usort($events, 'block_progress_compare_events');
     } else {
-        sort($events);
+        usort($events, 'block_progress_compare_times');
     }
     return $events;
 }
@@ -719,6 +715,21 @@ function block_progress_compare_events($a, $b) {
         return $a['section'] - $b['section'];
     } else {
         return $a['position'] - $b['position'];
+    }
+}
+
+/**
+ * Used to compare two activities/resources based their expected completion times
+ *
+ * @param array $a array of event information
+ * @param array $b array of event information
+ * @return <0, 0 or >0 depending on time then order of activities/resources
+ */
+function block_progress_compare_times($a, $b) {
+    if ($a['expected'] != $b['expected']) {
+        return $a['expected'] - $b['expected'];
+    } else {
+        return block_progress_compare_events($a, $b);
     }
 }
 
