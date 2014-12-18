@@ -86,47 +86,47 @@
     margin: 5px auto;
 }
 
-.progressConfigBox {
+#page-blocks-progress-overview .progressConfigBox {
     border:1px dashed #cccccc;
     padding: 5px;
     margin:5px 0 !important;
 }
 
-.progressConfigModuleTitle {
+#page-blocks-progress-overview .progressConfigModuleTitle {
     font-weight: bold;
 }
 
-.progressConfigModuleTitle img {
+#page-blocks-progress-overview .progressConfigModuleTitle img {
     vertical-align: middle;
 }
 
-.block_progress .groupselector {
+#page-blocks-progress-overview .block_progress .groupselector {
     text-align: center;
 }
 
-.progressoverviewmenus {
+#page-blocks-progress-overview .progressoverviewmenus {
     text-align: center;
     margin-bottom: 5px;
 }
 
-.progressoverviewmenus form, .progressoverviewmenus select, .progressoverviewmenus div {
+#page-blocks-progress-overview .progressoverviewmenus form, .progressoverviewmenus select, .progressoverviewmenus div {
     display: inline;
 }
 
-.progressoverviewmenus select {
+#page-blocks-progress-overview .progressoverviewmenus select {
     margin-left: 2px;
 }
 
-.overviewButton {
+#page-blocks-progress-overview .overviewButton {
     margin: 10px;
 }
 
-.buttons {
+#page-blocks-progress-overview .buttons {
     margin-top: 20px;
     text-align: center;
 }
 
-.buttons label {
+#page-blocks-progress-overview .buttons label {
     display: inline;
     margin: 0 5px 0 10px;
 }
