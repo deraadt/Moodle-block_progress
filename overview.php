@@ -200,12 +200,19 @@ for ($i = 0; $i < $numberofusers; $i++) {
     } else {
         $lastonline = userdate($users[$i]->lastseen);
     }
-    $userevents = block_progress_filter_visibility($events, $users[$i]->id, $context);
-    $attempts = block_progress_attempts($modules, $progressconfig, $userevents, $users[$i]->id, $course->id);
-    $progressbar = block_progress_bar($modules, $progressconfig, $userevents, $users[$i]->id, $progressblock->id, $attempts,
-        $course->id, true);
-    $progressvalue = block_progress_percentage($userevents, $attempts, true);
-    $progress = $progressvalue.'%';
+    $userevents = block_progress_filter_visibility($events, $users[$i]->id, $context, $course);
+    if (!empty($userevents)) {
+        $attempts = block_progress_attempts($modules, $progressconfig, $userevents, $users[$i]->id, $course->id);
+        $progressbar = block_progress_bar($modules, $progressconfig, $userevents, $users[$i]->id, $progressblock->id, $attempts,
+            $course->id, true);
+        $progressvalue = block_progress_percentage($userevents, $attempts, true);
+        $progress = $progressvalue.'%';
+    }
+    else {
+        $progressbar = get_string('no_visible_events_message', 'block_progress');
+        $progressvalue = 0;
+        $progress = '?';
+    }
 
     $rows[] = array(
         'firstname' => $users[$i]->firstname,

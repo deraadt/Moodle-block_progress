@@ -129,6 +129,7 @@ class block_progress extends block_base {
                            bi.configdata
                       FROM {block_instances} bi
                  LEFT JOIN {block_positions} bp ON bp.blockinstanceid = bi.id
+                                               AND ".$DB->sql_like('bp.pagetype', ':pagetype', false)."
                      WHERE bi.blockname = 'progress'
                        AND bi.parentcontextid = :contextid
                   ORDER BY region, weight, bi.id";
@@ -139,7 +140,7 @@ class block_progress extends block_base {
                 $modules = block_progress_modules_in_use($course->id);
                 if ($course->visible && !empty($modules)) {
                     $context = block_progress_get_course_context($course->id);
-                    $params = array('contextid' => $context->id);
+                    $params = array('contextid' => $context->id, 'pagetype' => 'course-view-%');
                     $blockinstances = $DB->get_records_sql($sql, $params);
                     $blockinstancesonpage = array_merge($blockinstancesonpage, array_keys($blockinstances));
                     foreach ($blockinstances as $blockid => $blockinstance) {
@@ -149,7 +150,8 @@ class block_progress extends block_base {
                                                          $blockinstance->config,
                                                          $modules,
                                                          $course->id);
-                            $blockinstance->events = block_progress_filter_visibility($blockinstance->events, $USER->id, $context);
+                            $blockinstance->events = block_progress_filter_visibility($blockinstance->events,
+                                                         $USER->id, $context, $course);
                         }
                         if ($blockinstance->visible == 0 || empty($blockinstance->config) || $blockinstance->events == 0) {
                             unset($blockinstances[$blockid]);

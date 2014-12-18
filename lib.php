@@ -1062,55 +1062,16 @@ function block_progress_course_sections($course) {
 }
 
 /**
- * Determines if a single activity/resource is visible to the given user.
- *
- * @param stdClass $coursemodule  the object with course module information
- * @param int      $userid        the user's ID (from the user table)
- * @param string   $coursecontext the context value of the course
- * @return bool whether the activity/resource is visible to the user
- */
-function block_progress_is_visible($coursemodule, $userid, $coursecontext) {
-    global $CFG;
-
-    // Check visibility in course.
-    if (!$coursemodule->visible && !has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid)) {
-        return false;
-    }
-
-    // Check availability, allowing for visible, but not accessible items.
-    if (!empty($CFG->enableavailability)) {
-        if (
-            isset($coursemodule->available) && !$coursemodule->available && empty($coursemodule->availableinfo) &&
-            !has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid)
-        ) {
-            return false;
-        }
-    }
-    // Check visibility by grouping constraints (includes capability check).
-    if (!empty($CFG->enablegroupmembersonly)) {
-        if (isset($coursemodule->uservisible)) {
-            if ($coursemodule->uservisible != 1 && empty($coursemodule->availableinfo)) {
-                return false;
-            }
-        }
-        else if (!groups_course_module_visible($coursemodule, $userid)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
  * Filters events that a user cannot see due to grouping constraints
  *
  * @param array  $events The possible events that can occur for modules
  * @param array  $userid The user's id
  * @param string $coursecontext the context value of the course
+ * @param string $course the course for filtering visibility
  * @return array The array with restricted events removed
  */
-function block_progress_filter_visibility($events, $userid, $coursecontext) {
-    global $CFG;
+function block_progress_filter_visibility($events, $userid, $coursecontext, $course = 0) {
+    global $CFG, $USER;
     $filteredevents = array();
 
     // Check if the events are empty or none are selected.
@@ -1123,9 +1084,43 @@ function block_progress_filter_visibility($events, $userid, $coursecontext) {
 
     // Keep only events that are visible.
     foreach ($events as $key => $event) {
-        if (block_progress_is_visible($event['cm'], $userid, $coursecontext)) {
-            $filteredevents[] = $event;
+
+        // Determine the correct user info to check.
+        if ($userid == $USER->id) {
+            $coursemodule = $event['cm'];
         }
+        else {
+            $coursemodule = block_progress_get_coursemodule($event['type'], $event['id'], $course->id, $userid);
+        }
+
+        // Check visibility in course.
+        if (!$coursemodule->visible && !has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid)) {
+            continue;
+        }
+
+        // Check availability, allowing for visible, but not accessible items.
+        if (!empty($CFG->enableavailability)) {
+            if (
+                isset($coursemodule->available) && !$coursemodule->available && empty($coursemodule->availableinfo) &&
+                !has_capability('moodle/course:viewhiddenactivities', $coursecontext, $userid)
+            ) {
+                continue;
+            }
+        }
+        // Check visibility by grouping constraints (includes capability check).
+        if (!empty($CFG->enablegroupmembersonly)) {
+            if (isset($coursemodule->uservisible)) {
+                if ($coursemodule->uservisible != 1 && empty($coursemodule->availableinfo)) {
+                    continue;
+                }
+            }
+            else if (!groups_course_module_visible($coursemodule, $userid)) {
+                continue;
+            }
+        }
+
+        // Save the visible event.
+        $filteredevents[] = $event;
     }
     return $filteredevents;
 }
@@ -1177,11 +1172,11 @@ function block_progress_get_block_context($blockid) {
  * @param int $courseid the course ID
  * @return stdClass The course module object
  */
-function block_progress_get_coursemodule($module, $recordid, $courseid) {
+function block_progress_get_coursemodule($module, $recordid, $courseid, $userid = 0) {
     global $CFG;
 
     if ($CFG->version >= 2012120300) {
-        return get_fast_modinfo($courseid)->instances[$module][$recordid];
+        return get_fast_modinfo($courseid, $userid)->instances[$module][$recordid];
     }
     else {
         return get_coursemodule_from_instance($module, $recordid, $courseid);
