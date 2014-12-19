@@ -261,6 +261,11 @@ class block_progress_edit_form extends block_edit_form {
                         if (array_key_exists($coursemoduleid, $modulesinform)) {
                             $moduleinfo = $modulesinform[$coursemoduleid];
 
+                            // Start box.
+                            $attributes = array('class' => 'progressConfigBox');
+                            $moduleboxstart = HTML_WRITER::start_tag('div', $attributes);
+                            $mform->addElement('html', $moduleboxstart);
+
                             // Icon, module type and name.
                             $modulename = get_string('pluginname', $moduleinfo->module);
                             $icon = $OUTPUT->pix_icon('icon', $modulename, 'mod_'.$moduleinfo->module);
@@ -330,6 +335,10 @@ class block_progress_edit_form extends block_edit_form {
                             $mform->setType('config_action_'.$moduleinfo->uniqueid, PARAM_ALPHANUMEXT);
                             $mform->addHelpButton('config_action_'.$moduleinfo->uniqueid,
                                                   'what_actions_can_be_monitored', 'block_progress');
+
+                            // End box.
+                            $moduleboxend = HTML_WRITER::end_tag('div');
+                            $mform->addElement('html', $moduleboxend);
                         }
                     }
                 }
