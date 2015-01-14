@@ -1004,7 +1004,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         }
         $content .= HTML_WRITER::empty_tag('br');
         $content .= get_string($action, 'block_progress').'&nbsp;';
-        $icon = ($attempted ? 'tick' : 'cross');
+        $icon = ($attempted && $attempted !== 'failed' ? 'tick' : 'cross');
         $content .= $OUTPUT->pix_icon($icon, '', 'block_progress');
         $content .= HTML_WRITER::empty_tag('br');
         if ($displaydate) {
