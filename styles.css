@@ -63,6 +63,10 @@
     margin: 5px auto;
 }
 
+#page-blocks-progress-overview .block_progress .progressEventInfo {
+    max-width: 200px;
+}
+
 .block_progress .progressEventInfo img {
     vertical-align: middle;
 }
