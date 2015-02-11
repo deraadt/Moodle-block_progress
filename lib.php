@@ -872,7 +872,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     global $OUTPUT, $CFG;
     $now = time();
     $numevents = count($events);
-    $dateformat = get_string('date_format', 'block_progress');
+    $dateformat = get_string('strftimerecentfull', 'langconfig');
     $tableoptions = array('class' => 'progressBarProgressTable',
                           'cellpadding' => '0',
                           'cellspacing' => '0');

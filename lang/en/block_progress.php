@@ -151,7 +151,6 @@ $string['how_ordering_works_help'] = '
 
 // Other terms.
 $string['addallcurrentitems'] = 'Add all activities/resources';
-$string['date_format'] = '%a %d %b, %I:%M %p';
 $string['mouse_over_prompt'] = 'Mouse over block for info.';
 $string['no_events_config_message'] = 'There are no activities or resources to monitor the progress of. Create some activities and/or resources then configure this block.';
 $string['no_events_message'] = 'No activities or resources are being monitored. Use config to set up monitoring.';
