@@ -28,16 +28,22 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configcolourpicker('block_progress/attempted_colour',
         get_string('attempted_colour_title', 'block_progress'),
-        get_string('attempted_colour_descr', 'block_progress'), '#5CD85C', null )
+        get_string('attempted_colour_descr', 'block_progress'),
+        get_string('attempted_colour', 'block_progress'),
+        null )
     );
 
     $settings->add(new admin_setting_configcolourpicker('block_progress/notattempted_colour',
         get_string('notattempted_colour_title', 'block_progress'),
-        get_string('notattempted_colour_descr', 'block_progress'), '#FF5C5C', null )
+        get_string('notattempted_colour_descr', 'block_progress'),
+        get_string('notAttempted_colour', 'block_progress'),
+        null )
     );
 
     $settings->add(new admin_setting_configcolourpicker('block_progress/futurenotattempted_colour',
         get_string('futurenotattempted_colour_title', 'block_progress'),
-        get_string('futurenotattempted_colour_descr', 'block_progress'), '#5C5CFF', null )
+        get_string('futurenotattempted_colour_descr', 'block_progress'),
+        get_string('futureNotAttempted_colour', 'block_progress'),
+        null )
     );
 }

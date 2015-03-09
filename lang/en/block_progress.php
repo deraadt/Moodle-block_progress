@@ -161,6 +161,7 @@ $string['selectitemstobeadded'] = 'Select activities/resources';
 $string['time_expected'] = 'Expected';
 
 // Default colours that may have different cultural meanings.
+// Note that these defaults can be overridden by the block's global settings.
 $string['attempted_colour'] = '#5CD85C';
 $string['notAttempted_colour'] = '#FF5C5C';
 $string['futureNotAttempted_colour'] = '#5C5CFF';
