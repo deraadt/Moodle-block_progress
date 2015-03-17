@@ -183,7 +183,9 @@ class block_progress extends block_base {
                     }
                 }
             }
-            if ($this->content->text == '') {
+
+            // Show a message explaining lack of bars, but only while editing is on.
+            if ($this->page->user_is_editing() && $this->content->text == '') {
                 $this->content->text = get_string('no_blocks', 'block_progress');
             }
         }
