@@ -72,6 +72,7 @@ $string['viewed'] = 'viewed';
 
 // Stings for the Config page.
 $string['config_default_title'] = 'Progress Bar';
+$string['config_group'] = 'Visible only to group';
 $string['config_header_action'] = 'Action';
 $string['config_header_expected'] = 'Expected by';
 $string['config_header_icon'] = 'Icon';
@@ -147,6 +148,10 @@ $string['how_ordering_works_help'] = '
     Activities/resources are presented in the same order as they are on the course page. When this option is used, time-related aspects are disabled.
     </li>
 </ul>
+';
+$string['how_group_works'] = 'How visible group works';
+$string['how_group_works_help'] = '
+<p>Selecting a group will limit the display of the this block to that group only.</p>
 ';
 
 // Other terms.
