@@ -24,6 +24,7 @@
  */
 
 // Module names.
+$string['aspirelist'] = 'Aspire resource list';
 $string['assign'] = 'Assignment';
 $string['assignment'] = 'Assignment';
 $string['book'] = 'Book';
