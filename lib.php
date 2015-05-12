@@ -801,12 +801,19 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
             else {
                 if ($modernlogging) {
                     foreach ($readers as $logstore => $reader) {
-                        if ($reader instanceof logstore_legacy\log\store) {
-                            $query = $module['actions']['viewed']['logstore_legacy'];
-                        }
-                        else if ($reader instanceof \core\log\sql_internal_reader) {
+                        if (
+                            $reader instanceof \core\log\sql_internal_table_reader ||
+                            $reader instanceof \core\log\sql_internal_reader
+                        ) {
                             $logtable = '{'.$reader->get_internal_log_table_name().'}';
                             $query = preg_replace('/\{log\}/', $logtable, $module['actions']['viewed']['sql_internal_reader']);
+                        }
+                        else if ($reader instanceof logstore_legacy\log\store) {
+                            $query = $module['actions']['viewed']['logstore_standard'];
+                        }
+                        else {
+                            // No logs available.
+                            continue;
                         }
                         $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
                         if ($attempts[$uniqueid]) {
