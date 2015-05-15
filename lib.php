@@ -809,7 +809,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
                             $query = preg_replace('/\{log\}/', $logtable, $module['actions']['viewed']['sql_internal_reader']);
                         }
                         else if ($reader instanceof logstore_legacy\log\store) {
-                            $query = $module['actions']['viewed']['logstore_standard'];
+                            $query = $module['actions']['viewed']['logstore_legacy'];
                         }
                         else {
                             // No logs available.
