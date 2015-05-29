@@ -24,6 +24,7 @@
  */
 
 // Module names.
+$string['aspirelist'] = 'Aspire resource list';
 $string['assign'] = 'Assignment';
 $string['assignment'] = 'Assignment';
 $string['book'] = 'Book';
@@ -43,6 +44,7 @@ $string['imscp'] = 'IMS Content Package';
 $string['journal'] = 'Journal';
 $string['lesson'] = 'Lesson';
 $string['page'] = 'Page';
+$string['panopto'] = 'Panopto video';
 $string['questionnaire'] = 'Questionnaire';
 $string['quiz'] = 'Quiz';
 $string['resource'] = 'File';
