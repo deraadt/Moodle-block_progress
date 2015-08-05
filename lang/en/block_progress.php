@@ -43,6 +43,7 @@ $string['imscp'] = 'IMS Content Package';
 $string['journal'] = 'Journal';
 $string['lesson'] = 'Lesson';
 $string['page'] = 'Page';
+$string['video'] = 'Video';
 $string['questionnaire'] = 'Questionnaire';
 $string['quiz'] = 'Quiz';
 $string['resource'] = 'File';
@@ -51,6 +52,7 @@ $string['scorm'] = 'SCORM';
 $string['turnitintool'] = 'Turnitin Tool';
 $string['url'] = 'URL';
 $string['wiki'] = 'Wiki';
+$string['ouwiki'] = 'OU Wiki';
 $string['workshop'] = 'Workshop';
 
 // Actions.
