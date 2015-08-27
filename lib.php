@@ -441,6 +441,27 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'viewed'
         ),
+        'video' => array(
+            'actions' => array(
+                'viewed' => array (
+                    'logstore_legacy'     => "SELECT id
+                                                FROM {log}
+                                               WHERE course = :courseid
+                                                 AND module = 'video'
+                                                 AND action = 'view'
+                                                 AND cmid = :cmid
+                                                 AND userid = :userid",
+                    'sql_internal_reader' => "SELECT id
+                                                FROM {log}
+                                               WHERE courseid = :courseid
+                                                 AND component = 'mod_video'
+                                                 AND action = 'viewed'
+                                                 AND objectid = :eventid
+                                                 AND userid = :userid",
+                ),
+            ),
+            'defaultAction' => 'viewed'
+        ),
         'questionnaire' => array(
             'defaultTime' => 'closedate',
             'actions' => array(
@@ -552,6 +573,27 @@ function block_progress_monitorable_modules() {
                                                 FROM {log}
                                                WHERE courseid = :courseid
                                                  AND component = 'mod_wiki'
+                                                 AND action = 'viewed'
+                                                 AND objectid = :eventid
+                                                 AND userid = :userid",
+                ),
+            ),
+            'defaultAction' => 'viewed'
+        ),
+        'ouwiki' => array(
+            'actions' => array(
+                'viewed' => array (
+                    'logstore_legacy'     => "SELECT id
+                                                FROM {log}
+                                               WHERE course = :courseid
+                                                 AND module = 'ouwiki'
+                                                 AND action = 'view'
+                                                 AND cmid = :cmid
+                                                 AND userid = :userid",
+                    'sql_internal_reader' => "SELECT id
+                                                FROM {log}
+                                               WHERE courseid = :courseid
+                                                 AND component = 'mod_ouwiki'
                                                  AND action = 'viewed'
                                                  AND objectid = :eventid
                                                  AND userid = :userid",
@@ -1019,7 +1061,14 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                             'style' => 'display: none;');
         $content .= HTML_WRITER::start_tag('div', $divoptions);
         $link = '/mod/'.$event['type'].'/view.php?id='.$event['cm']->id;
-        $text = $OUTPUT->pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon')).s($event['name']);
+        $text = '';
+        $activity_icon = $event['cm']->get_icon_url();
+        if(!empty($activity_icon)){
+            $text = html_writer::empty_tag('img', array('src' => $activity_icon,
+                    'class' => 'moduleIcon', 'alt' => '', 'role' => 'presentation')).s($event['name']);
+        }else{
+            $text = $OUTPUT->pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon')).s($event['name']);
+        }
         if (!empty($event['cm']->available)) {
             $content .= $OUTPUT->action_link($link, $text);
         } else {
