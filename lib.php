@@ -1062,6 +1062,10 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $content .= HTML_WRITER::start_tag('div', $divoptions);
         $link = '/mod/'.$event['type'].'/view.php?id='.$event['cm']->id;
         $text = $OUTPUT->pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon')).s($event['name']);
+        if(!empty($event['cm']->get_icon_url())){
+            $text = html_writer::empty_tag('img', array('src' => $event['cm']->get_icon_url(),
+                    'class' => 'moduleIcon', 'alt' => '', 'role' => 'presentation')).s($event['name']);
+        }
         if (!empty($event['cm']->available)) {
             $content .= $OUTPUT->action_link($link, $text);
         } else {
