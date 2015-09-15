@@ -24,6 +24,7 @@
  */
 
 // Module names.
+$string['aspirelist'] = 'Aspire resource list';
 $string['assign'] = 'Assignment';
 $string['assignment'] = 'Assignment';
 $string['book'] = 'Book';
@@ -42,7 +43,9 @@ $string['hsuforum'] = 'Advanced Forum';
 $string['imscp'] = 'IMS Content Package';
 $string['journal'] = 'Journal';
 $string['lesson'] = 'Lesson';
+$string['lti'] = 'External tool';
 $string['page'] = 'Page';
+$string['panopto'] = 'Panopto video';
 $string['questionnaire'] = 'Questionnaire';
 $string['quiz'] = 'Quiz';
 $string['resource'] = 'File';
@@ -165,18 +168,21 @@ $string['pluginname'] = 'Progress Bar';
 $string['selectitemstobeadded'] = 'Select activities/resources';
 $string['time_expected'] = 'Expected';
 
+// Global setting strings
 // Default colours that may have different cultural meanings.
 // Note that these defaults can be overridden by the block's global settings.
 $string['attempted_colour'] = '#5CD85C';
 $string['notAttempted_colour'] = '#FF5C5C';
 $string['futureNotAttempted_colour'] = '#5C5CFF';
-
 $string['attempted_colour_title'] = 'Attempted Colour';
 $string['attempted_colour_descr'] = 'HTML Colour code for elements that have been attempted';
 $string['notattempted_colour_title'] = 'Not-attempted Colour';
 $string['notattempted_colour_descr'] = 'HTML Colour code for current elements that have not yet been attempted';
 $string['futurenotattempted_colour_title'] = 'Future Not-attempted Colour';
 $string['futurenotattempted_colour_descr'] = 'HTML Colour code for future elements that have not yet been attemted';
+$string['coursenametoshow'] = 'Course name to show on Dashboard';
+$string['shortname'] = 'Short course name';
+$string['fullname'] = 'Full course name';
 
 // Overview page strings.
 $string['lastonline'] = 'Last in course';

@@ -18,13 +18,24 @@
  * Progress block settings
  *
  * @package   block_progress
- * @copyright 2014 onwards Johan Reinalda (johan at reinalda dot net)
+ * @copyright 2010 Michael de Raadt
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
+
+    $options = array(
+        'shortname' => get_string('shortname', 'block_progress'),
+        'fullname' => get_string('fullname', 'block_progress')
+    );
+    $settings->add(new admin_setting_configselect('block_progress/coursenametoshow',
+        get_string('coursenametoshow', 'block_progress'),
+        get_string('coursenametoshow', 'block_progress'),
+        'shortname',
+        $options)
+    );
 
     $settings->add(new admin_setting_configcolourpicker('block_progress/attempted_colour',
         get_string('attempted_colour_title', 'block_progress'),
