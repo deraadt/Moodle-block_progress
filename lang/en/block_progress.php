@@ -67,6 +67,7 @@ $string['finished'] = 'finished';
 $string['graded'] = 'graded';
 $string['marked'] = 'marked';
 $string['passed'] = 'passed';
+$string['passedby'] = 'passed by deadline';
 $string['passedscorm'] = 'passed';
 $string['posted_to'] = 'posted to';
 $string['responded_to'] = 'responded to';
@@ -132,7 +133,8 @@ $string['what_actions_can_be_monitored'] = 'What actions can be monitored?';
 $string['what_actions_can_be_monitored_help'] = '
 <p>Different activities and resources can be monitored.</p>
 <p>Because different activities and resources are used differently, what is monitored for each module varies. For example, for assignments, submission can be monitored; quizzes can be monitored on attempt; forums can be monitored for student postings; choice activities can monitored for answering and viewing resources is monitored.</p>
-<p>For the assignment and quiz modules, the notion of passed relies on a "Grade to pass" being set for the grade item in the Gradebook. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">More help...</a></p>
+<h3>Passing</h3>
+<p>For the assignment, lesson and quiz modules, the notion of passing relies on a "Grade to pass" being set for the grade item in the Gradebook. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">More help...</a></p>
 ';
 $string['why_show_precentage'] = 'Why show a progress percentage to students?';
 $string['why_show_precentage_help'] = '

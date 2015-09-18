@@ -74,6 +74,7 @@
 .block_progress .moduleIcon {
     float: left;
     margin-right: 5px;
+    max-width: 24px;
 }
 
 .block_progress .progressBarHeader {

@@ -109,6 +109,14 @@ function block_progress_monitorable_modules() {
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
+                                      AND g.finalgrade >= i.gradepass",
             ),
             'defaultAction' => 'submitted'
         ),
@@ -137,6 +145,14 @@ function block_progress_monitorable_modules() {
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assignment'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
+                                      AND g.finalgrade >= i.gradepass",
             ),
             'defaultAction' => 'submitted'
         ),
@@ -438,6 +454,21 @@ function block_progress_monitorable_modules() {
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passed'       => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'lesson'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'lesson'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
+                                      AND g.finalgrade >= i.gradepass",
             ),
             'defaultAction' => 'attempted'
         ),
@@ -552,6 +583,14 @@ function block_progress_monitorable_modules() {
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'quiz'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
+                                      AND g.finalgrade >= i.gradepass",
             ),
             'defaultAction' => 'finished'
         ),
