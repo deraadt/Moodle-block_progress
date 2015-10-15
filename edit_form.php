@@ -113,8 +113,7 @@ class block_progress_edit_form extends block_edit_form {
         if (!$usingweeklyformat) {
             $currenttime = time();
             $timearray = localtime($currenttime, true);
-            $endofweektimearray =
-                localtime($currenttime + (7 - $timearray['tm_wday']) * 86400, true);
+            $endofweektimearray = localtime($currenttime + (7 - $timearray['tm_wday']) * 86400, true);
             $endofweektime = mktime(23,
                                     55,
                                     0,

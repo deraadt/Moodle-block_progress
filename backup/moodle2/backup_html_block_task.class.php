@@ -16,7 +16,7 @@
 
 /**
  * @package    contrib
- * @subpackage block_progress   
+ * @subpackage block_progress
  * @copyright  2012 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,11 +25,11 @@
  * Backup task for the Progress Bar block
  *
  * @package    contrib
- * @subpackage block_progress   
+ * @subpackage block_progress
  * @copyright  2012 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_html_block_task extends backup_block_task {
+class backup_progress_block_task extends backup_block_task {
 
     protected function define_my_settings() {
     }
