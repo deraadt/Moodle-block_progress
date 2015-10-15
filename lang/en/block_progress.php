@@ -44,6 +44,7 @@ $string['imscp'] = 'IMS Content Package';
 $string['journal'] = 'Journal';
 $string['lesson'] = 'Lesson';
 $string['lti'] = 'External tool';
+$string['ouwiki'] = 'OU Wiki';
 $string['page'] = 'Page';
 $string['panopto'] = 'Panopto video';
 $string['questionnaire'] = 'Questionnaire';
@@ -53,6 +54,7 @@ $string['recordingsbn'] = 'BBB Recordings';
 $string['scorm'] = 'SCORM';
 $string['turnitintool'] = 'Turnitin Tool';
 $string['url'] = 'URL';
+$string['video'] = 'Video';
 $string['wiki'] = 'Wiki';
 $string['workshop'] = 'Workshop';
 
