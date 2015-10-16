@@ -184,6 +184,7 @@ $table->column_style('progressbar', 'width', '200px');
 $table->column_style('progress', 'text-align', 'center');
 
 $table->no_sorting('select');
+$select = '';
 $table->no_sorting('picture');
 $table->no_sorting('progressbar');
 $table->define_baseurl($PAGE->url);
@@ -191,8 +192,10 @@ $table->setup();
 
 // Build table of progress bars as they are marked.
 for ($i = 0; $i < $numberofusers; $i++) {
-    $selectattributes = array('type' => 'checkbox', 'class' => 'usercheckbox', 'name' => 'user'.$users[$i]->id);
-    $select = html_writer::empty_tag('input', $selectattributes);
+    if ($CFG->enablenotes || $CFG->messaging) {
+        $selectattributes = array('type' => 'checkbox', 'class' => 'usercheckbox', 'name' => 'user'.$users[$i]->id);
+        $select = html_writer::empty_tag('input', $selectattributes);
+    }
     $picture = $OUTPUT->user_picture($users[$i], array('course' => $course->id));
     $name = html_writer::link($CFG->wwwroot.'/user/view.php?id='.$users[$i]->id.'&course='.$course->id, fullname($users[$i]));
     if (empty($users[$i]->lastseen)) {
@@ -244,24 +247,28 @@ $table->print_initials_bar();
 $table->print_html();
 
 // Output messaging controls.
-echo html_writer::start_tag('div', array('class' => 'buttons'));
-echo html_writer::empty_tag('input', array('type' => 'button', 'id' => 'checkall', 'value' => get_string('selectall')));
-echo html_writer::empty_tag('input', array('type' => 'button', 'id' => 'checknone', 'value' => get_string('deselectall')));
-$displaylist = array();
-$displaylist['messageselect.php'] = get_string('messageselectadd');
-if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context)) {
-    $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
-    $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
+if ($CFG->enablenotes || $CFG->messaging) {
+    echo html_writer::start_tag('div', array('class' => 'buttons'));
+    echo html_writer::empty_tag('input', array('type' => 'button', 'id' => 'checkall', 'value' => get_string('selectall')));
+    echo html_writer::empty_tag('input', array('type' => 'button', 'id' => 'checknone', 'value' => get_string('deselectall')));
+    $displaylist = array();
+    if (!empty($CFG->messaging) && has_capability('moodle/course:bulkmessaging', $context)) {
+        $displaylist['messageselect.php'] = get_string('messageselectadd');
+    }
+    if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context)) {
+        $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
+        $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
+    }
+    echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
+    echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $course->id));
+    echo html_writer::start_tag('noscript', array('style' => 'display:inline;'));
+    echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('ok')));
+    echo html_writer::end_tag('noscript');
+    echo $OUTPUT->help_icon('withselectedusers');
+    echo html_writer::end_tag('div');
+    echo html_writer::end_tag('form');
 }
-echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
-echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $course->id));
-echo html_writer::start_tag('noscript', array('style' => 'display:inline;'));
-echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('ok')));
-echo html_writer::end_tag('noscript');
-echo $OUTPUT->help_icon('withselectedusers');
-echo html_writer::end_tag('div');
-echo html_writer::end_tag('form');
 
 // Organise access to JS for messaging.
 $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
