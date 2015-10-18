@@ -176,7 +176,7 @@ class block_progress extends block_base {
                     }
                     foreach ($blockinstances as $blockid => $blockinstance) {
                         if ($blockinstance->config->progressTitle != '') {
-                            $this->content->text .= HTML_WRITER::tag('p', s($blockinstance->config->progressTitle));
+                            $this->content->text .= HTML_WRITER::tag('p', s(format_string($blockinstance->config->progressTitle)));
                         }
                         $attempts = block_progress_attempts($modules,
                                                             $blockinstance->config,
