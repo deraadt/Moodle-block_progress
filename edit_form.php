@@ -39,6 +39,9 @@ class block_progress_edit_form extends block_edit_form {
         global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
         $loggingenabled = true;
 
+        // Raise the max_execution time to 60 seconds for courses with many modules.
+        core_php_time_limit::raise(60);
+
         // The My home version is not configurable.
         if (block_progress_on_site_page()) {
             return;
