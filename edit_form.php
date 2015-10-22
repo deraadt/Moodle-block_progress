@@ -42,6 +42,9 @@ class block_progress_edit_form extends block_edit_form {
         // Raise the max_execution time to 60 seconds for courses with many modules.
         core_php_time_limit::raise(60);
 
+        // Also raise memory limit for courses with many modules.
+        raise_memory_limit(MEMORY_EXTRA);
+
         // The My home version is not configurable.
         if (block_progress_on_site_page()) {
             return;
