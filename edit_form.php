@@ -113,8 +113,7 @@ class block_progress_edit_form extends block_edit_form {
         if (!$usingweeklyformat) {
             $currenttime = time();
             $timearray = localtime($currenttime, true);
-            $endofweektimearray =
-                localtime($currenttime + (7 - $timearray['tm_wday']) * 86400, true);
+            $endofweektimearray = localtime($currenttime + (7 - $timearray['tm_wday']) * 86400, true);
             $endofweektime = mktime(23,
                                     55,
                                     0,
@@ -229,11 +228,11 @@ class block_progress_edit_form extends block_edit_form {
                     foreach ($details['actions'] as $action => $sql) {
 
                         // Before allowing pass marks, see that Grade to pass value is set.
-                        if ($action == 'passed') {
+                        if ($action == 'passed' || $action == 'passedby') {
                             $params = array('courseid' => $COURSE->id, 'itemmodule' => $module, 'iteminstance' => $instance->id);
                             $gradetopass = $DB->get_record('grade_items', $params, 'id,gradepass', IGNORE_MULTIPLE);
                             if ($gradetopass && $gradetopass->gradepass > 0) {
-                                $actions['passed'] = get_string($action, 'block_progress');
+                                $actions[$action] = get_string($action, 'block_progress');
                             }
                         } else {
                             $actions[$action] = get_string($action, 'block_progress');

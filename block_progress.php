@@ -121,6 +121,7 @@ class block_progress extends block_base {
         // Draw the multi-bar content for the My home page.
         if (block_progress_on_my_page()) {
             $courses = enrol_get_my_courses();
+            $coursenametoshow = get_config('block_progress', 'coursenametoshow') ?: 'shortname';
             $sql = "SELECT bi.id,
                            bp.id AS blockpositionid,
                            COALESCE(bp.region, bi.defaultregion) AS region,
@@ -170,12 +171,12 @@ class block_progress extends block_base {
                     // Output the Progress Bar.
                     if (!empty($blockinstances)) {
                         $courselink = new moodle_url('/course/view.php', array('id' => $course->id));
-                        $linktext = HTML_WRITER::tag('h3', s($course->shortname));
+                        $linktext = HTML_WRITER::tag('h3', s($course->$coursenametoshow));
                         $this->content->text .= HTML_WRITER::link($courselink, $linktext);
                     }
                     foreach ($blockinstances as $blockid => $blockinstance) {
                         if ($blockinstance->config->progressTitle != '') {
-                            $this->content->text .= HTML_WRITER::tag('p', s($blockinstance->config->progressTitle));
+                            $this->content->text .= HTML_WRITER::tag('p', s(format_string($blockinstance->config->progressTitle)));
                         }
                         $attempts = block_progress_attempts($modules,
                                                             $blockinstance->config,
