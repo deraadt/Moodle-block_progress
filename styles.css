@@ -67,6 +67,11 @@
     max-width: 200px;
 }
 
+#page-blocks-progress-overview .overviewTable {
+    margin: 10px 0;
+    width: 100%;
+}
+
 .block_progress .progressEventInfo img {
     vertical-align: middle;
 }
@@ -105,35 +110,43 @@
     vertical-align: middle;
 }
 
-#page-blocks-progress-overview .groupselector {
-    text-align: center;
-}
-
-#page-blocks-progress-overview .progressoverviewmenus {
-    text-align: center;
-    margin-bottom: 5px;
-}
-
-#page-blocks-progress-overview .progressoverviewmenus form,
-#page-blocks-progress-overview .progressoverviewmenus select,
-#page-blocks-progress-overview .progressoverviewmenus div {
-    display: inline;
-}
-
-#page-blocks-progress-overview .progressoverviewmenus select {
-    margin-left: 2px;
-}
-
 .block_progress .overviewButton {
     margin: 10px;
 }
 
 #page-blocks-progress-overview .buttons {
     margin-top: 20px;
-    text-align: center;
+    text-align: left;
 }
 
 #page-blocks-progress-overview .buttons label {
     display: inline;
     margin: 0 5px 0 10px;
+}
+
+#page-blocks-progress-overview .groupselector {
+    text-align: left;
+    margin-right: 10px;
+}
+
+#page-blocks-progress-overview .progressoverviewmenus {
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+#page-blocks-progress-overview .progressoverviewmenus form,
+#page-blocks-progress-overview .progressoverviewmenus select,
+#page-blocks-progress-overview .progressoverviewmenus div,
+#page-blocks-progress-overview .paging div,
+#page-blocks-progress-overview #showall div {
+    display: inline;
+}
+
+#page-blocks-progress-overview #showall {
+    margin-left: 10px;
+}
+
+
+#page-blocks-progress-overview .progressoverviewmenus select {
+    margin-left: 2px;
 }

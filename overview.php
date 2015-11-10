@@ -29,9 +29,16 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/progress/lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 
+define('USER_SMALL_CLASS', 20);   // Below this is considered small.
+define('USER_LARGE_CLASS', 200);  // Above this is considered large.
+define('DEFAULT_PAGE_SIZE', 20);
+define('SHOW_ALL_PAGE_SIZE', 5000);
+
 // Gather form data.
 $id       = required_param('progressbarid', PARAM_INT);
 $courseid = required_param('courseid', PARAM_INT);
+$page     = optional_param('page', 0, PARAM_INT); // Which page to show.
+$perpage  = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
 
 // Determine course and context.
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -45,7 +52,15 @@ $progressblockcontext = block_progress_get_block_context($id);
 // Set up page parameters.
 $PAGE->set_course($course);
 $PAGE->requires->css('/blocks/progress/styles.css');
-$PAGE->set_url('/blocks/progress/overview.php', array('progressbarid' => $id, 'courseid' => $courseid));
+$PAGE->set_url(
+    '/blocks/progress/overview.php',
+    array(
+        'progressbarid' => $id,
+        'courseid' => $courseid,
+        'page' => $page,
+        'perpage' => $perpage,
+    )
+);
 $PAGE->set_context($context);
 $title = get_string('overview', 'block_progress');
 $PAGE->set_title($title);
@@ -141,17 +156,21 @@ if ($groupselected && $groupselected != 0) {
 
 // Get the list of users enrolled in the course.
 $picturefields = user_picture::fields('u');
-$sql = "SELECT DISTINCT $picturefields, l.timeaccess as lastseen
-         FROM {user} u
-         JOIN {role_assignments} a ON (a.contextid = :contextid AND a.userid = u.id $rolewhere)
-         $groupjoin
-    LEFT JOIN {user_lastaccess} l ON (l.courseid = :courseid AND l.userid = u.id)";
+$sql = "SELECT DISTINCT $picturefields, COALESCE(l.timeaccess, 0) AS lastonlinetime
+          FROM {user} u
+          JOIN {role_assignments} a ON (a.contextid = :contextid AND a.userid = u.id $rolewhere)
+          $groupjoin
+     LEFT JOIN {user_lastaccess} l ON (l.courseid = :courseid AND l.userid = u.id)";
 $params['contextid'] = $context->id;
 $params['courseid'] = $course->id;
 $userrecords = $DB->get_records_sql($sql, $params);
 $userids = array_keys($userrecords);
 $users = array_values($userrecords);
 $numberofusers = count($users);
+$paged = $numberofusers > $perpage;
+if (!$paged) {
+    $page = 0;
+}
 
 // Form for messaging selected participants.
 $formattributes = array('action' => $CFG->wwwroot.'/user/action_redir.php', 'method' => 'post', 'id' => 'participantsform');
@@ -161,6 +180,7 @@ echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'return
 
 // Setup submissions table.
 $table = new flexible_table('mod-block-progress-overview');
+$table->pagesize($perpage, $numberofusers);
 $tablecolumns = array('select', 'picture', 'fullname', 'lastonline', 'progressbar', 'progress');
 $table->define_columns($tablecolumns);
 $tableheaders = array(
@@ -174,7 +194,7 @@ $tableheaders = array(
 $table->define_headers($tableheaders);
 $table->sortable(true);
 
-$table->set_attribute('class', 'generalbox');
+$table->set_attribute('class', 'overviewTable');
 $table->column_style_all('padding', '5px');
 $table->column_style_all('text-align', 'left');
 $table->column_style_all('vertical-align', 'middle');
@@ -187,21 +207,39 @@ $table->no_sorting('select');
 $select = '';
 $table->no_sorting('picture');
 $table->no_sorting('progressbar');
+if ($paged) {
+    $table->no_sorting('progress');
+}
 $table->define_baseurl($PAGE->url);
 $table->setup();
 
+// Sort the users (except by progress).
+$sort = $table->get_sql_sort();
+$sortbyprogress = strncmp($sort, 'progress', 8) == 0;
+if (!$sort || ($paged && $sortbyprogress)) {
+     $sort = 'lastname DESC';
+}
+if (!$sortbyprogress) {
+    usort($users, 'block_progress_compare_rows');
+}
+
+// Get range of students for page.
+$startuser = $page * $perpage;
+$enduser = ($startuser + $perpage > $numberofusers) ? $numberofusers : ($startuser + $perpage);
+
 // Build table of progress bars as they are marked.
-for ($i = 0; $i < $numberofusers; $i++) {
+$rows = array();
+for ($i = $startuser; $i < $enduser; $i++) {
     if ($CFG->enablenotes || $CFG->messaging) {
         $selectattributes = array('type' => 'checkbox', 'class' => 'usercheckbox', 'name' => 'user'.$users[$i]->id);
         $select = html_writer::empty_tag('input', $selectattributes);
     }
     $picture = $OUTPUT->user_picture($users[$i], array('course' => $course->id));
-    $name = html_writer::link($CFG->wwwroot.'/user/view.php?id='.$users[$i]->id.'&course='.$course->id, fullname($users[$i]));
-    if (empty($users[$i]->lastseen)) {
+    $namelink = html_writer::link($CFG->wwwroot.'/user/view.php?id='.$users[$i]->id.'&course='.$course->id, fullname($users[$i]));
+    if (empty($users[$i]->lastonlinetime)) {
         $lastonline = get_string('never');
     } else {
-        $lastonline = userdate($users[$i]->lastseen);
+        $lastonline = userdate($users[$i]->lastonlinetime);
     }
     $userevents = block_progress_filter_visibility($events, $users[$i]->id, $context, $course);
     if (!empty($userevents)) {
@@ -222,8 +260,8 @@ for ($i = 0; $i < $numberofusers; $i++) {
         'lastname' => strtoupper($users[$i]->lastname),
         'select' => $select,
         'picture' => $picture,
-        'fullname' => $name,
-        'lastonlinetime' => (empty($users[$i]->lastseen) ? 0 : $users[$i]->lastseen),
+        'fullname' => $namelink,
+        'lastonlinetime' => $users[$i]->lastonlinetime,
         'lastonline' => $lastonline,
         'progressbar' => $progressbar,
         'progressvalue' => $progressvalue,
@@ -232,19 +270,27 @@ for ($i = 0; $i < $numberofusers; $i++) {
 }
 
 // Build the table content and output.
-if (!$sort = $table->get_sql_sort()) {
-     $sort = 'lastname DESC';
+if ($sortbyprogress) {
+    usort($rows, 'block_progress_compare_rows');
 }
 if ($numberofusers > 0) {
-    usort($rows, 'block_progress_compare_rows');
     foreach ($rows as $row) {
         $table->add_data(array($row['select'], $row['picture'],
             $row['fullname'], $row['lastonline'],
             $row['progressbar'], $row['progress']));
     }
 }
-$table->print_initials_bar();
 $table->print_html();
+
+$perpageurl = clone($PAGE->url);
+if ($paged) {
+    $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
+    echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showall', '', $numberofusers)), array(), 'showall');
+}
+else if ($numberofusers > DEFAULT_PAGE_SIZE) {
+    $perpageurl->param('perpage', DEFAULT_PAGE_SIZE);
+    echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)), array(), 'showall');
+}
 
 // Output messaging controls.
 if ($CFG->enablenotes || $CFG->messaging) {
@@ -315,10 +361,23 @@ function block_progress_compare_rows($a, $b) {
         }
 
         // Check of order can be established.
-        if ($a[$aspect] < $b[$aspect]) {
+        if (is_array($a)) {
+            $first = $a[$aspect];
+            $second = $b[$aspect];
+        } else {
+            $first = $a->$aspect;
+            $second = $b->$aspect;
+        }
+
+        if (preg_match('/name/', $aspect)) {
+            $first = strtolower($first);
+            $second = strtolower($second);
+        }
+
+        if ($first < $second) {
             return $ascdesc == 'ASC'?1:-1;
         }
-        if ($a[$aspect] > $b[$aspect]) {
+        if ($first > $second) {
             return $ascdesc == 'ASC'?-1:1;
         }
     }
