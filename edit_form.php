@@ -134,7 +134,10 @@ class block_progress_edit_form extends block_edit_form {
                 if ($module == 'assignment') {
                     $sql .= ', assignmenttype';
                 }
-                if (array_key_exists('defaultTime', $details)) {
+                if (
+                    array_key_exists('defaultTime', $details) &&
+                    $dbmanager->field_exists($module, $details['defaultTime'])
+                ) {
                     $sql .= ', '.$details['defaultTime'].' as due';
                 }
                 $sql .= ' FROM {'.$module.'} WHERE course=\''.$COURSE->id.'\' ORDER BY name';
@@ -152,7 +155,7 @@ class block_progress_edit_form extends block_edit_form {
                     $moduleinfo->label = get_string($module, 'block_progress');
                     $moduleinfo->instancename = $instance->name;
                     $moduleinfo->lockpossible = isset($details['defaultTime']);
-                    $moduleinfo->instancedue = $moduleinfo->lockpossible && $instance->due;
+                    $moduleinfo->instancedue = $moduleinfo->lockpossible && isset($instance->due);
 
                     // Get position of activity/resource on course page.
                     $coursemodule = get_coursemodule_from_instance($module, $instance->id, $COURSE->id);
@@ -186,7 +189,10 @@ class block_progress_edit_form extends block_edit_form {
 
                     // If there is a date associated with the activity/resource, use that.
                     $lockedproperty = 'locked_'.$module.$instance->id;
-                    if (isset($details['defaultTime']) && $instance->due != 0 && (
+                    if (
+                        isset($details['defaultTime']) &&
+                        isset($instance->due) &&
+                        $instance->due != 0 && (
                             (
                                 isset($this->block->config) &&
                                 property_exists($this->block->config, $lockedproperty) &&
@@ -295,7 +301,7 @@ class block_progress_edit_form extends block_edit_form {
                                                   'what_does_monitored_mean', 'block_progress');
 
                             // Allow locking turned on or off.
-                            if ($moduleinfo->lockpossible && $moduleinfo->instancedue != 0) {
+                            if ($moduleinfo->lockpossible && $moduleinfo->instancedue) {
                                 $mform->addElement('selectyesno', 'config_locked_'.$moduleinfo->uniqueid,
                                                    get_string('config_header_locked', 'block_progress'));
                                 $mform->setDefault('config_locked_'.$moduleinfo->uniqueid, 1);
