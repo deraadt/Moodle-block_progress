@@ -137,8 +137,8 @@
 #page-blocks-progress-overview .progressoverviewmenus form,
 #page-blocks-progress-overview .progressoverviewmenus select,
 #page-blocks-progress-overview .progressoverviewmenus div,
-#page-blocks-progress-overview .paging div,
-#page-blocks-progress-overview #showall div {
+#page-blocks-progress-overview .paging,
+#page-blocks-progress-overview #showall {
     display: inline;
 }
 
