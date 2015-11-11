@@ -175,9 +175,9 @@ $string['time_expected'] = 'Expected';
 // Global setting strings
 // Default colours that may have different cultural meanings.
 // Note that these defaults can be overridden by the block's global settings.
-$string['attempted_colour'] = '#5CD85C';
-$string['notAttempted_colour'] = '#FF5C5C';
-$string['futureNotAttempted_colour'] = '#5C5CFF';
+$string['attempted_colour'] = '#73A839';
+$string['notAttempted_colour'] = '#C71C22';
+$string['futureNotAttempted_colour'] = '#025187';
 $string['attempted_colour_title'] = 'Attempted Colour';
 $string['attempted_colour_descr'] = 'HTML Colour code for elements that have been attempted';
 $string['notattempted_colour_title'] = 'Not-attempted Colour';

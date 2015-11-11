@@ -10,16 +10,16 @@
 .block_progress .progressBarProgressTable {
     width: 100%;
     margin: 0 0 5px 0;
-    height: 25px;
+    height: 31px;
     overflow: hidden;
 }
 
 .block_progress .progressBarProgressTable.noNow {
-    height: 19px;
+    height: 25px;
 }
 
 .block_progress .progressBarCell {
-    height: 19px;
+    height: 25px;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -51,7 +51,7 @@
     max-width: 15px;
     height: auto;
     max-height: 15px;
-    vertical-align: text-bottom;
+    vertical-align: middle;
 }
 
 .block_progress .progressEventInfo {
@@ -61,6 +61,11 @@
     overflow: hidden;
     padding: 0;
     margin: 5px auto;
+}
+
+.block_progress .progressEventInfo .iconInInfo,
+#fitem_id_config_progressBarIcons .iconOnConfig {
+    height: 1.2em;
 }
 
 #page-blocks-progress-overview .block_progress .progressEventInfo {
