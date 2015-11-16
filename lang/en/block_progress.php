@@ -187,6 +187,7 @@ $string['futurenotattempted_colour_descr'] = 'HTML Colour code for future elemen
 $string['coursenametoshow'] = 'Course name to show on Dashboard';
 $string['shortname'] = 'Short course name';
 $string['fullname'] = 'Full course name';
+$string['showinactive'] = 'Show inactive students in Overview';
 
 // Overview page strings.
 $string['lastonline'] = 'Last in course';

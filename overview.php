@@ -126,7 +126,7 @@ if (!has_capability('moodle/site:accessallgroups', $context)) {
 }
 $groups = groups_get_all_groups($course->id);
 if (!empty($groups)) {
-    $course->groupmode = 1;
+    $course->groupmode = 2;
     groups_print_course_menu($course, $PAGE->url);
 }
 
@@ -164,6 +164,9 @@ $sql = "SELECT DISTINCT $picturefields, COALESCE(l.timeaccess, 0) AS lastonlinet
 $params['contextid'] = $context->id;
 $params['courseid'] = $course->id;
 $userrecords = $DB->get_records_sql($sql, $params);
+if (get_config('block_progress', 'showinactive') != 1) {
+    extract_suspended_users($context, $userrecords);
+}
 $userids = array_keys($userrecords);
 $users = array_values($userrecords);
 $numberofusers = count($users);
