@@ -689,6 +689,38 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'viewed'
         ),
+        'vpl' => array(
+            'defaultTime' => 'duedate',
+            'actions' => array(
+                'attempted'    => "SELECT id
+                                     FROM {vpl_submissions}
+                                    WHERE vpl = :eventid
+                                      AND userid = :userid",
+                'marked'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'vpl'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passed'       => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'vpl'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'vpl'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
+                                      AND g.finalgrade >= i.gradepass",
+            ),
+            'defaultAction' => 'marked'
+        ),
         'wiki' => array(
             'actions' => array(
                 'viewed' => array (
@@ -1006,7 +1038,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
                 $query = $module['actions'][$action];
             }
 
-             // Check if the user has attempted the module.
+            // Check if the user has attempted the module.
             $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
         }
     }
