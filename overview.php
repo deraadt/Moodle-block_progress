@@ -251,8 +251,7 @@ for ($i = $startuser; $i < $enduser; $i++) {
             $course->id, true);
         $progressvalue = block_progress_percentage($userevents, $attempts, true);
         $progress = $progressvalue.'%';
-    }
-    else {
+    } else {
         $progressbar = get_string('no_visible_events_message', 'block_progress');
         $progressvalue = 0;
         $progress = '?';
@@ -289,8 +288,7 @@ $perpageurl = clone($PAGE->url);
 if ($paged) {
     $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
     echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showall', '', $numberofusers)), array(), 'showall');
-}
-else if ($numberofusers > DEFAULT_PAGE_SIZE) {
+} else if ($numberofusers > DEFAULT_PAGE_SIZE) {
     $perpageurl->param('perpage', DEFAULT_PAGE_SIZE);
     echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)), array(), 'showall');
 }
@@ -378,10 +376,10 @@ function block_progress_compare_rows($a, $b) {
         }
 
         if ($first < $second) {
-            return $ascdesc == 'ASC'?1:-1;
+            return $ascdesc == 'ASC' ? 1 : -1;
         }
         if ($first > $second) {
-            return $ascdesc == 'ASC'?-1:1;
+            return $ascdesc == 'ASC' ? -1 : 1;
         }
     }
 
