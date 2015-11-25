@@ -55,6 +55,7 @@ $string['scorm'] = 'SCORM';
 $string['turnitintool'] = 'Turnitin Tool';
 $string['url'] = 'URL';
 $string['video'] = 'Video';
+$string['vpl'] = 'Virtual Programming Lab';
 $string['wiki'] = 'Wiki';
 $string['workshop'] = 'Workshop';
 
