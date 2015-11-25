@@ -936,11 +936,13 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
         // Check for passing grades as unattempted, passed or failed.
         if (isset($config->{'action_'.$uniqueid}) && $config->{'action_'.$uniqueid} == 'passed') {
             $query = $module['actions'][$config->{'action_'.$uniqueid}];
-            $graderesult = $DB->get_record_sql($query, $parameters);
-            if ($graderesult === false || $graderesult->finalgrade === null) {
-                $attempts[$uniqueid] = false;
-            } else {
-                $attempts[$uniqueid] = $graderesult->finalgrade >= $graderesult->gradepass ? true : 'failed';
+            if ($query != "") {
+                $graderesult = $DB->get_record_sql($query, $parameters);
+                if ($graderesult === false || $graderesult->finalgrade === null) {
+                    $attempts[$uniqueid] = false;
+                } else {
+                    $attempts[$uniqueid] = $graderesult->finalgrade >= $graderesult->gradepass ? true : 'failed';
+                }
             }
         }
 
@@ -957,6 +959,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
             else {
                 if ($modernlogging) {
                     foreach ($readers as $logstore => $reader) {
+                        $query = "";
                         if (
                             $reader instanceof \core\log\sql_internal_table_reader ||
                             $reader instanceof \core\log\sql_internal_reader
@@ -967,8 +970,8 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
                         else if ($reader instanceof logstore_legacy\log\store) {
                             $query = $module['actions']['viewed']['logstore_legacy'];
                         }
-                        else {
-                            // No logs available.
+                        if ($query == "") {
+                            // No usable logs available.
                             continue;
                         }
                         $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
@@ -980,10 +983,12 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
                     }
                 } else {
                     $query = $module['actions']['viewed']['logstore_legacy'];
-                    $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
-                    if ($cachingused && $attempts[$uniqueid]) {
-                        $cachedlogviews[$uniqueid] = true;
-                        $cachedlogsupdated = true;
+                    if ($query != "") {
+                        $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+                        if ($cachingused && $attempts[$uniqueid]) {
+                            $cachedlogviews[$uniqueid] = true;
+                            $cachedlogsupdated = true;
+                        }
                     }
                 }
             }
@@ -1006,8 +1011,10 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
                 $query = $module['actions'][$action];
             }
 
-             // Check if the user has attempted the module.
-            $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+            if ($query != "") {
+                // Check if the user has attempted the module.
+                $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+            }
         }
     }
 
