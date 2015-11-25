@@ -321,8 +321,10 @@ class block_progress_edit_form extends block_edit_form {
                                                 'config_monitor_'.$moduleinfo->uniqueid, 'eq', 0);
                             $mform->disabledif('config_date_time_'.$moduleinfo->uniqueid,
                                                'config_orderby', 'eq', 'orderbycourse');
-                            $mform->disabledif('config_locked_'.$moduleinfo->uniqueid,
-                                               'config_orderby', 'eq', 'orderbycourse');
+                            if ($moduleinfo->lockpossible && $moduleinfo->instancedue) {
+                                $mform->disabledif('config_locked_'.$moduleinfo->uniqueid,
+                                                   'config_orderby', 'eq', 'orderbycourse');
+                            }
                             $mform->setDefault('config_date_time_'.$moduleinfo->uniqueid, $moduleinfo->expected);
                             $mform->addHelpButton('config_date_time_'.$moduleinfo->uniqueid,
                                                   'what_expected_by_means', 'block_progress');
