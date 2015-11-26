@@ -37,10 +37,30 @@ class block_progress_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
         global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
+        $loggingenabled = true;
 
         // The My home version is not configurable.
         if (block_progress_on_my_page()) {
             return;
+        }
+
+        // Check that logging is enabled in 2.7 onwards.
+        if (function_exists('get_log_manager')) {
+            $logmanager = get_log_manager();
+            $readers = $logmanager->get_readers();
+            $loggingenabled = !empty($readers);
+            if(!$loggingenabled) {
+                $warningstring = get_string('config_warning_logstores', 'block_progress');
+                $warning = HTML_WRITER::tag('div', $warningstring, array('class' => 'warning progressWarningBox'));
+                $mform->addElement('html', $warning);
+            }
+        }
+
+        // Check that logs will be available during course.
+        if(isset($CFG->loglifetime) && $CFG->loglifetime > 0) {
+            $warningstring = get_string('config_warning_loglifetime', 'block_progress', $CFG->loglifetime);
+            $warning = HTML_WRITER::tag('div', $warningstring, array('class' => 'warning progressWarningBox'));
+            $mform->addElement('html', $warning);
         }
 
         $turnallon = optional_param('turnallon', 0, PARAM_INT);

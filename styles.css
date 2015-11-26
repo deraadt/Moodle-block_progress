@@ -101,6 +101,16 @@
     margin: 5px auto;
 }
 
+.progressWarningBox {
+    border: 2px solid #F00;
+    padding: 10px;
+    background-color: #F66;
+    color: white;
+    margin: 10px 0;
+    font-size: large;
+    font-weight: bold;
+}
+
 .progressConfigBox {
     border-bottom: 1px dashed #cccccc;
     padding: 5px;

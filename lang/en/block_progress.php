@@ -92,6 +92,8 @@ $string['config_title'] = 'Alternate title';
 $string['config_orderby'] = 'Order bar items by';
 $string['config_orderby_due_time'] = '"Expected by" date-time';
 $string['config_orderby_course_order'] = 'Ordering in course';
+$string['config_warning_logstores'] = 'Warning: Logging is disabled so actions relying on views will not be checked.';
+$string['config_warning_loglifetime'] = 'Warning: Logs are cleared after {$a} day(s). Actions relying on views will be affected by this.';
 
 // Help strings.
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';
@@ -161,6 +163,7 @@ $string['how_group_works'] = 'How visible group works';
 $string['how_group_works_help'] = '
 <p>Selecting a group will limit the display of the this block to that group only.</p>
 ';
+
 
 // Other terms.
 $string['addallcurrentitems'] = 'Add all activities/resources';
