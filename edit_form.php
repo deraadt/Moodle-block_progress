@@ -27,6 +27,8 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/progress/lib.php');
 
+define('YEARS_TO_SHOW', 20);
+
 /**
  * Progress Bar block config form class
  *
@@ -38,6 +40,8 @@ class block_progress_edit_form extends block_edit_form {
     protected function specific_definition($mform) {
         global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
         $loggingenabled = true;
+        $coursestartdate = localtime($COURSE->startdate, true);
+        $minyear = $coursestartdate['tm_year']+1900;
 
         // The My home version is not configurable.
         if (block_progress_on_my_page()) {
@@ -285,6 +289,14 @@ class block_progress_edit_form extends block_edit_form {
 
         // Output the form elements for each module.
         if ($count > 0) {
+
+            $dateselectoroptions = array(
+                'optional' => false,
+                'hideyuicalendar' => true,
+                'startyear' => $minyear - 1,
+                'stopyear' => $minyear + YEARS_TO_SHOW
+            );
+
             foreach ($sections as $i => $section) {
                 if (count($section->sequence) > 0) {
 
@@ -334,7 +346,8 @@ class block_progress_edit_form extends block_edit_form {
                             // Print the date selector.
                             $mform->addElement('date_time_selector',
                                                'config_date_time_'.$moduleinfo->uniqueid,
-                                               get_string('config_header_expected', 'block_progress'));
+                                               get_string('config_header_expected', 'block_progress'),
+                                               $dateselectoroptions);
                             $mform->disabledif ('config_date_time_'.$moduleinfo->uniqueid,
                                                 'config_locked_'.$moduleinfo->uniqueid, 'eq', 1);
                             $mform->disabledif ('config_date_time_'.$moduleinfo->uniqueid,

@@ -344,7 +344,6 @@ function block_progress_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'forum' => array(
-            'defaultTime' => 'assesstimefinish',
             'actions' => array(
                 'posted_to'    => "SELECT id
                                      FROM {forum_posts}
@@ -1389,7 +1388,7 @@ function block_progress_get_block_context($blockid) {
 function block_progress_get_coursemodule($module, $recordid, $courseid, $userid = 0) {
     global $CFG;
 
-    if ($CFG->version >= 2012120300) {
+    if (function_exists('get_fast_modinfo')) {
         return get_fast_modinfo($courseid, $userid)->instances[$module][$recordid];
     }
     else {
