@@ -179,7 +179,7 @@ class block_progress_edit_form extends block_edit_form {
                     $moduleinfo->label = get_string($module, 'block_progress');
                     $moduleinfo->instancename = $instance->name;
                     $moduleinfo->lockpossible = isset($details['defaultTime']);
-                    $moduleinfo->instancedue = $moduleinfo->lockpossible && isset($instance->due);
+                    $moduleinfo->instancedue = isset($instance->due) && ($instance->due != 0);
 
                     // Get position of activity/resource on course page.
                     $coursemodule = get_coursemodule_from_instance($module, $instance->id, $COURSE->id);
@@ -213,6 +213,7 @@ class block_progress_edit_form extends block_edit_form {
 
                     // If there is a date associated with the activity/resource, use that.
                     $lockedproperty = 'locked_'.$module.$instance->id;
+
                     if (
                         isset($details['defaultTime']) &&
                         isset($instance->due) &&
@@ -231,6 +232,7 @@ class block_progress_edit_form extends block_edit_form {
                             property_exists($this->block->config, $datetimepropery)
                         ) {
                             $this->block->config->$datetimepropery = $expected;
+                            $this->block->config->$lockedproperty = 1;
                         }
                     }
 
