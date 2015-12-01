@@ -44,7 +44,7 @@ class block_progress_edit_form extends block_edit_form {
         $minyear = $coursestartdate['tm_year']+1900;
 
         // The My home version is not configurable.
-        if (block_progress_on_my_page()) {
+        if (block_progress_on_site_page()) {
             return;
         }
 

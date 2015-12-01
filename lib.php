@@ -1343,10 +1343,10 @@ function block_progress_filter_visibility($events, $userid, $coursecontext, $cou
  *
  * @return bool True when on the My home page.
  */
-function block_progress_on_my_page() {
-    global $SCRIPT;
+function block_progress_on_site_page() {
+    global $SCRIPT, $COURSE;
 
-    return $SCRIPT === '/my/index.php';
+    return $SCRIPT === '/my/index.php' || $COURSE->id == 1;
 }
 
 /**

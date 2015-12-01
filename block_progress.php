@@ -70,7 +70,7 @@ class block_progress extends block_base {
      * @return bool
      */
     public function instance_allow_multiple() {
-        return !block_progress_on_my_page();
+        return !block_progress_on_site_page();
     }
 
     /**
@@ -79,7 +79,7 @@ class block_progress extends block_base {
      * @return bool
      */
     public function instance_allow_config() {
-        return !block_progress_on_my_page();
+        return !block_progress_on_site_page();
     }
 
     /**
@@ -90,7 +90,7 @@ class block_progress extends block_base {
     public function applicable_formats() {
         return array(
             'course-view'    => true,
-            'site'           => false,
+            'site'           => true,
             'mod'            => false,
             'my'             => true
         );
@@ -118,8 +118,8 @@ class block_progress extends block_base {
             return $this->content;
         }
 
-        // Draw the multi-bar content for the My home page.
-        if (block_progress_on_my_page()) {
+        // Draw the multi-bar content for the Dashboard and Front page.
+        if (block_progress_on_site_page()) {
             $courses = enrol_get_my_courses();
             $coursenametoshow = get_config('block_progress', 'coursenametoshow') ?: 'shortname';
             $sql = "SELECT bi.id,
