@@ -63,4 +63,9 @@ if ($ADMIN->fulltree) {
         '',
         0)
     );
+
+    $settings->add(new admin_setting_configcheckbox('block_progress/plainlistview',
+        get_string('plainlistview_title', 'block_progress'),
+        get_string('plainlistview_descr', 'block_progress'), 0, 1 )
+    );
 }

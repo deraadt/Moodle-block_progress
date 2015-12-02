@@ -194,13 +194,17 @@ $string['shortname'] = 'Short course name';
 $string['fullname'] = 'Full course name';
 $string['showinactive'] = 'Show inactive students in Overview';
 
+// Settings page: Choice of plain accessible view or progress bar view.
+$string['plainlistview_title'] = 'Show plain list';
+$string['plainlistview_descr'] = 'Replaces progress bar with an accessible list view which does not require hovering the mouse over the progress bar to view the activity details.';
+
 // Overview page strings.
 $string['lastonline'] = 'Last in course';
 $string['overview'] = 'Overview of students';
 $string['progress'] = 'Progress';
 $string['progressbar'] = 'Progress Bar';
 
-// For cabailities.
+// For capabilities.
 $string['progress:overview'] = 'View course overview of Progress bars for all students';
 $string['progress:addinstance'] = 'Add a new Progress Bar block';
 $string['progress:myaddinstance'] = 'Add a Progress Bar block to My home page';

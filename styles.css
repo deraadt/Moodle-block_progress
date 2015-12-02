@@ -1,5 +1,25 @@
 .block_progress .content {
-    text-align: center;
+    text-align: left;
+}
+
+.block_progress ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    width: 100%;
+}
+
+.block_progress li {
+    list-style: none;
+    display: inline-block;
+    padding: 0 0 0 1px;
+    margin: 0;
+    border-left:7px solid #000;
+}
+
+.block_progress li.now {
+    width:100%;
+    border:none;
 }
 
 .block_progress table {
@@ -7,11 +27,17 @@
     padding: 0;
 }
 
+.block_progress li img.smallicon {
+    height: 15px;
+    width: auto;
+    vertical-align: top;
+}
+
 .block_progress .progressBarProgressTable {
     width: 100%;
     margin: 0 0 5px 0;
     height: 31px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .block_progress .progressBarProgressTable.noNow {
@@ -57,7 +83,7 @@
 .block_progress .progressEventInfo {
     font-size: x-small;
     text-align: left;
-    white-space: pre;
+/*    white-space: pre;  */
     overflow: hidden;
     padding: 0;
     margin: 5px auto;
@@ -127,6 +153,7 @@
 
 .block_progress .overviewButton {
     margin: 10px;
+    text-align: center;
 }
 
 #page-blocks-progress-overview .buttons {

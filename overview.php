@@ -248,7 +248,7 @@ for ($i = $startuser; $i < $enduser; $i++) {
     if (!empty($userevents)) {
         $attempts = block_progress_attempts($modules, $progressconfig, $userevents, $users[$i]->id, $course->id);
         $progressbar = block_progress_bar($modules, $progressconfig, $userevents, $users[$i]->id, $progressblock->id, $attempts,
-            $course->id, true);
+            $course->id, true, true);
         $progressvalue = block_progress_percentage($userevents, $attempts, true);
         $progress = $progressvalue.'%';
     } else {
