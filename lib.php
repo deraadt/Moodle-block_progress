@@ -270,6 +270,27 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'viewed'
         ),
+        'equella' => array(
+            'actions' => array(
+                'viewed' => array (
+                    'logstore_legacy'     => "SELECT id
+                                                FROM {log}
+                                               WHERE course = :courseid
+                                                 AND module = 'equella'
+                                                 AND action = 'view'
+                                                 AND cmid = :cmid
+                                                 AND userid = :userid",
+                    'sql_internal_reader' => "SELECT id
+                                                FROM {log}
+                                               WHERE courseid = :courseid
+                                                 AND component = 'mod_equella'
+                                                 AND action = 'viewed'
+                                                 AND objectid = :eventid
+                                                 AND userid = :userid",
+                ),
+            ),
+            'defaultAction' => 'viewed'
+        ),
         'feedback' => array(
             'defaultTime' => 'timeclose',
             'actions' => array(
