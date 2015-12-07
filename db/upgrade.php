@@ -60,5 +60,29 @@ function xmldb_block_progress_upgrade($oldversion, $block) {
         }
     }
 
+    // Update colours to match new icons, if default colours are used.
+    if ($oldversion < 2015111200) {
+        $colourvalues = array(
+            'attempted_colour' => array(
+                'oldcolour' => '#5CD85C',
+                'newcolour' => '#73A839',
+            ),
+            'notattempted_colour' => array(
+                'oldcolour' => '#FF5C5C',
+                'newcolour' => '#C71C22',
+            ),
+            'futurenotattempted_colour' => array(
+                'oldcolour' => '#5C5CFF',
+                'newcolour' => '#025187',
+            ),
+        );
+
+        foreach ($colourvalues as $setting => $details) {
+            if (get_config('block_progress', $setting) == $details['oldcolour']) {
+                set_config($setting, $details['newcolour'], 'block_progress');
+            }
+        }
+    }
+
     return true;
 }

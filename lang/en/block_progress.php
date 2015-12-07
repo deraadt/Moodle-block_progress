@@ -33,6 +33,7 @@ $string['certificate'] = 'Certificate';
 $string['chat'] = 'Chat';
 $string['choice'] = 'Choice';
 $string['data'] = 'Database';
+$string['equella'] = 'Equella';
 $string['feedback'] = 'Feedback';
 $string['flashcardtrainer'] = 'Flashcard trainer';
 $string['folder'] = 'Folder';
@@ -55,6 +56,7 @@ $string['scorm'] = 'SCORM';
 $string['turnitintool'] = 'Turnitin Tool';
 $string['url'] = 'URL';
 $string['video'] = 'Video';
+$string['vpl'] = 'Virtual Programming Lab';
 $string['wiki'] = 'Wiki';
 $string['workshop'] = 'Workshop';
 
@@ -91,6 +93,8 @@ $string['config_title'] = 'Alternate title';
 $string['config_orderby'] = 'Order bar items by';
 $string['config_orderby_due_time'] = '"Expected by" date-time';
 $string['config_orderby_course_order'] = 'Ordering in course';
+$string['config_warning_logstores'] = 'Warning: Logging is disabled so actions relying on views will not be checked.';
+$string['config_warning_loglifetime'] = 'Warning: Logs are cleared after {$a} day(s). Actions relying on views will be affected by this.';
 
 // Help strings.
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';
@@ -161,6 +165,7 @@ $string['how_group_works_help'] = '
 <p>Selecting a group will limit the display of the this block to that group only.</p>
 ';
 
+
 // Other terms.
 $string['addallcurrentitems'] = 'Add all activities/resources';
 $string['mouse_over_prompt'] = 'Mouse over block for info.';
@@ -175,9 +180,9 @@ $string['time_expected'] = 'Expected';
 // Global setting strings
 // Default colours that may have different cultural meanings.
 // Note that these defaults can be overridden by the block's global settings.
-$string['attempted_colour'] = '#5CD85C';
-$string['notAttempted_colour'] = '#FF5C5C';
-$string['futureNotAttempted_colour'] = '#5C5CFF';
+$string['attempted_colour'] = '#73A839';
+$string['notAttempted_colour'] = '#C71C22';
+$string['futureNotAttempted_colour'] = '#025187';
 $string['attempted_colour_title'] = 'Attempted Colour';
 $string['attempted_colour_descr'] = 'HTML Colour code for elements that have been attempted';
 $string['notattempted_colour_title'] = 'Not-attempted Colour';
@@ -187,6 +192,7 @@ $string['futurenotattempted_colour_descr'] = 'HTML Colour code for future elemen
 $string['coursenametoshow'] = 'Course name to show on Dashboard';
 $string['shortname'] = 'Short course name';
 $string['fullname'] = 'Full course name';
+$string['showinactive'] = 'Show inactive students in Overview';
 
 // Overview page strings.
 $string['lastonline'] = 'Last in course';

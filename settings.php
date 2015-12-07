@@ -32,7 +32,7 @@ if ($ADMIN->fulltree) {
     );
     $settings->add(new admin_setting_configselect('block_progress/coursenametoshow',
         get_string('coursenametoshow', 'block_progress'),
-        get_string('coursenametoshow', 'block_progress'),
+        '',
         'shortname',
         $options)
     );
@@ -56,5 +56,11 @@ if ($ADMIN->fulltree) {
         get_string('futurenotattempted_colour_descr', 'block_progress'),
         get_string('futureNotAttempted_colour', 'block_progress'),
         null )
+    );
+
+    $settings->add(new admin_setting_configcheckbox('block_progress/showinactive',
+        get_string('showinactive', 'block_progress'),
+        '',
+        0)
     );
 }

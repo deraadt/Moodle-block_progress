@@ -27,6 +27,8 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/progress/lib.php');
 
+define('YEARS_TO_SHOW', 20);
+
 /**
  * Progress Bar block config form class
  *
@@ -37,10 +39,32 @@ class block_progress_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
         global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
+        $loggingenabled = true;
+        $coursestartdate = localtime($COURSE->startdate, true);
+        $minyear = $coursestartdate['tm_year']+1900;
 
         // The My home version is not configurable.
-        if (block_progress_on_my_page()) {
+        if (block_progress_on_site_page()) {
             return;
+        }
+
+        // Check that logging is enabled in 2.7 onwards.
+        if (function_exists('get_log_manager')) {
+            $logmanager = get_log_manager();
+            $readers = $logmanager->get_readers();
+            $loggingenabled = !empty($readers);
+            if(!$loggingenabled) {
+                $warningstring = get_string('config_warning_logstores', 'block_progress');
+                $warning = HTML_WRITER::tag('div', $warningstring, array('class' => 'warning progressWarningBox'));
+                $mform->addElement('html', $warning);
+            }
+        }
+
+        // Check that logs will be available during course.
+        if(isset($CFG->loglifetime) && $CFG->loglifetime > 0) {
+            $warningstring = get_string('config_warning_loglifetime', 'block_progress', $CFG->loglifetime);
+            $warning = HTML_WRITER::tag('div', $warningstring, array('class' => 'warning progressWarningBox'));
+            $mform->addElement('html', $warning);
         }
 
         $turnallon = optional_param('turnallon', 0, PARAM_INT);
@@ -62,8 +86,8 @@ class block_progress_edit_form extends block_edit_form {
         // Allow icons to be turned on/off on the block.
         $mform->addElement('selectyesno', 'config_progressBarIcons',
                            get_string('config_icons', 'block_progress').'&nbsp;'.
-                           $OUTPUT->pix_icon('tick', '', 'block_progress').'&nbsp;'.
-                           $OUTPUT->pix_icon('cross', '', 'block_progress'));
+                           $OUTPUT->pix_icon('tick', '', 'block_progress', array('class' => 'iconOnConfig')).'&nbsp;'.
+                           $OUTPUT->pix_icon('cross', '', 'block_progress', array('class' => 'iconOnConfig')));
         $mform->setDefault('config_progressBarIcons', 0);
         $mform->addHelpButton('config_progressBarIcons', 'why_use_icons', 'block_progress');
 
@@ -134,7 +158,10 @@ class block_progress_edit_form extends block_edit_form {
                 if ($module == 'assignment') {
                     $sql .= ', assignmenttype';
                 }
-                if (array_key_exists('defaultTime', $details)) {
+                if (
+                    array_key_exists('defaultTime', $details) &&
+                    $dbmanager->field_exists($module, $details['defaultTime'])
+                ) {
                     $sql .= ', '.$details['defaultTime'].' as due';
                 }
                 $sql .= ' FROM {'.$module.'} WHERE course=\''.$COURSE->id.'\' ORDER BY name';
@@ -152,7 +179,7 @@ class block_progress_edit_form extends block_edit_form {
                     $moduleinfo->label = get_string($module, 'block_progress');
                     $moduleinfo->instancename = $instance->name;
                     $moduleinfo->lockpossible = isset($details['defaultTime']);
-                    $moduleinfo->instancedue = $moduleinfo->lockpossible && $instance->due;
+                    $moduleinfo->instancedue = isset($instance->due) && ($instance->due != 0);
 
                     // Get position of activity/resource on course page.
                     $coursemodule = get_coursemodule_from_instance($module, $instance->id, $COURSE->id);
@@ -186,7 +213,11 @@ class block_progress_edit_form extends block_edit_form {
 
                     // If there is a date associated with the activity/resource, use that.
                     $lockedproperty = 'locked_'.$module.$instance->id;
-                    if (isset($details['defaultTime']) && $instance->due != 0 && (
+
+                    if (
+                        isset($details['defaultTime']) &&
+                        isset($instance->due) &&
+                        $instance->due != 0 && (
                             (
                                 isset($this->block->config) &&
                                 property_exists($this->block->config, $lockedproperty) &&
@@ -201,6 +232,7 @@ class block_progress_edit_form extends block_edit_form {
                             property_exists($this->block->config, $datetimepropery)
                         ) {
                             $this->block->config->$datetimepropery = $expected;
+                            $this->block->config->$lockedproperty = 1;
                         }
                     }
 
@@ -259,6 +291,14 @@ class block_progress_edit_form extends block_edit_form {
 
         // Output the form elements for each module.
         if ($count > 0) {
+
+            $dateselectoroptions = array(
+                'optional' => false,
+                'hideyuicalendar' => true,
+                'startyear' => $minyear - 1,
+                'stopyear' => $minyear + YEARS_TO_SHOW
+            );
+
             foreach ($sections as $i => $section) {
                 if (count($section->sequence) > 0) {
 
@@ -295,7 +335,7 @@ class block_progress_edit_form extends block_edit_form {
                                                   'what_does_monitored_mean', 'block_progress');
 
                             // Allow locking turned on or off.
-                            if ($moduleinfo->lockpossible && $moduleinfo->instancedue != 0) {
+                            if ($moduleinfo->lockpossible && $moduleinfo->instancedue) {
                                 $mform->addElement('selectyesno', 'config_locked_'.$moduleinfo->uniqueid,
                                                    get_string('config_header_locked', 'block_progress'));
                                 $mform->setDefault('config_locked_'.$moduleinfo->uniqueid, 1);
@@ -308,15 +348,18 @@ class block_progress_edit_form extends block_edit_form {
                             // Print the date selector.
                             $mform->addElement('date_time_selector',
                                                'config_date_time_'.$moduleinfo->uniqueid,
-                                               get_string('config_header_expected', 'block_progress'));
+                                               get_string('config_header_expected', 'block_progress'),
+                                               $dateselectoroptions);
                             $mform->disabledif ('config_date_time_'.$moduleinfo->uniqueid,
                                                 'config_locked_'.$moduleinfo->uniqueid, 'eq', 1);
                             $mform->disabledif ('config_date_time_'.$moduleinfo->uniqueid,
                                                 'config_monitor_'.$moduleinfo->uniqueid, 'eq', 0);
                             $mform->disabledif('config_date_time_'.$moduleinfo->uniqueid,
                                                'config_orderby', 'eq', 'orderbycourse');
-                            $mform->disabledif('config_locked_'.$moduleinfo->uniqueid,
-                                               'config_orderby', 'eq', 'orderbycourse');
+                            if ($moduleinfo->lockpossible && $moduleinfo->instancedue) {
+                                $mform->disabledif('config_locked_'.$moduleinfo->uniqueid,
+                                                   'config_orderby', 'eq', 'orderbycourse');
+                            }
                             $mform->setDefault('config_date_time_'.$moduleinfo->uniqueid, $moduleinfo->expected);
                             $mform->addHelpButton('config_date_time_'.$moduleinfo->uniqueid,
                                                   'what_expected_by_means', 'block_progress');

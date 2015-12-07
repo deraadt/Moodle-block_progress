@@ -10,16 +10,16 @@
 .block_progress .progressBarProgressTable {
     width: 100%;
     margin: 0 0 5px 0;
-    height: 25px;
+    height: 31px;
     overflow: hidden;
 }
 
 .block_progress .progressBarProgressTable.noNow {
-    height: 19px;
+    height: 25px;
 }
 
 .block_progress .progressBarCell {
-    height: 19px;
+    height: 25px;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -51,7 +51,7 @@
     max-width: 15px;
     height: auto;
     max-height: 15px;
-    vertical-align: text-bottom;
+    vertical-align: middle;
 }
 
 .block_progress .progressEventInfo {
@@ -63,8 +63,18 @@
     margin: 5px auto;
 }
 
+.block_progress .progressEventInfo .iconInInfo,
+#fitem_id_config_progressBarIcons .iconOnConfig {
+    height: 1.2em;
+}
+
 #page-blocks-progress-overview .block_progress .progressEventInfo {
     max-width: 200px;
+}
+
+#page-blocks-progress-overview .overviewTable {
+    margin: 10px 0;
+    width: 100%;
 }
 
 .block_progress .progressEventInfo img {
@@ -91,6 +101,16 @@
     margin: 5px auto;
 }
 
+.progressWarningBox {
+    border: 2px solid #F00;
+    padding: 10px;
+    background-color: #F66;
+    color: white;
+    margin: 10px 0;
+    font-size: large;
+    font-weight: bold;
+}
+
 .progressConfigBox {
     border-bottom: 1px dashed #cccccc;
     padding: 5px;
@@ -105,35 +125,43 @@
     vertical-align: middle;
 }
 
-#page-blocks-progress-overview .groupselector {
-    text-align: center;
-}
-
-#page-blocks-progress-overview .progressoverviewmenus {
-    text-align: center;
-    margin-bottom: 5px;
-}
-
-#page-blocks-progress-overview .progressoverviewmenus form,
-#page-blocks-progress-overview .progressoverviewmenus select,
-#page-blocks-progress-overview .progressoverviewmenus div {
-    display: inline;
-}
-
-#page-blocks-progress-overview .progressoverviewmenus select {
-    margin-left: 2px;
-}
-
 .block_progress .overviewButton {
     margin: 10px;
 }
 
 #page-blocks-progress-overview .buttons {
     margin-top: 20px;
-    text-align: center;
+    text-align: left;
 }
 
 #page-blocks-progress-overview .buttons label {
     display: inline;
     margin: 0 5px 0 10px;
+}
+
+#page-blocks-progress-overview .groupselector {
+    text-align: left;
+    margin-right: 10px;
+}
+
+#page-blocks-progress-overview .progressoverviewmenus {
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+#page-blocks-progress-overview .progressoverviewmenus form,
+#page-blocks-progress-overview .progressoverviewmenus select,
+#page-blocks-progress-overview .progressoverviewmenus div,
+#page-blocks-progress-overview .paging,
+#page-blocks-progress-overview #showall {
+    display: inline;
+}
+
+#page-blocks-progress-overview #showall {
+    margin-left: 10px;
+}
+
+
+#page-blocks-progress-overview .progressoverviewmenus select {
+    margin-left: 2px;
 }

@@ -73,7 +73,7 @@ class restore_progress_block_task extends restore_block_task {
 
                         // Translate new instance values from old IDs.
                         foreach ($prefixes as $prefix) {
-                            if (isset($config["$prefix$module$instance"])) {
+                            if (array_key_exists("$prefix$module$instance", $config)) {
                                 $newconfig["$prefix$module$newinstanceid"] = $config["$prefix$module$instance"];
                             }
                         }
