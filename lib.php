@@ -1106,10 +1106,21 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         }
     }
 
+    $content = '';
+
+    // Output progress percentage
+    if (isset($config->showpercentage) && $config->showpercentage == 1) {
+      $progress = block_progress_percentage($events, $attempts);
+      $content .= HTML_WRITER::start_tag('div', array('class' => 'progressContainer'));
+      $content .= HTML_WRITER::tag('span', get_string('progress', 'block_progress').': ', array('class' => 'progressLabel'));
+      $content .= HTML_WRITER::tag('span', $progress.'%', array('class' => 'progressPercentage'));
+      $content .= HTML_WRITER::end_tag('div');
+    }
+
     // Place now arrow.
     if ((!isset($config->orderby) || $config->orderby == 'orderbytime') && $config->displayNow == 1 && !$simple) {
 
-        $content = HTML_WRITER::start_tag('table', $tableoptions);
+        $content .= HTML_WRITER::start_tag('table', $tableoptions);
 
         // Find where to put now arrow.
         $nowpos = 0;
@@ -1145,7 +1156,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     }
     else {
         $tableoptions['class'] = 'progressBarProgressTable noNow';
-        $content = HTML_WRITER::start_tag('table', $tableoptions);
+        $content .= HTML_WRITER::start_tag('table', $tableoptions);
     }
 
     // Start progress bar.
@@ -1203,12 +1214,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                         'id' => 'progressBarInfo'.$instance.'-'.$userid.'-info');
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
-        if (isset($config->showpercentage) && $config->showpercentage == 1) {
-            $progress = block_progress_percentage($events, $attempts);
-            $content .= get_string('progress', 'block_progress').': ';
-            $content .= $progress.'%'.HTML_WRITER::empty_tag('br');
-        }
-        $content .= get_string('mouse_over_prompt', 'block_progress');
+        $content .= HTML_WRITER::tag('span', get_string('mouse_over_prompt', 'block_progress'), array('class' => 'mouse_over_prompt'));
     }
     $content .= HTML_WRITER::end_tag('div');
 
