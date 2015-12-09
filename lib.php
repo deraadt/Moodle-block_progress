@@ -667,6 +667,17 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'submitted'
         ),
+        'turnitintooltwo' => array(
+            'defaultTime' => 'defaultdtdue',
+            'actions' => array(
+                'submitted'     => "SELECT id
+                                      FROM {turnitintooltwo_submissions}
+                                     WHERE turnitintooltwoid = :eventid
+                                       AND userid = :userid
+                                       AND submission_score IS NOT NULL"
+            ),
+            'defaultAction' => 'submitted'
+        ),
         'url' => array(
             'actions' => array(
                 'viewed' => array (

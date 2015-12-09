@@ -54,6 +54,7 @@ $string['resource'] = 'File';
 $string['recordingsbn'] = 'BBB Recordings';
 $string['scorm'] = 'SCORM';
 $string['turnitintool'] = 'Turnitin Tool';
+$string['turnitintooltwo'] = 'Turnitin Tool 2';
 $string['url'] = 'URL';
 $string['video'] = 'Video';
 $string['vpl'] = 'Virtual Programming Lab';
