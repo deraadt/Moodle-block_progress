@@ -54,7 +54,8 @@
     vertical-align: middle;
 }
 
-.block_progress .progressEventInfo {
+.block_progress .progressEventInfo,
+.block_progress .progressPercentage {
     font-size: x-small;
     text-align: left;
     white-space: pre;

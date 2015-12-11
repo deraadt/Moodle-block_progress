@@ -1209,16 +1209,19 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     $content .= HTML_WRITER::end_tag('tr');
     $content .= HTML_WRITER::end_tag('table');
 
+    // Add the percentage below the progress bar.
+    if (isset($config->showpercentage) && $config->showpercentage == 1) {
+        $progress = block_progress_percentage($events, $attempts);
+        $percentagecontent = get_string('progress', 'block_progress').': '.$progress.'%';
+        $percentageoptions = array('class' => 'progressPercentage');
+        $content .= HTML_WRITER::tag('div', $percentagecontent, $percentageoptions);
+    }
+
     // Add the info box below the table.
     $divoptions = array('class' => 'progressEventInfo',
                         'id' => 'progressBarInfo'.$instance.'-'.$userid.'-info');
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
-        if (isset($config->showpercentage) && $config->showpercentage == 1) {
-            $progress = block_progress_percentage($events, $attempts);
-            $content .= get_string('progress', 'block_progress').': ';
-            $content .= $progress.'%'.HTML_WRITER::empty_tag('br');
-        }
         $content .= get_string('mouse_over_prompt', 'block_progress');
     }
     $content .= HTML_WRITER::end_tag('div');
