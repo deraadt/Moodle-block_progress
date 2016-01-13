@@ -270,6 +270,16 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'viewed'
         ),
+        'dmelearn' => array(
+            'actions' => array(
+                'finished'     => "SELECT id
+                                     FROM {dmelearn_entries}
+                                    WHERE dmelearn = :eventid
+                                      AND grade >= 100
+                                      AND userid = :userid"
+            ),
+            'defaultAction' => 'finished'
+        ),
         'equella' => array(
             'actions' => array(
                 'viewed' => array (
