@@ -33,6 +33,7 @@ $string['certificate'] = 'Certificate';
 $string['chat'] = 'Chat';
 $string['choice'] = 'Choice';
 $string['data'] = 'Database';
+$string['dmelearn'] = 'Digital Media e-Learning';
 $string['equella'] = 'Equella';
 $string['feedback'] = 'Feedback';
 $string['flashcardtrainer'] = 'Flashcard trainer';
