@@ -1203,9 +1203,12 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             $celloptions['style'] .= $colours['futurenotattempted_colour'].';';
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
-        if (!empty($event['cm']->available)) {
+        if (!empty($event['cm']->available) || $simple) {
             $celloptions['onclick'] = 'document.location=\''.
                 $CFG->wwwroot.'/mod/'.$event['type'].'/view.php?id='.$event['cm']->id.'\';';
+        }
+        else {
+            $celloptions['style'] .= 'cursor: not-allowed;';
         }
         if ($counter == 1) {
             $celloptions['id'] .= 'first';
@@ -1258,7 +1261,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             $text .= $OUTPUT->pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon'));
         }
         $text .= s($event['name']);
-        if (!empty($event['cm']->available)) {
+        if (!empty($event['cm']->available) || $simple) {
             $content .= $OUTPUT->action_link($link, $text);
         } else {
             $content .= $text;
