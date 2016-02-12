@@ -39,6 +39,7 @@ $id       = required_param('progressbarid', PARAM_INT);
 $courseid = required_param('courseid', PARAM_INT);
 $page     = optional_param('page', 0, PARAM_INT); // Which page to show.
 $perpage  = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
+$group    = optional_param('group', 0, PARAM_INT); // Group selected.
 
 // Determine course and context.
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -120,14 +121,24 @@ $rolewhere = $roleselected != 0 ? "AND a.roleid = $roleselected" : '';
 
 // Output group selector if there are groups in the course.
 echo $OUTPUT->container_start('progressoverviewmenus');
-$groupuserid = 0;
-if (!has_capability('moodle/site:accessallgroups', $context)) {
-    $groupuserid = $USER->id;
+$groupselected = 0;
+$groupuserid = $USER->id;
+if (has_capability('moodle/site:accessallgroups', $context)) {
+    $groupuserid = 0;
 }
-$groups = groups_get_all_groups($course->id);
+$groupids = array();
+$groups = groups_get_all_groups($course->id, $groupuserid);
 if (!empty($groups)) {
-    $course->groupmode = 2;
-    groups_print_course_menu($course, $PAGE->url);
+    $groupstodisplay = array(0 => get_string('allparticipants'));
+    foreach ($groups as $groupid => $groupobject) {
+        $groupstodisplay[$groupid] = $groupobject->name;
+        $groupids[] = $groupid;
+    }
+    if (!in_array($group, $groupids)) {
+        $group = 0;
+    }
+    echo get_string('groupsvisible');
+    echo $OUTPUT->single_select($PAGE->url, 'group', $groupstodisplay, $group);
 }
 
 // Output the roles menu.
@@ -148,10 +159,11 @@ echo $OUTPUT->container_end();
 // Apply group restrictions.
 $params = array();
 $groupjoin = '';
-$groupselected = groups_get_course_group($course);
-if ($groupselected && $groupselected != 0) {
+if ($group && $group != 0) {
     $groupjoin = 'JOIN {groups_members} g ON (g.groupid = :groupselected AND g.userid = u.id)';
-    $params['groupselected'] = $groupselected;
+    $params['groupselected'] = $group;
+} else if ($groupuserid != 0 && !empty($groupids)) {
+    $groupjoin = 'JOIN {groups_members} g ON (g.groupid IN ('.implode(',', $groupids).') AND g.userid = u.id)';
 }
 
 // Get the list of users enrolled in the course.

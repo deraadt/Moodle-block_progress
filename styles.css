@@ -140,14 +140,14 @@
     margin: 0 5px 0 10px;
 }
 
-#page-blocks-progress-overview .groupselector {
-    text-align: left;
-    margin-right: 10px;
-}
-
 #page-blocks-progress-overview .progressoverviewmenus {
     text-align: left;
     margin-bottom: 5px;
+}
+
+#page-blocks-progress-overview .progressoverviewmenus .singleselect {
+    text-align: left;
+    margin-right: 10px;
 }
 
 #page-blocks-progress-overview .progressoverviewmenus form,
