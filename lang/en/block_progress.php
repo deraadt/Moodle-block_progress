@@ -206,6 +206,7 @@ $string['progressbar'] = 'Progress Bar';
 $string['progress:overview'] = 'View course overview of Progress bars for all students';
 $string['progress:addinstance'] = 'Add a new Progress Bar block';
 $string['progress:myaddinstance'] = 'Add a Progress Bar block to My home page';
+$string['progress:showbar'] = 'Show the bar in the Progress Bar block';
 
 // For Cache.
 $string['cachedef_cachedlogs'] = 'Progress Bar log query caching';

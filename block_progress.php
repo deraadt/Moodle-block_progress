@@ -154,7 +154,9 @@ class block_progress extends block_base {
                             $blockinstance->events = block_progress_filter_visibility($blockinstance->events,
                                                          $USER->id, $context, $course);
                         }
+                        $blockcontext = block_progress_get_block_context($blockid);
                         if (
+                            !has_capability('block/progress:showbar', $blockcontext) ||
                             $blockinstance->visible == 0 ||
                             empty($blockinstance->config) ||
                             $blockinstance->events == 0 ||
@@ -250,14 +252,16 @@ class block_progress extends block_base {
             }
 
             // Display progress bar.
-            $attempts = block_progress_attempts($modules, $this->config, $events, $USER->id, $COURSE->id);
-            $this->content->text = block_progress_bar($modules,
-                                                      $this->config,
-                                                      $events,
-                                                      $USER->id,
-                                                      $this->instance->id,
-                                                      $attempts,
-                                                      $COURSE->id);
+            if(has_capability('block/progress:showbar', $this->context)) {
+                $attempts = block_progress_attempts($modules, $this->config, $events, $USER->id, $COURSE->id);
+                $this->content->text .= block_progress_bar($modules,
+                                                           $this->config,
+                                                           $events,
+                                                           $USER->id,
+                                                           $this->instance->id,
+                                                           $attempts,
+                                                           $COURSE->id);
+            }
             $blockinstancesonpage = array($this->instance->id);
 
             // Allow teachers to access the overview page.

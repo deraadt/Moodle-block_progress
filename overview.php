@@ -104,12 +104,12 @@ if (empty($events)) {
 $numevents = count($events);
 
 // Determine if a role has been selected.
-$sql = "SELECT DISTINCT r.id, r.name
+$sql = "SELECT DISTINCT r.id, r.name, r.archetype
           FROM {role} r, {role_assignments} a
          WHERE a.contextid = :contextid
            AND r.id = a.roleid
-           AND r.shortname = :shortname";
-$params = array('contextid' => $context->id, 'shortname' => 'student');
+           AND r.archetype = :archetype";
+$params = array('contextid' => $context->id, 'archetype' => 'student');
 $studentrole = $DB->get_record_sql($sql, $params);
 if ($studentrole) {
     $studentroleid = $studentrole->id;

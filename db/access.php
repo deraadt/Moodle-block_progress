@@ -29,7 +29,7 @@ $capabilities = array (
     'block/progress:overview' => array (
         'riskbitmask'   => RISK_PERSONAL,
         'captype'       => 'read',
-        'contextlevel'  => CONTEXT_COURSE,
+        'contextlevel'  => CONTEXT_BLOCK,
         'archetypes'    => array (
             'teacher'           => CAP_ALLOW,
             'editingteacher'    => CAP_ALLOW,
@@ -38,14 +38,24 @@ $capabilities = array (
         )
     ),
 
+    'block/progress:showbar' => array (
+        'captype'       => 'read',
+        'contextlevel'  => CONTEXT_BLOCK,
+        'archetypes'    => array (
+            'teacher'           => CAP_ALLOW,
+            'editingteacher'    => CAP_ALLOW,
+            'student'           => CAP_ALLOW,
+        )
+    ),
+
     'block/progress:addinstance' => array(
         'riskbitmask' => RISK_PERSONAL,
-
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager'        => CAP_ALLOW
+            'manager'        => CAP_ALLOW,
+            'coursecreator'  => CAP_ALLOW
         ),
 
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
@@ -53,9 +63,8 @@ $capabilities = array (
 
     'block/progress:myaddinstance' => array(
         'riskbitmask' => RISK_PERSONAL,
-
         'captype' => 'read',
-        'contextlevel' => CONTEXT_BLOCK,
+        'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
             'user' => CAP_ALLOW
         ),
