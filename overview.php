@@ -67,9 +67,9 @@ $title = get_string('overview', 'block_progress');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 $PAGE->navbar->add($title);
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('report');
 
-// Check user is logged in and capable of grading.
+// Check user is logged in and capable of accessing the Overview.
 require_login($course, false);
 require_capability('block/progress:overview', $progressblockcontext);
 

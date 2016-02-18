@@ -666,6 +666,15 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'attempted'
         ),
+        'survey' => array(
+            'actions' => array(
+                'submitted'    => "SELECT id
+                                     FROM {survey_answers}
+                                    WHERE survey = :eventid
+                                      AND userid = :userid"
+            ),
+            'defaultAction' => 'submitted'
+        ),
         'turnitintool' => array(
             'defaultTime' => 'defaultdtdue',
             'actions' => array(

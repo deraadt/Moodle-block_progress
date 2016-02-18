@@ -143,7 +143,6 @@ class block_progress extends block_base {
                     $context = block_progress_get_course_context($course->id);
                     $params = array('contextid' => $context->id, 'pagetype' => 'course-view-%');
                     $blockinstances = $DB->get_records_sql($sql, $params);
-                    $blockinstancesonpage = array_merge($blockinstancesonpage, array_keys($blockinstances));
                     foreach ($blockinstances as $blockid => $blockinstance) {
                         $blockinstance->config = unserialize(base64_decode($blockinstance->configdata));
                         if (!empty($blockinstance->config)) {
@@ -169,6 +168,7 @@ class block_progress extends block_base {
                             unset($blockinstances[$blockid]);
                         }
                     }
+                    $blockinstancesonpage = array_merge($blockinstancesonpage, array_keys($blockinstances));
 
                     // Output the Progress Bar.
                     if (!empty($blockinstances)) {
