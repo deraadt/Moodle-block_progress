@@ -54,6 +54,7 @@ $string['quiz'] = 'Quiz';
 $string['resource'] = 'File';
 $string['recordingsbn'] = 'BBB Recordings';
 $string['scorm'] = 'SCORM';
+$string['subcourse'] = 'Subcourse';
 $string['survey'] = 'Survey';
 $string['turnitintool'] = 'Turnitin Tool';
 $string['turnitintooltwo'] = 'Turnitin Tool 2';
