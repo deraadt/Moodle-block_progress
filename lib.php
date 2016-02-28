@@ -1010,6 +1010,7 @@ function block_progress_compare_times($a, $b) {
  */
 function block_progress_attempts($modules, $config, $events, $userid, $course) {
     global $DB;
+    static $staticcompletioncache;
     $attempts = array();
     $modernlogging = false;
     $cachingused = false;
@@ -1034,6 +1035,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
     }
 
     foreach ($events as $event) {
+        $useactivitycompletion = false;
         $module = $modules[$event['type']];
         $uniqueid = $event['type'].$event['id'];
         $parameters = array('courseid' => $course, 'courseid1' => $course,
@@ -1098,11 +1100,14 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
 
             // If activity completion is used, check completions table.
             if (isset($config->{'action_'.$uniqueid}) && $config->{'action_'.$uniqueid} == 'activity_completion') {
-                $query = 'SELECT id
+                $useactivitycompletion = true;
+                if (!isset($staticcompletioncache[$event['cm']->id])) {
+                    $sql = 'SELECT userid
                             FROM {course_modules_completion}
-                           WHERE userid = :userid
-                             AND coursemoduleid = :cmid
+                           WHERE coursemoduleid = :cmid
                              AND completionstate >= 1';
+                    $staticcompletioncache[$event['cm']->id] = $DB->get_records_sql($sql, array('cmid' => $event['cm']->id));
+                }
             }
 
             // Determine the set action and develop a query.
@@ -1112,9 +1117,12 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
                           $module['defaultAction'];
                 $query = $module['actions'][$action];
             }
-
-            // Check if the user has attempted the module.
-            $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+            if ($useactivitycompletion) {
+                $attempts[$uniqueid] = isset($staticcompletioncache[$event['cm']->id][$userid]);
+            } else {
+                // Check if the user has attempted the module.
+                $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+            }
         }
     }
 
