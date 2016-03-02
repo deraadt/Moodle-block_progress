@@ -321,7 +321,7 @@ class block_progress_edit_form extends block_edit_form {
 
                             // Icon, module type and name.
                             $modulename = get_string('pluginname', $moduleinfo->module);
-                            $icon = $OUTPUT->pix_icon('icon', $modulename, 'mod_'.$moduleinfo->module);
+                            $icon = $OUTPUT->pix_icon('icon', $modulename, 'mod_'.$moduleinfo->module, array('class' => 'iconlarge activityicon'));
                             $text = '&nbsp;'.$moduleinfo->label.':&nbsp;'.format_string($moduleinfo->instancename);
                             $attributes = array('class' => 'progressConfigModuleTitle');
                             $moduletitle = HTML_WRITER::tag('div', $icon.$text, $attributes);
