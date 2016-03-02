@@ -118,7 +118,11 @@ function block_progress_monitorable_modules() {
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
                                       AND g.finalgrade >= i.gradepass",
             ),
-            'defaultAction' => 'submitted'
+            'defaultAction' => 'submitted',
+            'alternatelink' => array(
+                'url' => '/mod/assign/view.php?id=:eventid&action=grade&userid=:userid&rownum=0',
+                'capability' => 'mod/assign:grade',
+            ),
         ),
         'assignment' => array(
             'defaultTime' => 'timedue',
@@ -309,7 +313,12 @@ function block_progress_monitorable_modules() {
                                     WHERE feedback = :eventid
                                       AND userid = :userid"
             ),
-            'defaultAction' => 'responded_to'
+            'defaultAction' => 'responded_to',
+            'alternatelink' => array(
+                // Breaks if anonymous feedback is collected.
+                'url' => '/mod/feedback/show_entries.php?id=:cmid&do_show=showoneentry&userid=:userid',
+                'capability' => 'mod/feedback:viewreports',
+            ),
         ),
         'resource' => array(  // AKA file.
             'actions' => array(
@@ -500,7 +509,11 @@ function block_progress_monitorable_modules() {
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
                                       AND g.finalgrade >= i.gradepass",
             ),
-            'defaultAction' => 'attempted'
+            'defaultAction' => 'attempted',
+            'alternatelink' => array(
+                'url' => '/mod/lesson/report.php?id=:cmid&action=reportdetail&userid=:userid',
+                'capability' => 'mod/lesson:viewreports',
+            ),
         ),
         'lti' => array(
             'actions' => array(
@@ -643,7 +656,11 @@ function block_progress_monitorable_modules() {
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
                                       AND g.finalgrade >= i.gradepass",
             ),
-            'defaultAction' => 'finished'
+            'defaultAction' => 'finished',
+            'alternatelink' => array(
+                'url' => '/mod/quiz/report.php?id=:cmid&mode=overview',
+                'capability' => 'mod/quiz:viewreports',
+            ),
         ),
         'scorm' => array(
             'actions' => array(
@@ -664,7 +681,11 @@ function block_progress_monitorable_modules() {
                                       AND element = 'cmi.core.lesson_status'
                                       AND {$DB->sql_compare_text('value')} = 'passed'"
             ),
-            'defaultAction' => 'attempted'
+            'defaultAction' => 'attempted',
+            'alternatelink' => array(
+                'url' => '/mod/scorm/report/userreport.php?id=:cmid&user=:userid',
+                'capability' => 'mod/scorm:viewreport',
+            ),
         ),
         'subcourse' => array(
             'actions' => array(
@@ -1139,7 +1160,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
  * @return string  Progress Bar HTML content
  */
 function block_progress_bar($modules, $config, $events, $userid, $instance, $attempts, $course, $simple = false) {
-    global $OUTPUT, $CFG;
+    global $OUTPUT, $CFG, $USER;
     $now = time();
     $numevents = count($events);
     $dateformat = get_string('strftimerecentfull', 'langconfig');
@@ -1205,6 +1226,26 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $content = HTML_WRITER::start_tag('table', $tableoptions);
     }
 
+    // Determine links to activities.
+    for ($i=0; $i < $numevents; $i++) {
+        if ($userid != $USER->id &&
+            array_key_exists('alternatelink', $modules[$events[$i]['type']]) &&
+            has_capability($modules[$events[$i]['type']]['alternatelink']['capability'], $events[$i]['cm']->context)
+        ) {
+            $substitutions = array(
+                '/:courseid/' => $course,
+                '/:eventid/'  => $events[$i]['id'],
+                '/:cmid/'     => $events[$i]['cm']->id,
+                '/:userid/'   => $userid,
+            );
+            $link = $modules[$events[$i]['type']]['alternatelink']['url'];
+            $link = preg_replace(array_keys($substitutions), array_values($substitutions), $link);
+            $events[$i]['link'] = $CFG->wwwroot.$link;
+        } else {
+            $events[$i]['link'] = $CFG->wwwroot.'/mod/'.$events[$i]['type'].'/view.php?id='.$events[$i]['cm']->id;
+        }
+    }
+
     // Start progress bar.
     $width = 100 / $numevents;
     $content .= HTML_WRITER::start_tag('tr');
@@ -1240,8 +1281,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
         if (!empty($event['cm']->available) || $simple) {
-            $celloptions['onclick'] = 'document.location=\''.
-                $CFG->wwwroot.'/mod/'.$event['type'].'/view.php?id='.$event['cm']->id.'\';';
+            $celloptions['onclick'] = 'document.location=\''.$event['link'].'\';';
         }
         else {
             $celloptions['style'] .= 'cursor: not-allowed;';
@@ -1287,7 +1327,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                             'id' => 'progressBarInfo'.$instance.'-'.$userid.'-'.$event['cm']->id,
                             'style' => 'display: none;');
         $content .= HTML_WRITER::start_tag('div', $divoptions);
-        $link = '/mod/'.$event['type'].'/view.php?id='.$event['cm']->id;
+
         $text = '';
         if (method_exists($event['cm'], 'get_icon_url')) {
             $activityicon = $event['cm']->get_icon_url();
@@ -1298,7 +1338,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         }
         $text .= s($event['name']);
         if (!empty($event['cm']->available) || $simple) {
-            $content .= $OUTPUT->action_link($link, $text);
+            $content .= $OUTPUT->action_link($event['link'], $text);
         } else {
             $content .= $text;
         }
