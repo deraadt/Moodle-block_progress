@@ -63,6 +63,8 @@ $string['video'] = 'Video';
 $string['vpl'] = 'Virtual Programming Lab';
 $string['wiki'] = 'Wiki';
 $string['workshop'] = 'Workshop';
+$string['jclic'] = 'JClic';
+$string['geogebra'] = 'Geogebra';
 
 // Actions.
 $string['activity_completion'] = 'activity completion';

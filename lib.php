@@ -863,6 +863,31 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'submitted'
         ),
+        'jclic' => array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
+                'attempted'    => "SELECT id
+                                     FROM {jclic_sessions}
+                                    WHERE jclicid = :eventid
+                                      AND user_id = :userid"
+            ),
+            'defaultAction' => 'attempted'
+        ),
+        'geogebra' => array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
+                'attempted'    => "SELECT id
+                                     FROM {geogebra_attempts}
+                                    WHERE geogebra = :eventid
+                                      AND userid = :userid",
+                'finished'    => "SELECT id
+                                     FROM {geogebra_attempts}
+                                    WHERE geogebra = :eventid
+                                      AND userid = :userid
+                                      AND finished = 1"
+            ),
+            'defaultAction' => 'finished'
+        ),
     );
 }
 
