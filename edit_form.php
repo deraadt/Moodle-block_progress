@@ -55,7 +55,7 @@ class block_progress_edit_form extends block_edit_form {
             $loggingenabled = !empty($readers);
             if(!$loggingenabled) {
                 $warningstring = get_string('config_warning_logstores', 'block_progress');
-                $warning = HTML_WRITER::tag('div', $warningstring, array('class' => 'warning progressWarningBox'));
+                $warning = $OUTPUT->notification($warningstring);
                 $mform->addElement('html', $warning);
             }
         }

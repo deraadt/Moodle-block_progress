@@ -1072,7 +1072,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
     if (class_exists('cache')) {
         $cachingused = true;
         $cachedlogs = cache::make('block_progress', 'cachedlogs');
-        $cachedlogviews = $cachedlogs->get($userid);
+        $cachedlogviews = $cachedlogs->get($course);
         if (empty($cachedlogviews)) {
             $cachedlogviews = array();
         }
@@ -1166,7 +1166,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
 
     // Update log cache if new values were added.
     if ($cachingused && $cachedlogsupdated) {
-        $cachedlogs->set($userid, $cachedlogviews);
+        $cachedlogs->set($course, $cachedlogviews);
     }
 
     return $attempts;
