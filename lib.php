@@ -118,11 +118,12 @@ function block_progress_monitorable_modules() {
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
                                       AND g.finalgrade >= i.gradepass",
             ),
-            'defaultAction' => 'submitted',
+            'defaultAction' => 'marked',
             'alternatelink' => array(
-                'url' => '/mod/assign/view.php?id=:eventid&action=grade&userid=:userid&rownum=0',
+                'url' => '/mod/assign/view.php?id=:cmid&action=grade&userid=:userid&rownum=0',
                 'capability' => 'mod/assign:grade',
             ),
+            'showsubmittedfirst' => true,
         ),
         'assignment' => array(
             'defaultTime' => 'timedue',
@@ -395,6 +396,21 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'posted_to'
         ),
+        'geogebra' => array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
+                'attempted'    => "SELECT id
+                                     FROM {geogebra_attempts}
+                                    WHERE geogebra = :eventid
+                                      AND userid = :userid",
+                'finished'    => "SELECT id
+                                     FROM {geogebra_attempts}
+                                    WHERE geogebra = :eventid
+                                      AND userid = :userid
+                                      AND finished = 1"
+            ),
+            'defaultAction' => 'finished'
+        ),
         'glossary' => array(
             'actions' => array(
                 'viewed' => array (
@@ -473,6 +489,16 @@ function block_progress_monitorable_modules() {
                                       AND userid = :userid"
             ),
             'defaultAction' => 'posted_to'
+        ),
+        'jclic' => array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
+                'attempted'    => "SELECT id
+                                     FROM {jclic_sessions}
+                                    WHERE jclicid = :eventid
+                                      AND user_id = :userid"
+            ),
+            'defaultAction' => 'attempted'
         ),
         'lesson' => array(
             'defaultTime' => 'deadline',
@@ -861,32 +887,8 @@ function block_progress_monitorable_modules() {
                                       AND g.userid = :userid
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
             ),
-            'defaultAction' => 'submitted'
-        ),
-        'jclic' => array(
-            'defaultTime' => 'timedue',
-            'actions' => array(
-                'attempted'    => "SELECT id
-                                     FROM {jclic_sessions}
-                                    WHERE jclicid = :eventid
-                                      AND user_id = :userid"
-            ),
-            'defaultAction' => 'attempted'
-        ),
-        'geogebra' => array(
-            'defaultTime' => 'timedue',
-            'actions' => array(
-                'attempted'    => "SELECT id
-                                     FROM {geogebra_attempts}
-                                    WHERE geogebra = :eventid
-                                      AND userid = :userid",
-                'finished'    => "SELECT id
-                                     FROM {geogebra_attempts}
-                                    WHERE geogebra = :eventid
-                                      AND userid = :userid
-                                      AND finished = 1"
-            ),
-            'defaultAction' => 'finished'
+            'defaultAction' => 'graded',
+            'showsubmittedfirst' => true,
         ),
     );
 }
@@ -1161,6 +1163,21 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
 
             // Check if the user has attempted the module.
             $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+
+            // Check if activity requires submission first.
+            if (
+                !$attempts[$uniqueid] &&
+                isset($config->{'action_'.$uniqueid}) &&
+                $config->{'action_'.$uniqueid} != 'submitted' &&
+                isset($config->{'showsubmitted_'.$uniqueid}) &&
+                $config->{'showsubmitted_'.$uniqueid}
+            ) {
+                $query = $module['actions']['submitted'];
+                $submitted = $DB->record_exists_sql($query, $parameters) ? true : false;
+                if ($submitted) {
+                    $attempts[$uniqueid] = 'submitted';
+                }
+            }
         }
     }
 
@@ -1196,15 +1213,14 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     // Get colours and use defaults if they are not set in global settings.
     $colournames = array(
         'attempted_colour' => 'attempted_colour',
+        'submittednotcomplete_colour' => 'submittednotcomplete_colour',
         'notattempted_colour' => 'notAttempted_colour',
         'futurenotattempted_colour' => 'futureNotAttempted_colour'
     );
     $colours = array();
     foreach ($colournames as $name => $stringkey) {
-        if (get_config('block_progress', $name)) {
-            $colours[$name] = get_config('block_progress', $name);
-        }
-        else {
+        $colours[$name] = get_config('block_progress', $name);
+        if (!$colours[$name]) {
             $colours[$name] = get_string('block_progress', $stringkey);
         }
     }
@@ -1288,7 +1304,11 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             'width' => $width.'%',
             'onmouseover' => 'M.block_progress.showInfo('.$instance.','.$userid.','.$event['cm']->id.');',
              'style' => 'background-color:');
-        if ($attempted === true) {
+        if ($attempted === 'submitted') {
+            $celloptions['style'] .= $colours['submittednotcomplete_colour'].';';
+            $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
+
+        } else if ($attempted === true) {
             $celloptions['style'] .= $colours['attempted_colour'].';';
             $cellcontent = $OUTPUT->pix_icon(
                                isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
@@ -1369,8 +1389,11 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         }
         $content .= HTML_WRITER::empty_tag('br');
         $content .= get_string($action, 'block_progress').'&nbsp;';
-        $icon = ($attempted && $attempted !== 'failed' ? 'tick' : 'cross');
+        $icon = ($attempted && $attempted !== 'failed' && $attempted !== 'submitted' ? 'tick' : 'cross');
         $content .= $OUTPUT->pix_icon($icon, '', 'block_progress', array('class' => 'iconInInfo'));
+        if ($attempted === 'submitted') {
+            $content .= ' (' . get_string('submitted', 'block_progress') . ')';
+        }
         $content .= HTML_WRITER::empty_tag('br');
         if ($displaydate) {
             $content .= HTML_WRITER::start_tag('div', array('class' => 'expectedBy'));

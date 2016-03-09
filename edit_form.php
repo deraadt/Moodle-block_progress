@@ -372,25 +372,47 @@ class block_progress_edit_form extends block_edit_form {
                                                    get_string('config_header_action', 'block_progress'),
                                                    get_string($action, 'block_progress'));
                                 $mform->addElement('hidden', 'config_action_'.$moduleinfo->uniqueid, $action);
+                                $mform->setType('config_action_'.$moduleinfo->uniqueid, PARAM_ALPHANUMEXT);
+                                $mform->addHelpButton('config_action_'.$moduleinfo->uniqueid,
+                                                  'what_actions_can_be_monitored', 'block_progress');
                             } else {
-                                $mform->addElement('select', 'config_action_'.$moduleinfo->uniqueid,
-                                                   get_string('config_header_action', 'block_progress'),
-                                                   $moduleinfo->actions );
+                                $actiongroup = array();
+                                $actiongroup[] = $mform->createElement(
+                                    'select',
+                                    'config_action_'.$moduleinfo->uniqueid,
+                                    '',
+                                    $moduleinfo->actions
+                                );
+                                if (
+                                    array_key_exists('showsubmittedfirst', $modules[$moduleinfo->module]) &&
+                                    $modules[$moduleinfo->module]['showsubmittedfirst']
+                                ) {
+                                    $actiongroup[] = $mform->createElement(
+                                        'checkbox',
+                                        'config_showsubmitted_'.$moduleinfo->uniqueid,
+                                        '',
+                                        get_string('config_header_showsubmitted', 'block_progress')
+                                    );
+                                }
+                                $mform->addGroup($actiongroup, 'config_action_group_'.$moduleinfo->uniqueid, get_string('config_header_action', 'block_progress'), ' ', false);
                                 if (
                                     (!$moduleinfo->lockpossible || $moduleinfo->instancedue == 0) &&
                                     array_key_exists('activity_completion', $moduleinfo->actions)
                                 ) {
                                     $defaultaction = 'activity_completion';
                                 } else {
-                                    $defaultaction = $details['defaultAction'];
+                                    $defaultaction = $modules[$moduleinfo->module]['defaultAction'];
                                 }
                                 $mform->setDefault('config_action_'.$moduleinfo->uniqueid, $defaultaction);
-                                $mform->disabledif ('config_action_'.$moduleinfo->uniqueid,
+                                $mform->disabledif ('config_action_group_'.$moduleinfo->uniqueid,
                                                     'config_monitor_'.$moduleinfo->uniqueid, 'eq', 0);
+                                $mform->setDefault('config_showsubmitted_'.$moduleinfo->uniqueid, true);
+                                $mform->disabledif ('config_showsubmitted_'.$moduleinfo->uniqueid,
+                                                    'config_action_'.$moduleinfo->uniqueid, 'eq', 'submitted');
+                                $mform->setType('config_action_'.$moduleinfo->uniqueid, PARAM_ALPHANUMEXT);
+                                $mform->addHelpButton('config_action_group_'.$moduleinfo->uniqueid,
+                                                      'what_actions_can_be_monitored', 'block_progress');
                             }
-                            $mform->setType('config_action_'.$moduleinfo->uniqueid, PARAM_ALPHANUMEXT);
-                            $mform->addHelpButton('config_action_'.$moduleinfo->uniqueid,
-                                                  'what_actions_can_be_monitored', 'block_progress');
 
                             // End box.
                             $moduleboxend = HTML_WRITER::end_tag('div');

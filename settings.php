@@ -44,6 +44,13 @@ if ($ADMIN->fulltree) {
         null )
     );
 
+    $settings->add(new admin_setting_configcolourpicker('block_progress/submittednotcomplete_colour',
+        get_string('submittednotcomplete_colour_title', 'block_progress'),
+        get_string('submittednotcomplete_colour_descr', 'block_progress'),
+        get_string('submittednotcomplete_colour', 'block_progress'),
+        null )
+    );
+
     $settings->add(new admin_setting_configcolourpicker('block_progress/notattempted_colour',
         get_string('notattempted_colour_title', 'block_progress'),
         get_string('notattempted_colour_descr', 'block_progress'),

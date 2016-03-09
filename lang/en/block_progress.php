@@ -92,6 +92,7 @@ $string['config_header_expected'] = 'Expected by';
 $string['config_header_icon'] = 'Icon';
 $string['config_header_locked'] = 'Locked to deadline';
 $string['config_header_monitored'] = 'Monitored';
+$string['config_header_showsubmitted'] = 'Show submitted before action';
 $string['config_icons'] = 'Use icons in bar';
 $string['config_now'] = 'Use';
 $string['config_percentage'] = 'Show percentage to students';
@@ -143,8 +144,18 @@ $string['what_expected_by_means_help'] = '
 ';
 $string['what_actions_can_be_monitored'] = 'What actions can be monitored?';
 $string['what_actions_can_be_monitored_help'] = '
-<p>Different activities and resources can be monitored.</p>
-<p>Because different activities and resources are used differently, what is monitored for each module varies. For example, for assignments, submission can be monitored; quizzes can be monitored on attempt; forums can be monitored for student postings; choice activities can monitored for answering and viewing resources is monitored.</p>
+<p>A number of different actions may be possible for an activity.</p>
+<p>For example, with the Assignment module possible actions are:
+    <ul>
+        <li>submitted,</li>
+        <li>marked,</li>
+        <li>passed (see note on passing below),</li>
+        <li>passed by deadline (see note on passing below) and</li>
+        <li>activity completion (when enabled in the site, course and set for the activity).</li>
+    </ul>
+</p>
+<h3>Show submitted before action</h3>
+<p>When actions require students to submit then to wait for a mark, an option can be set to show that the submission has been made, but the full action of marking is not yet complete.</p>
 <h3>Passing</h3>
 <p>For the assignment, lesson and quiz modules, the notion of passing relies on a "Grade to pass" being set for the grade item in the Gradebook. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">More help...</a></p>
 ';
@@ -187,14 +198,17 @@ $string['time_expected'] = 'Expected';
 // Default colours that may have different cultural meanings.
 // Note that these defaults can be overridden by the block's global settings.
 $string['attempted_colour'] = '#73A839';
+$string['submittednotcomplete_colour'] = '#FFCC00';
 $string['notAttempted_colour'] = '#C71C22';
 $string['futureNotAttempted_colour'] = '#025187';
-$string['attempted_colour_title'] = 'Attempted Colour';
+$string['attempted_colour_title'] = 'Attempted colour';
 $string['attempted_colour_descr'] = 'HTML Colour code for elements that have been attempted';
-$string['notattempted_colour_title'] = 'Not-attempted Colour';
-$string['notattempted_colour_descr'] = 'HTML Colour code for current elements that have not yet been attempted';
-$string['futurenotattempted_colour_title'] = 'Future Not-attempted Colour';
-$string['futurenotattempted_colour_descr'] = 'HTML Colour code for future elements that have not yet been attemted';
+$string['submittednotcomplete_colour_title'] = 'Submitted but not complete colour';
+$string['submittednotcomplete_colour_descr'] = 'HTML colour code for elements that have been submitted, but are not yet complete';
+$string['notattempted_colour_title'] = 'Not-attempted colour';
+$string['notattempted_colour_descr'] = 'HTML colour code for current elements that have not yet been attempted';
+$string['futurenotattempted_colour_title'] = 'Future Not-attempted colour';
+$string['futurenotattempted_colour_descr'] = 'HTML colour code for future elements that have not yet been attemted';
 $string['coursenametoshow'] = 'Course name to show on Dashboard';
 $string['shortname'] = 'Short course name';
 $string['fullname'] = 'Full course name';
@@ -206,7 +220,7 @@ $string['overview'] = 'Overview of students';
 $string['progress'] = 'Progress';
 $string['progressbar'] = 'Progress Bar';
 
-// For cabailities.
+// For capabilities.
 $string['progress:overview'] = 'View course overview of Progress bars for all students';
 $string['progress:addinstance'] = 'Add a new Progress Bar block';
 $string['progress:myaddinstance'] = 'Add a Progress Bar block to My home page';
