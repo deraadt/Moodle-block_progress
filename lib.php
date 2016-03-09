@@ -1155,9 +1155,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
 
             // Determine the set action and develop a query.
             else {
-                $action = isset($config->{'action_'.$uniqueid}) ?
-                          $config->{'action_'.$uniqueid} :
-                          $module['defaultAction'];
+                $action = isset($config->{'action_'.$uniqueid}) ? $config->{'action_'.$uniqueid} : $module['defaultAction'];
                 $query = $module['actions'][$action];
             }
 
@@ -1268,7 +1266,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     }
 
     // Determine links to activities.
-    for ($i=0; $i < $numevents; $i++) {
+    for ($i = 0; $i < $numevents; $i++) {
         if ($userid != $USER->id &&
             array_key_exists('alternatelink', $modules[$events[$i]['type']]) &&
             has_capability($modules[$events[$i]['type']]['alternatelink']['capability'], $events[$i]['cm']->context)
@@ -1293,9 +1291,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     $counter = 1;
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
-        $action = isset($config->{'action_'.$event['type'].$event['id']}) ?
-                  $config->{'action_'.$event['type'].$event['id']} :
-                  $modules[$event['type']]['defaultAction'];
+        $action = isset($config->{'action_'.$event['type'].$event['id']}) ? $config->{'action_'.$event['type'].$event['id']} : $modules[$event['type']]['defaultAction'];
 
         // A cell in the progress bar.
         $celloptions = array(
@@ -1311,15 +1307,13 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         } else if ($attempted === true) {
             $celloptions['style'] .= $colours['attempted_colour'].';';
             $cellcontent = $OUTPUT->pix_icon(
-                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
-                               'tick' : 'blank', '', 'block_progress');
+                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ? 'tick' : 'blank', '', 'block_progress');
 
         } else if (((!isset($config->orderby) || $config->orderby == 'orderbytime') && $event['expected'] < $now) ||
                  ($attempted === 'failed')) {
             $celloptions['style'] .= $colours['notattempted_colour'].';';
             $cellcontent = $OUTPUT->pix_icon(
-                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
-                               'cross' : 'blank', '', 'block_progress');
+                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ? 'cross' : 'blank', '', 'block_progress');
 
         } else {
             $celloptions['style'] .= $colours['futurenotattempted_colour'].';';
@@ -1365,9 +1359,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                    (!isset($config->displayNow) || $config->displayNow == 1);
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
-        $action = isset($config->{'action_'.$event['type'].$event['id']}) ?
-                  $config->{'action_'.$event['type'].$event['id']} :
-                  $modules[$event['type']]['defaultAction'];
+        $action = isset($config->{'action_'.$event['type'].$event['id']}) ? $config->{'action_'.$event['type'].$event['id']} : $modules[$event['type']]['defaultAction'];
         $divoptions = array('class' => 'progressEventInfo',
                             'id' => 'progressBarInfo'.$instance.'-'.$userid.'-'.$event['cm']->id,
                             'style' => 'display: none;');

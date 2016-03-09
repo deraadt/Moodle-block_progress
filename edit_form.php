@@ -41,7 +41,7 @@ class block_progress_edit_form extends block_edit_form {
         global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
         $loggingenabled = true;
         $coursestartdate = localtime($COURSE->startdate, true);
-        $minyear = $coursestartdate['tm_year']+1900;
+        $minyear = $coursestartdate['tm_year'] + 1900;
 
         // The My home version is not configurable.
         if (block_progress_on_site_page()) {
