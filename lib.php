@@ -1328,7 +1328,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
         if (!empty($event['cm']->available) || $simple) {
-            $celloptions['onclicl'] = 'document.location=\''.$event['link'].'\';';
+            $celloptions['onclick'] = 'document.location=\''.$event['link'].'\';';
         } else {
             $celloptions['style'] .= 'cursor: not-allowed;';
         }
