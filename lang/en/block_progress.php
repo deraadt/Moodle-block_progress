@@ -185,7 +185,7 @@ $string['how_group_works_help'] = '
 
 // Other terms.
 $string['addallcurrentitems'] = 'Add all activities/resources';
-$string['mouse_over_prompt'] = 'Mouse over block for info.';
+$string['mouse_over_prompt'] = 'Mouse over or touch bar for info.';
 $string['no_events_config_message'] = 'There are no activities or resources to monitor the progress of. Create some activities and/or resources then configure this block.';
 $string['no_events_message'] = 'No activities or resources are being monitored. Use config to set up monitoring.';
 $string['no_visible_events_message'] = 'None of the monitored events are currently visible.';
