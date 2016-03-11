@@ -41,7 +41,7 @@ class block_progress_edit_form extends block_edit_form {
         global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
         $loggingenabled = true;
         $coursestartdate = localtime($COURSE->startdate, true);
-        $minyear = $coursestartdate['tm_year']+1900;
+        $minyear = $coursestartdate['tm_year'] + 1900;
 
         // The My home version is not configurable.
         if (block_progress_on_site_page()) {
@@ -53,7 +53,7 @@ class block_progress_edit_form extends block_edit_form {
             $logmanager = get_log_manager();
             $readers = $logmanager->get_readers();
             $loggingenabled = !empty($readers);
-            if(!$loggingenabled) {
+            if (!$loggingenabled) {
                 $warningstring = get_string('config_warning_logstores', 'block_progress');
                 $warning = $OUTPUT->notification($warningstring);
                 $mform->addElement('html', $warning);
@@ -61,7 +61,7 @@ class block_progress_edit_form extends block_edit_form {
         }
 
         // Check that logs will be available during course.
-        if(isset($CFG->loglifetime) && $CFG->loglifetime > 0) {
+        if (isset($CFG->loglifetime) && $CFG->loglifetime > 0) {
             $warningstring = get_string('config_warning_loglifetime', 'block_progress', $CFG->loglifetime);
             $warning = HTML_WRITER::tag('div', $warningstring, array('class' => 'warning progressWarningBox'));
             $mform->addElement('html', $warning);
@@ -394,7 +394,13 @@ class block_progress_edit_form extends block_edit_form {
                                         get_string('config_header_showsubmitted', 'block_progress')
                                     );
                                 }
-                                $mform->addGroup($actiongroup, 'config_action_group_'.$moduleinfo->uniqueid, get_string('config_header_action', 'block_progress'), ' ', false);
+                                $mform->addGroup(
+                                    $actiongroup,
+                                    'config_action_group_'.$moduleinfo->uniqueid,
+                                    get_string('config_header_action', 'block_progress'),
+                                    ' ',
+                                    false
+                                );
                                 if (
                                     (!$moduleinfo->lockpossible || $moduleinfo->instancedue == 0) &&
                                     array_key_exists('activity_completion', $moduleinfo->actions)

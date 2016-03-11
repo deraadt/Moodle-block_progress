@@ -252,7 +252,7 @@ class block_progress extends block_base {
             }
 
             // Display progress bar.
-            if(has_capability('block/progress:showbar', $this->context)) {
+            if (has_capability('block/progress:showbar', $this->context)) {
                 $attempts = block_progress_attempts($modules, $this->config, $events, $USER->id, $COURSE->id);
                 $this->content->text .= block_progress_bar($modules,
                                                            $this->config,

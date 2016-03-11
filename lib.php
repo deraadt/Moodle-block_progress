@@ -1268,7 +1268,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     }
 
     // Determine links to activities.
-    for ($i=0; $i < $numevents; $i++) {
+    for ($i = 0; $i < $numevents; $i++) {
         if ($userid != $USER->id &&
             array_key_exists('alternatelink', $modules[$events[$i]['type']]) &&
             has_capability($modules[$events[$i]['type']]['alternatelink']['capability'], $events[$i]['cm']->context)
@@ -1298,11 +1298,13 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                   $modules[$event['type']]['defaultAction'];
 
         // A cell in the progress bar.
+        $showinfojs = 'M.block_progress.showInfo('.$instance.','.$userid.','.$event['cm']->id.');';
         $celloptions = array(
             'class' => 'progressBarCell',
             'id' => '',
             'width' => $width.'%',
-            'onmouseover' => 'M.block_progress.showInfo('.$instance.','.$userid.','.$event['cm']->id.');',
+            'ontouchstart' => $showinfojs . ' return false;',
+            'onmouseover' => $showinfojs,
              'style' => 'background-color:');
         if ($attempted === 'submitted') {
             $celloptions['style'] .= $colours['submittednotcomplete_colour'].';';
@@ -1326,9 +1328,8 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
         if (!empty($event['cm']->available) || $simple) {
-            $celloptions['onclick'] = 'document.location=\''.$event['link'].'\';';
-        }
-        else {
+            $celloptions['onclicl'] = 'document.location=\''.$event['link'].'\';';
+        } else {
             $celloptions['style'] .= 'cursor: not-allowed;';
         }
         if ($counter == 1) {
@@ -1562,8 +1563,7 @@ function block_progress_get_coursemodule($module, $recordid, $courseid, $userid 
 
     if (function_exists('get_fast_modinfo')) {
         return get_fast_modinfo($courseid, $userid)->instances[$module][$recordid];
-    }
-    else {
+    } else {
         return get_coursemodule_from_instance($module, $recordid, $courseid);
     }
 }
