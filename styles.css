@@ -1,57 +1,67 @@
 .block_progress .content {
-    text-align: center;
+    text-align: left;
 }
 
-.block_progress table {
-    margin: 0 auto;
+.block_progress .barContainer {
+    overflow: hidden;
+    position: relative;
     padding: 0;
 }
 
-.block_progress .progressBarProgressTable {
-    width: 100%;
-    margin: 0 0 5px 0;
-    height: 31px;
-    overflow: hidden;
+.left-arrow-svg,
+.right-arrow-svg {
+    position: absolute;
+    top: calc(50% - 15px);
+    display: none;
 }
 
-.block_progress .progressBarProgressTable.noNow {
+.triangle-polygon {
+    fill: rgba(0, 0, 0, 0.3);
+    stroke: white;
+    stroke-width: 3px;
+}
+
+.block_progress .nowRow,
+.block_progress .barRow {
+    padding: 0;
+    width: 100%;
+    margin: 0;
     height: 25px;
+    display: table;
+}
+
+.block_progress .nowRow .blankDiv {
+    display: table-cell;
 }
 
 .block_progress .progressBarCell {
     height: 25px;
-    margin: 0;
+    margin: 0 -1px 0 0;
     padding: 0;
     text-align: center;
     vertical-align: middle;
-    background-color: none;
     cursor: pointer;
     border-left: solid 1px #e3e3e3;
+    border-top: solid 1px #e3e3e3;
 }
 
-.block_progress .progressBarCell#first {
-    border-radius: 3px 0 0 3px;
+.block_progress .progressBarCell.firstProgressBarCell {
+    border-radius: 4px 0 0 4px;
     border-left: none;
 }
 
-.block_progress .progressBarCell#last {
-    border-radius: 0 3px 3px 0;
+.block_progress .progressBarCell.lastProgressBarCell {
+    border-radius: 0 4px 4px 0;
 }
 
 .block_progress .progressBarCell img {
-    width: 100%;
-    height: 15px;
-    margin: 1px 0 0 0;
-    padding: 0;
-}
-
-.block_progress .progressBarCell .smallicon {
-    width: 85%;
-    height: 85%;
-    max-width: 15px;
     height: auto;
+    margin: 1px 0 0 0;
     max-height: 15px;
+    max-width: 15px;
+    padding: 0;
     vertical-align: middle;
+    width: 85%;
 }
 
 .block_progress .progressEventInfo,
@@ -76,6 +86,7 @@
 #page-blocks-progress-overview .overviewTable {
     margin: 10px 0;
     width: 100%;
+    table-layout: fixed;
 }
 
 .block_progress .progressEventInfo img {
@@ -128,6 +139,7 @@
 
 .block_progress .overviewButton {
     margin: 10px;
+    text-align: center;
 }
 
 #page-blocks-progress-overview .buttons {

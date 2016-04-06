@@ -121,7 +121,7 @@ class block_progress extends block_base {
         // Draw the multi-bar content for the Dashboard and Front page.
         if (block_progress_on_site_page()) {
             $courses = enrol_get_my_courses();
-            $coursenametoshow = get_config('block_progress', 'coursenametoshow') ?: 'shortname';
+            $coursenametoshow = get_config('block_progress', 'coursenametoshow') ?: DEFAULT_COURSENAMETOSHOW;
             $sql = "SELECT bi.id,
                            bp.id AS blockpositionid,
                            COALESCE(bp.region, bi.defaultregion) AS region,
@@ -282,6 +282,7 @@ class block_progress extends block_base {
             'strings' => array(),
         );
         $arguments = array($blockinstancesonpage, array($USER->id));
+        $this->page->requires->js_init_call('M.block_progress.setupScrolling', array(), false, $jsmodule);
         $this->page->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 
         return $this->content;

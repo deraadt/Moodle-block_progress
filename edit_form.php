@@ -88,7 +88,7 @@ class block_progress_edit_form extends block_edit_form {
                            get_string('config_icons', 'block_progress').'&nbsp;'.
                            $OUTPUT->pix_icon('tick', '', 'block_progress', array('class' => 'iconOnConfig')).'&nbsp;'.
                            $OUTPUT->pix_icon('cross', '', 'block_progress', array('class' => 'iconOnConfig')));
-        $mform->setDefault('config_progressBarIcons', 0);
+        $mform->setDefault('config_progressBarIcons', DEFAULT_PROGRESSBARICONS);
         $mform->addHelpButton('config_progressBarIcons', 'why_use_icons', 'block_progress');
 
         // Control order of items in Progress Bar.
@@ -98,22 +98,35 @@ class block_progress_edit_form extends block_edit_form {
         );
         $orderbylabel = get_string('config_orderby', 'block_progress');
         $mform->addElement('select', 'config_orderby', $orderbylabel, $orderingoptions);
-        $mform->setDefault('config_orderby', 'orderbytime');
+        $mform->setDefault('config_orderby', DEFAULT_ORDERBY);
         $mform->addHelpButton('config_orderby', 'how_ordering_works', 'block_progress');
+
+        // Control how long bars wrap/scroll.
+        $longbaroptions = array(
+            'squeeze' => get_string('config_squeeze', 'block_progress'),
+            'scroll' => get_string('config_scroll', 'block_progress'),
+            'wrap' => get_string('config_wrap', 'block_progress'),
+        );
+        $longbarslabel = get_string('config_longbars', 'block_progress');
+        $mform->addElement('select', 'config_longbars', $longbarslabel, $longbaroptions);
+        $defaultlongbars = get_config('block_progress', 'defaultlongbars') ?: DEFAULT_LONGBARS;
+        $mform->setDefault('config_longbars', $defaultlongbars);
+        $mform->addHelpButton('config_longbars', 'how_longbars_works', 'block_progress');
 
         // Allow NOW to be turned on or off.
         $mform->addElement('selectyesno', 'config_displayNow',
                            get_string('config_now', 'block_progress').'&nbsp;'.
                            $OUTPUT->pix_icon('left', '', 'block_progress').
                            get_string('now_indicator', 'block_progress'));
-        $mform->setDefault('config_displayNow', 1);
+        $mform->setDefault('config_displayNow', DEFAULT_DISPLAYNOW);
         $mform->addHelpButton('config_displayNow', 'why_display_now', 'block_progress');
         $mform->disabledif('config_displayNow', 'config_orderby', 'eq', 'orderbycourse');
+        $mform->disabledif('config_displayNow', 'config_longbars', 'eq', 'wrap');
 
         // Allow progress percentage to be turned on for students.
         $mform->addElement('selectyesno', 'config_showpercentage',
                            get_string('config_percentage', 'block_progress'));
-        $mform->setDefault('config_showpercentage', 0);
+        $mform->setDefault('config_showpercentage', DEFAULT_SHOWPERCENTAGE);
         $mform->addHelpButton('config_showpercentage', 'why_show_precentage', 'block_progress');
 
         // Allow the block to be visible to a single group.
@@ -321,7 +334,8 @@ class block_progress_edit_form extends block_edit_form {
 
                             // Icon, module type and name.
                             $modulename = get_string('pluginname', $moduleinfo->module);
-                            $icon = $OUTPUT->pix_icon('icon', $modulename, 'mod_'.$moduleinfo->module, array('class' => 'iconlarge activityicon'));
+                            $attributes = array('class' => 'iconlarge activityicon');
+                            $icon = $OUTPUT->pix_icon('icon', $modulename, 'mod_'.$moduleinfo->module, $attributes);
                             $text = '&nbsp;'.$moduleinfo->label.':&nbsp;'.format_string($moduleinfo->instancename);
                             $attributes = array('class' => 'progressConfigModuleTitle');
                             $moduletitle = HTML_WRITER::tag('div', $icon.$text, $attributes);

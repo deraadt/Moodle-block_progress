@@ -60,6 +60,7 @@ $PAGE->set_url(
         'courseid' => $courseid,
         'page' => $page,
         'perpage' => $perpage,
+        'group' => $group,
     )
 );
 $PAGE->set_context($context);
@@ -136,6 +137,7 @@ if (!empty($groups)) {
     }
     if (!in_array($group, $groupids)) {
         $group = 0;
+        $PAGE->url->param('group', $group);
     }
     echo get_string('groupsvisible');
     echo $OUTPUT->single_select($PAGE->url, 'group', $groupstodisplay, $group);
@@ -176,7 +178,7 @@ $sql = "SELECT DISTINCT $picturefields, COALESCE(l.timeaccess, 0) AS lastonlinet
 $params['contextid'] = $context->id;
 $params['courseid'] = $course->id;
 $userrecords = $DB->get_records_sql($sql, $params);
-if (get_config('block_progress', 'showinactive') != 1) {
+if (get_config('block_progress', 'showinactive') !== 1) {
     extract_suspended_users($context, $userrecords);
 }
 $userids = array_keys($userrecords);
@@ -215,8 +217,14 @@ $table->column_style_all('text-align', 'left');
 $table->column_style_all('vertical-align', 'middle');
 $table->column_style('select', 'text-align', 'right');
 $table->column_style('select', 'padding', '5px 0 5px 5px');
-$table->column_style('progressbar', 'width', '200px');
+$table->column_style('select', 'width', '5%');
+$table->column_style('picture', 'width', '5%');
+$table->column_style('fullname', 'width', '10%');
+$table->column_style('lastonline', 'width', '10%');
+$table->column_style('progressbar', 'min-width', '200px');
+$table->column_style('progressbar', 'width', '*');
 $table->column_style('progress', 'text-align', 'center');
+$table->column_style('progress', 'width', '8%');
 
 $table->no_sorting('select');
 $select = '';
@@ -336,6 +344,7 @@ $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $mo
 // Organise access to JS for progress bars.
 $jsmodule = array('name' => 'block_progress', 'fullpath' => '/blocks/progress/module.js');
 $arguments = array(array($progressblock->id), $userids);
+$PAGE->requires->js_init_call('M.block_progress.setupScrolling', array(), false, $jsmodule);
 $PAGE->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 
 echo $OUTPUT->container_end();

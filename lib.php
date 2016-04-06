@@ -57,6 +57,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Global defaults.
+define('DEFAULT_WRAPAFTER', 16);
+define('DEFAULT_LONGBARS', 'squeeze');
+define('DEFAULT_SCROLLCELLWIDTH', 25);
+define('DEFAULT_COURSENAMETOSHOW', 'shortname');
+define('DEFAULT_SHOWINACTIVE', 0);
+define('DEFAULT_PROGRESSBARICONS', 0);
+define('DEFAULT_ORDERBY', 'orderbytime');
+define('DEFAULT_DISPLAYNOW', 1);
+define('DEFAULT_SHOWPERCENTAGE', 0);
+
 /**
  * Provides information about monitorable modules
  *
@@ -120,7 +131,7 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'marked',
             'alternatelink' => array(
-                'url' => '/mod/assign/view.php?id=:cmid&action=grade&userid=:userid&rownum=0',
+                'url' => '/mod/assign/view.php?id=:cmid&action=grading',
                 'capability' => 'mod/assign:grade',
             ),
             'showsubmittedfirst' => true,
@@ -1053,7 +1064,7 @@ function block_progress_compare_times($a, $b) {
  * @param stdClass $config   The blocks configuration settings
  * @param array    $events   The possible events that can occur for modules
  * @param int      $userid   The user's id
- * @param int      $instance The instance of the block
+ * @param int      $course   The course ID
  * @return array   an describing the user's attempts based on module+instance identifiers
  */
 function block_progress_attempts($modules, $config, $events, $userid, $course) {
@@ -1074,7 +1085,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
     if (class_exists('cache')) {
         $cachingused = true;
         $cachedlogs = cache::make('block_progress', 'cachedlogs');
-        $cachedlogviews = $cachedlogs->get($course);
+        $cachedlogviews = $cachedlogs->get($userid);
         if (empty($cachedlogviews)) {
             $cachedlogviews = array();
         }
@@ -1164,26 +1175,31 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
             // Check if the user has attempted the module.
             $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
 
-            // Check if activity requires submission first.
-            if (
-                !$attempts[$uniqueid] &&
-                isset($config->{'action_'.$uniqueid}) &&
-                $config->{'action_'.$uniqueid} != 'submitted' &&
-                isset($config->{'showsubmitted_'.$uniqueid}) &&
-                $config->{'showsubmitted_'.$uniqueid}
-            ) {
-                $query = $module['actions']['submitted'];
-                $submitted = $DB->record_exists_sql($query, $parameters) ? true : false;
-                if ($submitted) {
-                    $attempts[$uniqueid] = 'submitted';
-                }
+        }
+
+        // Check if activity requires submission first.
+        if (
+            array_key_exists('showsubmittedfirst', $module) &&
+            $module['showsubmittedfirst'] &&
+            array_key_exists('submitted', $module['actions']) &&
+            isset($config->{'action_'.$uniqueid}) &&
+            $config->{'action_'.$uniqueid} != 'submitted' &&
+            isset($config->{'showsubmitted_'.$uniqueid}) &&
+            $config->{'showsubmitted_'.$uniqueid} &&
+            $attempts[$uniqueid] !== true &&
+            $attempts[$uniqueid] !== 'failed'
+        ) {
+            $query = $module['actions']['submitted'];
+            $submitted = $DB->record_exists_sql($query, $parameters) ? true : false;
+            if ($submitted) {
+                $attempts[$uniqueid] = 'submitted';
             }
         }
     }
 
     // Update log cache if new values were added.
     if ($cachingused && $cachedlogsupdated) {
-        $cachedlogs->set($course, $cachedlogviews);
+        $cachedlogs->set($userid, $cachedlogviews);
     }
 
     return $attempts;
@@ -1203,6 +1219,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
  */
 function block_progress_bar($modules, $config, $events, $userid, $instance, $attempts, $course, $simple = false) {
     global $OUTPUT, $CFG, $USER;
+    $content = '';
     $now = time();
     $numevents = count($events);
     $dateformat = get_string('strftimerecentfull', 'langconfig');
@@ -1219,52 +1236,73 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     );
     $colours = array();
     foreach ($colournames as $name => $stringkey) {
-        $colours[$name] = get_config('block_progress', $name);
-        if (!$colours[$name]) {
-            $colours[$name] = get_string('block_progress', $stringkey);
-        }
+        $colours[$name] = get_config('block_progress', $name) ?: get_string('block_progress', $stringkey);
+    }
+
+    // Get relevant block instance settings or use defaults.
+    $useicons = isset($config->progressBarIcons) ? $config->progressBarIcons : DEFAULT_PROGRESSBARICONS;
+    $orderby = isset($config->orderby) ? $config->orderby : DEFAULT_ORDERBY;
+    $defaultlongbars = get_config('block_progress', 'defaultlongbars') ?: DEFAULT_LONGBARS;
+    $longbars = isset($config->longbars) ? $config->longbars : $defaultlongbars;
+    $displaynow = isset($config->displayNow) ? $config->displayNow : DEFAULT_DISPLAYNOW;
+    $showpercentage = isset($config->showpercentage) ? $config->showpercentage : DEFAULT_SHOWPERCENTAGE;
+    $rowoptions = array();
+    $content .= HTML_WRITER::start_div('barContainer');
+
+    // Determine the segment width.
+    $wrapafter = get_config('block_progress', 'wrapafter') ?: DEFAULT_WRAPAFTER;
+    if ($numevents <= $wrapafter) {
+        $longbars = 'squeeze';
+    }
+    if ($longbars == 'wrap') {
+        $rows = ceil($numevents / $wrapafter);
+        $cellwidth = floor(100 / ceil($numevents / $rows));
+        $cellunit = '%';
+        $celldisplay = 'inline-block';
+    }
+    if ($longbars == 'scroll') {
+        $cellwidth = DEFAULT_SCROLLCELLWIDTH;
+        $cellunit = 'px';
+        $celldisplay = 'inline-block';
+        $rowoptions['style'] = 'white-space: nowrap;';
+        $leftpoly = HTML_WRITER::tag('polygon', '', array('points' => '30,0 0,15 30,30', 'class' => 'triangle-polygon'));
+        $rightpoly = HTML_WRITER::tag('polygon', '', array('points' => '0,0 30,15 0,30', 'class' => 'triangle-polygon'));
+        $content .= HTML_WRITER::tag('svg', $leftpoly, array('class' => 'left-arrow-svg', 'height' => '30', 'width' => '30'));
+        $content .= HTML_WRITER::tag('svg', $rightpoly, array('class' => 'right-arrow-svg', 'height' => '30', 'width' => '30'));
+    }
+    if ($longbars == 'squeeze') {
+        $cellwidth = floor(100 / $numevents);
+        $cellunit = '%';
+        $celldisplay = 'table-cell';
     }
 
     // Place now arrow.
-    if ((!isset($config->orderby) || $config->orderby == 'orderbytime') && $config->displayNow == 1 && !$simple) {
-
-        $content = HTML_WRITER::start_tag('table', $tableoptions);
+    if ($orderby == 'orderbytime' && $longbars != 'wrap' && $displaynow == 1 && !$simple) {
 
         // Find where to put now arrow.
         $nowpos = 0;
         while ($nowpos < $numevents && $now > $events[$nowpos]['expected']) {
             $nowpos++;
         }
-        $content .= HTML_WRITER::start_tag('tr');
+        $content .= HTML_WRITER::start_div('nowRow', $rowoptions);
         $nowstring = get_string('now_indicator', 'block_progress');
         if ($nowpos < $numevents / 2) {
             for ($i = 0; $i < $nowpos; $i++) {
-                $content .= HTML_WRITER::tag('td', '&nbsp;', array('class' => 'progressBarHeader'));
+                $content .= HTML_WRITER::div(null, 'blankDiv', array('style' => "width:$cellwidth$cellunit;"));
             }
-            $celloptions = array('colspan' => $numevents - $nowpos,
-                                 'class' => 'progressBarHeader',
-                                 'style' => 'text-align:left;');
-            $content .= HTML_WRITER::start_tag('td', $celloptions);
-            $content .= $OUTPUT->pix_icon('left', $nowstring, 'block_progress');
+            $celloptions = array('style' => "text-align:left; width:$cellwidth;");
+            $content .= HTML_WRITER::start_div('nowDiv', $celloptions);
+            $content .= $OUTPUT->pix_icon('left', $nowstring, 'block_progress', array('class' => 'nowicon'));
             $content .= $nowstring;
-            $content .= HTML_WRITER::end_tag('td');
+            $content .= HTML_WRITER::end_div();
         } else {
-            $celloptions = array('colspan' => $nowpos,
-                                 'class' => 'progressBarHeader',
-                                 'style' => 'text-align:right;');
-            $content .= HTML_WRITER::start_tag('td', $celloptions);
+            $celloptions = array('style' => 'text-align:right; width:'. ($cellwidth * $nowpos) . $cellunit .';');
+            $content .= HTML_WRITER::start_div('nowdiv', $celloptions);
             $content .= $nowstring;
-            $content .= $OUTPUT->pix_icon('right', $nowstring, 'block_progress');
-            $content .= HTML_WRITER::end_tag('td');
-            for ($i = $nowpos; $i < $numevents; $i++) {
-                $content .= HTML_WRITER::tag('td', '&nbsp;', array('class' => 'progressBarHeader'));
-            }
+            $content .= $OUTPUT->pix_icon('right', $nowstring, 'block_progress', array('class' => 'nowicon'));
+            $content .= HTML_WRITER::end_div();
         }
-        $content .= HTML_WRITER::end_tag('tr');
-    }
-    else {
-        $tableoptions['class'] = 'progressBarProgressTable noNow';
-        $content = HTML_WRITER::start_tag('table', $tableoptions);
+        $content .= HTML_WRITER::end_div();
     }
 
     // Determine links to activities.
@@ -1288,8 +1326,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     }
 
     // Start progress bar.
-    $width = 100 / $numevents;
-    $content .= HTML_WRITER::start_tag('tr');
+    $content .= HTML_WRITER::start_div('barRow', $rowoptions);
     $counter = 1;
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
@@ -1301,27 +1338,21 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $showinfojs = 'M.block_progress.showInfo('.$instance.','.$userid.','.$event['cm']->id.');';
         $celloptions = array(
             'class' => 'progressBarCell',
-            'id' => '',
-            'width' => $width.'%',
             'ontouchstart' => $showinfojs . ' return false;',
             'onmouseover' => $showinfojs,
-             'style' => 'background-color:');
+             'style' => 'display:' . $celldisplay .'; width:' . $cellwidth . $cellunit . ';background-color:');
         if ($attempted === 'submitted') {
             $celloptions['style'] .= $colours['submittednotcomplete_colour'].';';
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
 
         } else if ($attempted === true) {
             $celloptions['style'] .= $colours['attempted_colour'].';';
-            $cellcontent = $OUTPUT->pix_icon(
-                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
-                               'tick' : 'blank', '', 'block_progress');
+            $cellcontent = $OUTPUT->pix_icon($useicons == 1 ? 'tick' : 'blank', '', 'block_progress');
 
         } else if (((!isset($config->orderby) || $config->orderby == 'orderbytime') && $event['expected'] < $now) ||
                  ($attempted === 'failed')) {
             $celloptions['style'] .= $colours['notattempted_colour'].';';
-            $cellcontent = $OUTPUT->pix_icon(
-                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
-                               'cross' : 'blank', '', 'block_progress');
+            $cellcontent = $OUTPUT->pix_icon($useicons == 1 ? 'cross' : 'blank', '', 'block_progress');
 
         } else {
             $celloptions['style'] .= $colours['futurenotattempted_colour'].';';
@@ -1332,20 +1363,20 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         } else {
             $celloptions['style'] .= 'cursor: not-allowed;';
         }
-        if ($counter == 1) {
-            $celloptions['id'] .= 'first';
+        if ($longbars != 'wrap' && $counter == 1) {
+            $celloptions['class'] .= ' firstProgressBarCell';
         }
-        if ($counter == $numevents) {
-            $celloptions['id'] .= 'last';
+        if ($longbars != 'wrap' && $counter == $numevents) {
+            $celloptions['class'] .= ' lastProgressBarCell';
         }
         $counter++;
-        $content .= HTML_WRITER::tag('td', $cellcontent, $celloptions);
+        $content .= HTML_WRITER::div($cellcontent, null, $celloptions);
     }
-    $content .= HTML_WRITER::end_tag('tr');
-    $content .= HTML_WRITER::end_tag('table');
+    $content .= HTML_WRITER::end_div();
+    $content .= HTML_WRITER::end_div();
 
     // Add the percentage below the progress bar.
-    if (isset($config->showpercentage) && $config->showpercentage == 1) {
+    if ($showpercentage == 1) {
         $progress = block_progress_percentage($events, $attempts);
         $percentagecontent = get_string('progress', 'block_progress').': '.$progress.'%';
         $percentageoptions = array('class' => 'progressPercentage');
@@ -1362,8 +1393,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     $content .= HTML_WRITER::end_tag('div');
 
     // Add hidden divs for activity information.
-    $displaydate = (!isset($config->orderby) || $config->orderby == 'orderbytime') &&
-                   (!isset($config->displayNow) || $config->displayNow == 1);
+    $displaydate = $orderby == 'orderbytime' && $displaynow == 1;
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
         $action = isset($config->{'action_'.$event['type'].$event['id']}) ?

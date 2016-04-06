@@ -94,14 +94,18 @@ $string['config_header_locked'] = 'Locked to deadline';
 $string['config_header_monitored'] = 'Monitored';
 $string['config_header_showsubmitted'] = 'Show submitted before action';
 $string['config_icons'] = 'Use icons in bar';
+$string['config_longbars'] = 'How to present long bars';
 $string['config_now'] = 'Use';
 $string['config_percentage'] = 'Show percentage to students';
+$string['config_scroll'] = 'Scroll';
+$string['config_squeeze'] = 'Squeeze';
 $string['config_title'] = 'Alternate title';
 $string['config_orderby'] = 'Order bar items by';
 $string['config_orderby_due_time'] = '"Expected by" date-time';
 $string['config_orderby_course_order'] = 'Ordering in course';
 $string['config_warning_logstores'] = 'Warning: Logging is disabled so actions relying on views will not be checked.';
 $string['config_warning_loglifetime'] = 'Warning: Logs are cleared after {$a} day(s). Actions relying on views will be affected by this.';
+$string['config_wrap'] = 'Wrap';
 
 // Help strings.
 $string['why_set_the_title'] = 'Why you might want to set the block instance title?';
@@ -181,6 +185,16 @@ $string['how_group_works'] = 'How visible group works';
 $string['how_group_works_help'] = '
 <p>Selecting a group will limit the display of the this block to that group only.</p>
 ';
+$string['how_longbars_works'] = 'How long bars are presented';
+$string['how_longbars_works_help'] = '
+<p>When bars exceed a set length, how they can be presented in one of the following ways.</p>
+<ul>
+    <li>Squeezed into one horizontal bar</li>
+    <li>Scrolling sideways to show overflowing bar segments</li>
+    <li>Wrapping to show all bar segments on multiple lines</li>
+</ul>
+<p>Note that when the bar is wrapped, the NOW indicator will not be shown.</p>
+';
 
 
 // Other terms.
@@ -213,6 +227,8 @@ $string['coursenametoshow'] = 'Course name to show on Dashboard';
 $string['shortname'] = 'Short course name';
 $string['fullname'] = 'Full course name';
 $string['showinactive'] = 'Show inactive students in Overview';
+$string['wrapafter'] = 'When wrapping, limit rows to';
+$string['defaultlongbars'] = 'Default presentation for long bars';
 
 // Overview page strings.
 $string['lastonline'] = 'Last in course';
