@@ -1389,6 +1389,12 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
         $content .= get_string('mouse_over_prompt', 'block_progress');
+        $content .= ' ';
+        $attributes = array (
+            'class' => 'accesshide',
+            'onclick' => 'M.block_progress.showAll('.$instance.','.$userid.')'
+        );
+        $content .= HTML_WRITER::link('#', get_string('showallinfo', 'block_progress'), $attributes);
     }
     $content .= HTML_WRITER::end_tag('div');
 

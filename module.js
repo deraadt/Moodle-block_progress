@@ -1,5 +1,6 @@
 M.block_progress = {
     progressBarLast: new Array(),
+    locked: false,
 
     init: function (YUIObject, instances, users) {
         var instance;
@@ -13,10 +14,27 @@ M.block_progress = {
     },
 
     showInfo: function (instance, user, id) {
+        if (this.locked) {
+            return;
+        }
         var last = this.progressBarLast[instance + '-' + user];
         document.getElementById('progressBarInfo' + instance + '-' + user + '-' + last).style.display = 'none';
         document.getElementById('progressBarInfo' + instance + '-' + user + '-' + id).style.display = 'block';
         this.progressBarLast[instance + '-' + user] = id;
+    },
+
+    showAll: function (instance, user) {
+        var infoBlocks = document.getElementsByClassName('progressEventInfo');
+        var i;
+        var searchString = 'progressBarInfo' + instance + '-' + user + '-';
+        var searchStringLength = searchString.length;
+        for (i = 0; i < infoBlocks.length; i++) {
+            if (infoBlocks[i].id.substring(0,searchStringLength) == searchString) {
+                infoBlocks[i].style.display = 'block';
+            }
+        }
+        document.getElementById(searchString + 'info').style.display = 'none';
+        this.locked = true;
     },
 
     setupScrolling: function(YUIObject) {

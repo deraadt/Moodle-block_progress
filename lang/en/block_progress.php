@@ -206,6 +206,7 @@ $string['no_visible_events_message'] = 'None of the monitored events are current
 $string['now_indicator'] = 'NOW';
 $string['pluginname'] = 'Progress Bar';
 $string['selectitemstobeadded'] = 'Select activities/resources';
+$string['showallinfo'] = 'Show all info';
 $string['time_expected'] = 'Expected';
 
 // Global setting strings
