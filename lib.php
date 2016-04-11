@@ -105,29 +105,51 @@ function block_progress_monitorable_modules() {
                                      FROM {assign_submission}
                                     WHERE assignment = :eventid
                                       AND userid = :userid
+                                      AND latest = 1
                                       AND status = 'submitted'",
-                'marked'       => "SELECT g.rawgrade
-                                     FROM {grade_grades} g, {grade_items} i
+                'marked'       => "SELECT a.grade
+                                     FROM {assign_grades} a, {assign_submission} s, {grade_items} i, {grade_grades} g
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
-                'passed'       => "SELECT g.finalgrade, i.gradepass
-                                     FROM {grade_grades} g, {grade_items} i
+                                      AND g.excluded = 0
+                                      AND s.assignment = :eventid1
+                                      AND s.userid = :userid1
+                                      AND latest = 1
+                                      AND a.assignment = s.assignment
+                                      AND a.userid = s.userid
+                                      AND a.attemptnumber = s.attemptnumber
+                                      AND a.grade IS NOT NULL",
+                'passed'       => "SELECT a.grade AS finalgrade, i.gradepass
+                                     FROM {assign_grades} a, {assign_submission} s, {grade_items} i, {grade_grades} g
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
-                'passedby'     => "SELECT g.finalgrade, i.gradepass
-                                     FROM {grade_grades} g, {grade_items} i
+                                      AND g.excluded = 0
+                                      AND s.assignment = :eventid1
+                                      AND s.userid = :userid1
+                                      AND latest = 1
+                                      AND a.assignment = s.assignment
+                                      AND a.userid = s.userid
+                                      AND a.attemptnumber = s.attemptnumber
+                                      AND a.grade IS NOT NULL",
+                'passedby'     => "SELECT a.grade AS finalgrade, i.gradepass
+                                     FROM {assign_grades} a, {assign_submission} s, {grade_items} i, {grade_grades} g
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
-                                      AND g.finalgrade >= i.gradepass",
+                                      AND g.excluded = 0
+                                      AND s.assignment = :eventid1
+                                      AND s.userid = :userid1
+                                      AND latest = 1
+                                      AND a.assignment = s.assignment
+                                      AND a.userid = s.userid
+                                      AND a.attemptnumber = s.attemptnumber
+                                      AND a.grade IS NOT NULL
+                                      AND a.grade >= i.gradepass",
             ),
             'defaultAction' => 'marked',
             'alternatelink' => array(
@@ -1376,7 +1398,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     $content .= HTML_WRITER::end_div();
 
     // Add the percentage below the progress bar.
-    if ($showpercentage == 1) {
+    if ($showpercentage == 1 && !$simple) {
         $progress = block_progress_percentage($events, $attempts);
         $percentagecontent = get_string('progress', 'block_progress').': '.$progress.'%';
         $percentageoptions = array('class' => 'progressPercentage');

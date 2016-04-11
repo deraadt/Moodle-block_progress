@@ -390,31 +390,15 @@ class block_progress_edit_form extends block_edit_form {
                                 $mform->addHelpButton('config_action_'.$moduleinfo->uniqueid,
                                                   'what_actions_can_be_monitored', 'block_progress');
                             } else {
-                                $actiongroup = array();
-                                $actiongroup[] = $mform->createElement(
-                                    'select',
-                                    'config_action_'.$moduleinfo->uniqueid,
-                                    '',
-                                    $moduleinfo->actions
-                                );
+                                $mform->addElement('select', 'config_action_'.$moduleinfo->uniqueid,
+                                                   get_string('config_header_action', 'block_progress'), $moduleinfo->actions);
                                 if (
                                     array_key_exists('showsubmittedfirst', $modules[$moduleinfo->module]) &&
                                     $modules[$moduleinfo->module]['showsubmittedfirst']
                                 ) {
-                                    $actiongroup[] = $mform->createElement(
-                                        'checkbox',
-                                        'config_showsubmitted_'.$moduleinfo->uniqueid,
-                                        '',
-                                        get_string('config_header_showsubmitted', 'block_progress')
-                                    );
+                                    $mform->addElement('selectyesno', 'config_showsubmitted_'.$moduleinfo->uniqueid,
+                                                          get_string('config_header_showsubmitted', 'block_progress'));
                                 }
-                                $mform->addGroup(
-                                    $actiongroup,
-                                    'config_action_group_'.$moduleinfo->uniqueid,
-                                    get_string('config_header_action', 'block_progress'),
-                                    ' ',
-                                    false
-                                );
                                 if (
                                     (!$moduleinfo->lockpossible || $moduleinfo->instancedue == 0) &&
                                     array_key_exists('activity_completion', $moduleinfo->actions)
@@ -430,7 +414,7 @@ class block_progress_edit_form extends block_edit_form {
                                 $mform->disabledif ('config_showsubmitted_'.$moduleinfo->uniqueid,
                                                     'config_action_'.$moduleinfo->uniqueid, 'eq', 'submitted');
                                 $mform->setType('config_action_'.$moduleinfo->uniqueid, PARAM_ALPHANUMEXT);
-                                $mform->addHelpButton('config_action_group_'.$moduleinfo->uniqueid,
+                                $mform->addHelpButton('config_action_'.$moduleinfo->uniqueid,
                                                       'what_actions_can_be_monitored', 'block_progress');
                             }
 

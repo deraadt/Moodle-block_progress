@@ -223,6 +223,7 @@ $table->column_style('fullname', 'width', '10%');
 $table->column_style('lastonline', 'width', '10%');
 $table->column_style('progressbar', 'min-width', '200px');
 $table->column_style('progressbar', 'width', '*');
+$table->column_style('progressbar', 'padding', '0');
 $table->column_style('progress', 'text-align', 'center');
 $table->column_style('progress', 'width', '8%');
 

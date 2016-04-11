@@ -71,16 +71,12 @@
     white-space: pre;
     overflow: hidden;
     padding: 0;
-    margin: 5px auto;
+    margin: 5px;
 }
 
 .block_progress .progressEventInfo .iconInInfo,
 #fitem_id_config_progressBarIcons .iconOnConfig {
     height: 1.2em;
-}
-
-#page-blocks-progress-overview .block_progress .progressEventInfo {
-    max-width: 200px;
 }
 
 #page-blocks-progress-overview .overviewTable {
@@ -173,7 +169,6 @@
 #page-blocks-progress-overview #showall {
     margin-left: 10px;
 }
-
 
 #page-blocks-progress-overview .progressoverviewmenus select {
     margin-left: 2px;
