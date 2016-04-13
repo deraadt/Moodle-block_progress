@@ -136,7 +136,7 @@ function block_progress_monitorable_modules() {
                                       AND i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid1
                                     UNION
-                                   SELECT g.finalgrade, 0 AS gradepass
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
                                      FROM {grade_items} i, {grade_grades} g
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid2
