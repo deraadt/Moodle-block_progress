@@ -50,8 +50,18 @@
     border-left: none;
 }
 
+.dir-rtl .block_progress .progressBarCell.firstProgressBarCell {
+    border-radius: 0px 4px 4px 0px;
+    border-left: solid 1px #e3e3e3;
+}
+
 .block_progress .progressBarCell.lastProgressBarCell {
     border-radius: 0 4px 4px 0;
+}
+
+.dir-rtl .block_progress .progressBarCell.lastProgressBarCell {
+    border-radius: 4px 0px 0px 4px;
+    border-left: none;
 }
 
 .block_progress .progressBarCell img {
