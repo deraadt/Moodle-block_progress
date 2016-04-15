@@ -31,10 +31,10 @@ $capabilities = array (
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_BLOCK,
         'archetypes'    => array (
-            'teacher'           => CAP_ALLOW,
-            'editingteacher'    => CAP_ALLOW,
-            'manager'           => CAP_ALLOW,
-            'coursecreator'     => CAP_ALLOW
+            'teacher'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager'        => CAP_ALLOW,
+            'coursecreator'  => CAP_ALLOW
         )
     ),
 
@@ -42,9 +42,9 @@ $capabilities = array (
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_BLOCK,
         'archetypes'    => array (
-            'teacher'           => CAP_ALLOW,
-            'editingteacher'    => CAP_ALLOW,
-            'student'           => CAP_ALLOW,
+            'teacher'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'student'        => CAP_ALLOW,
         )
     ),
 
@@ -66,7 +66,11 @@ $capabilities = array (
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
-            'user' => CAP_ALLOW
+            'teacher'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager'        => CAP_ALLOW,
+            'coursecreator'  => CAP_ALLOW,
+            'student'        => CAP_ALLOW,
         ),
 
         'clonepermissionsfrom' => 'moodle/my:manageblocks'
