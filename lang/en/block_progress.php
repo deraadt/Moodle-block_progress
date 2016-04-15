@@ -158,11 +158,11 @@ $string['what_actions_can_be_monitored_help'] = '
         <li>activity completion (when enabled in the site, course and set for the activity).</li>
     </ul>
 </p>
-<h3>Show submitted before action</h3>
-<p>When actions require students to submit then to wait for a mark, an option can be set to show that the submission has been made, but the full action of marking is not yet complete.</p>
 <h3>Passing</h3>
 <p>For the assignment, lesson and quiz modules, the notion of passing relies on a "Grade to pass" being set for the grade item in the Gradebook. <a href="http://docs.moodle.org/en/Grade_items#Activity-based_grade_items" target="_blank">More help...</a></p>
 ';
+$string['what_show_submitted_means'] = 'What show submitted before action means.';
+$string['what_show_submitted_means_help'] = 'Some activities allow students to submit. When students have submitted, but the final action (eg. marking) for the activity has not been completed, the Progress bar will change colour to show a submission has been made.';
 $string['why_show_precentage'] = 'Why show a progress percentage to students?';
 $string['why_show_precentage_help'] = '
 <p>It is possible to show an overall percentage of progress to students.</p>

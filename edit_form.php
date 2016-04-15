@@ -27,8 +27,6 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/progress/lib.php');
 
-define('YEARS_TO_SHOW', 20);
-
 /**
  * Progress Bar block config form class
  *
@@ -40,8 +38,6 @@ class block_progress_edit_form extends block_edit_form {
     protected function specific_definition($mform) {
         global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
         $loggingenabled = true;
-        $coursestartdate = localtime($COURSE->startdate, true);
-        $minyear = $coursestartdate['tm_year'] + 1900;
 
         // The My home version is not configurable.
         if (block_progress_on_site_page()) {
@@ -307,9 +303,6 @@ class block_progress_edit_form extends block_edit_form {
 
             $dateselectoroptions = array(
                 'optional' => false,
-                'hideyuicalendar' => true,
-                'startyear' => $minyear - 1,
-                'stopyear' => $minyear + YEARS_TO_SHOW
             );
 
             foreach ($sections as $i => $section) {
@@ -398,6 +391,11 @@ class block_progress_edit_form extends block_edit_form {
                                 ) {
                                     $mform->addElement('selectyesno', 'config_showsubmitted_'.$moduleinfo->uniqueid,
                                                           get_string('config_header_showsubmitted', 'block_progress'));
+                                    $mform->setDefault('config_showsubmitted_'.$moduleinfo->uniqueid, 1);
+                                    $mform->disabledif ('config_showsubmitted_'.$moduleinfo->uniqueid,
+                                                        'config_action_'.$moduleinfo->uniqueid, 'eq', 'submitted');
+                                    $mform->addHelpButton('config_showsubmitted_'.$moduleinfo->uniqueid,
+                                                      'what_show_submitted_means', 'block_progress');
                                 }
                                 if (
                                     (!$moduleinfo->lockpossible || $moduleinfo->instancedue == 0) &&

@@ -74,9 +74,9 @@ define('DEFAULT_SHOWPERCENTAGE', 0);
  * @return array
  */
 function block_progress_monitorable_modules() {
-    global $DB;
+    global $CFG, $DB;
 
-    return array(
+    $modules = array(
         'aspirelist' => array(
             'actions' => array(
                 'viewed' => array (
@@ -99,6 +99,51 @@ function block_progress_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'assign' => array(
+            'defaultTime' => 'duedate',
+            'actions' => array(
+                'submitted'    => "SELECT id
+                                     FROM {assign_submission}
+                                    WHERE assignment = :eventid
+                                      AND userid = :userid
+                                      AND status = 'submitted'",
+                'marked'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passed'       => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT g.finalgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
+            ),
+            'defaultAction' => 'marked',
+            'alternatelink' => array(
+                'url' => '/mod/assign/view.php?id=:cmid&action=grading',
+                'capability' => 'mod/assign:grade',
+            ),
+            'showsubmittedfirst' => true,
+        ),
+        'assign28on' => array(
             'defaultTime' => 'duedate',
             'actions' => array(
                 'submitted'    => "SELECT id
@@ -211,7 +256,6 @@ function block_progress_monitorable_modules() {
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
                                       AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
-
             ),
             'defaultAction' => 'submitted'
         ),
@@ -1013,6 +1057,13 @@ function block_progress_monitorable_modules() {
             'showsubmittedfirst' => true,
         ),
     );
+
+    if ($CFG->version >= 2014072400) {
+        $modules['assign'] = $modules['assign28on'];
+    }
+    unset($modules['assign28on']);
+
+    return $modules;
 }
 
 /**
@@ -1295,8 +1346,7 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
             array_key_exists('submitted', $module['actions']) &&
             isset($config->{'action_'.$uniqueid}) &&
             $config->{'action_'.$uniqueid} != 'submitted' &&
-            isset($config->{'showsubmitted_'.$uniqueid}) &&
-            $config->{'showsubmitted_'.$uniqueid} &&
+            (!isset($config->{'showsubmitted_'.$uniqueid}) || $config->{'showsubmitted_'.$uniqueid}) &&
             $attempts[$uniqueid] !== true &&
             $attempts[$uniqueid] !== 'failed'
         ) {
