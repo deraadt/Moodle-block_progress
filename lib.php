@@ -152,6 +152,13 @@ function block_progress_monitorable_modules() {
                                       AND userid = :userid
                                       AND latest = 1
                                       AND status = 'submitted'",
+                'graded'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
                 'marked'       => "SELECT a.grade AS finalgrade
                                      FROM {assign_grades} a, {assign_submission} s
                                     WHERE s.assignment = :eventid
