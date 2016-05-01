@@ -241,7 +241,7 @@ $table->setup();
 $sort = $table->get_sql_sort();
 $sortbyprogress = strncmp($sort, 'progress', 8) == 0;
 if (!$sort || ($paged && $sortbyprogress)) {
-     $sort = 'lastname DESC';
+     $sort = 'firstname DESC';
 }
 if (!$sortbyprogress) {
     usort($users, 'block_progress_compare_rows');

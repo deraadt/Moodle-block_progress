@@ -138,6 +138,8 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'marked',
             'alternatelink' => array(
+                // The following can be used when MDL-52133 is resolved
+                // 'url' => '/mod/assign/view.php?id=:cmid&action=grade&userid=:userid&rownum=0',
                 'url' => '/mod/assign/view.php?id=:cmid&action=grading',
                 'capability' => 'mod/assign:grade',
             ),
@@ -218,6 +220,8 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'marked',
             'alternatelink' => array(
+                // The following can be used when MDL-52133 is resolved
+                // 'url' => '/mod/assign/view.php?id=:cmid&action=grade&userid=:userid&rownum=0',
                 'url' => '/mod/assign/view.php?id=:cmid&action=grading',
                 'capability' => 'mod/assign:grade',
             ),
