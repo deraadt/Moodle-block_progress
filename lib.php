@@ -57,15 +57,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Global defaults.
+define('DEFAULT_WRAPAFTER', 16);
+define('DEFAULT_LONGBARS', 'squeeze');
+define('DEFAULT_SCROLLCELLWIDTH', 25);
+define('DEFAULT_COURSENAMETOSHOW', 'shortname');
+define('DEFAULT_SHOWINACTIVE', 0);
+define('DEFAULT_PROGRESSBARICONS', 0);
+define('DEFAULT_ORDERBY', 'orderbytime');
+define('DEFAULT_DISPLAYNOW', 1);
+define('DEFAULT_SHOWPERCENTAGE', 0);
+
 /**
  * Provides information about monitorable modules
  *
  * @return array
  */
 function block_progress_monitorable_modules() {
-    global $DB;
+    global $CFG, $DB;
 
-    return array(
+    $modules = array(
         'aspirelist' => array(
             'actions' => array(
                 'viewed' => array (
@@ -108,17 +119,109 @@ function block_progress_monitorable_modules() {
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
-                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT g.finalgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'assign'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
-                                      AND g.finalgrade >= i.gradepass",
+                                      AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
             ),
-            'defaultAction' => 'submitted'
+            'defaultAction' => 'marked',
+            'alternatelink' => array(
+                'url' => '/mod/assign/view.php?id=:cmid&action=grading',
+                'capability' => 'mod/assign:grade',
+            ),
+            'showsubmittedfirst' => true,
+        ),
+        'assign28on' => array(
+            'defaultTime' => 'duedate',
+            'actions' => array(
+                'submitted'    => "SELECT id
+                                     FROM {assign_submission}
+                                    WHERE assignment = :eventid
+                                      AND userid = :userid
+                                      AND latest = 1
+                                      AND status = 'submitted'",
+                'graded'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'marked'       => "SELECT a.grade AS finalgrade
+                                     FROM {assign_grades} a, {assign_submission} s
+                                    WHERE s.assignment = :eventid
+                                      AND s.userid = :userid
+                                      AND s.latest = 1
+                                      AND a.assignment = s.assignment
+                                      AND a.userid = s.userid
+                                      AND a.attemptnumber = s.attemptnumber
+                                      AND a.grade IS NOT NULL
+                                    UNION
+                                   SELECT g.finalgrade
+                                     FROM {grade_items} i, {grade_grades} g
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passed'       => "SELECT a.grade AS finalgrade, i.gradepass
+                                     FROM {assign_grades} a, {assign_submission} s, {grade_items} i
+                                    WHERE s.assignment = :eventid
+                                      AND s.userid = :userid
+                                      AND s.latest = 1
+                                      AND a.assignment = s.assignment
+                                      AND a.userid = s.userid
+                                      AND a.attemptnumber = s.attemptnumber
+                                      AND a.grade IS NOT NULL
+                                      AND i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid1
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_items} i, {grade_grades} g
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid2
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT a.grade
+                                     FROM {assign_grades} a, {assign_submission} s, {grade_items} i
+                                    WHERE s.assignment = :eventid
+                                      AND s.userid = :userid
+                                      AND s.latest = 1
+                                      AND a.assignment = s.assignment
+                                      AND a.userid = s.userid
+                                      AND a.attemptnumber = s.attemptnumber
+                                      AND a.grade IS NOT NULL
+                                      AND i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid1
+                                      AND a.grade >= i.gradepass
+                                    UNION
+                                   SELECT g.finalgrade
+                                     FROM {grade_items} i, {grade_grades} g
+                                    WHERE i.itemmodule = 'assign'
+                                      AND i.iteminstance = :eventid2
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+            ),
+            'defaultAction' => 'marked',
+            'alternatelink' => array(
+                'url' => '/mod/assign/view.php?id=:cmid&action=grading',
+                'capability' => 'mod/assign:grade',
+            ),
+            'showsubmittedfirst' => true,
         ),
         'assignment' => array(
             'defaultTime' => 'timedue',
@@ -144,15 +247,22 @@ function block_progress_monitorable_modules() {
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
-                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'assignment'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT g.finalgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'assignment'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
-                                      AND g.finalgrade >= i.gradepass",
+                                      AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
             ),
             'defaultAction' => 'submitted'
         ),
@@ -270,6 +380,16 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'viewed'
         ),
+        'dmelearn' => array(
+            'actions' => array(
+                'finished'     => "SELECT id
+                                     FROM {dmelearn_entries}
+                                    WHERE dmelearn = :eventid
+                                      AND grade >= 100
+                                      AND userid = :userid"
+            ),
+            'defaultAction' => 'finished'
+        ),
         'equella' => array(
             'actions' => array(
                 'viewed' => array (
@@ -299,7 +419,12 @@ function block_progress_monitorable_modules() {
                                     WHERE feedback = :eventid
                                       AND userid = :userid"
             ),
-            'defaultAction' => 'responded_to'
+            'defaultAction' => 'responded_to',
+            'alternatelink' => array(
+                // Breaks if anonymous feedback is collected.
+                'url' => '/mod/feedback/show_entries.php?id=:cmid&do_show=showoneentry&userid=:userid',
+                'capability' => 'mod/feedback:viewreports',
+            ),
         ),
         'resource' => array(  // AKA file.
             'actions' => array(
@@ -375,6 +500,21 @@ function block_progress_monitorable_modules() {
                                     )"
             ),
             'defaultAction' => 'posted_to'
+        ),
+        'geogebra' => array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
+                'attempted'    => "SELECT id
+                                     FROM {geogebra_attempts}
+                                    WHERE geogebra = :eventid
+                                      AND userid = :userid",
+                'finished'    => "SELECT id
+                                     FROM {geogebra_attempts}
+                                    WHERE geogebra = :eventid
+                                      AND userid = :userid
+                                      AND finished = 1"
+            ),
+            'defaultAction' => 'finished'
         ),
         'glossary' => array(
             'actions' => array(
@@ -455,6 +595,16 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'posted_to'
         ),
+        'jclic' => array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
+                'attempted'    => "SELECT id
+                                     FROM {jclic_sessions}
+                                    WHERE jclicid = :eventid
+                                      AND user_id = :userid"
+            ),
+            'defaultAction' => 'attempted'
+        ),
         'lesson' => array(
             'defaultTime' => 'deadline',
             'actions' => array(
@@ -480,17 +630,28 @@ function block_progress_monitorable_modules() {
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
-                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'lesson'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT g.finalgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'lesson'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
-                                      AND g.finalgrade >= i.gradepass",
+                                      AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
             ),
-            'defaultAction' => 'attempted'
+            'defaultAction' => 'attempted',
+            'alternatelink' => array(
+                'url' => '/mod/lesson/report.php?id=:cmid&action=reportdetail&userid=:userid',
+                'capability' => 'mod/lesson:viewreports',
+            ),
         ),
         'lti' => array(
             'actions' => array(
@@ -623,17 +784,28 @@ function block_progress_monitorable_modules() {
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
-                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'quiz'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT g.finalgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'quiz'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
-                                      AND g.finalgrade >= i.gradepass",
+                                      AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
             ),
-            'defaultAction' => 'finished'
+            'defaultAction' => 'finished',
+            'alternatelink' => array(
+                'url' => '/mod/quiz/report.php?id=:cmid&mode=overview',
+                'capability' => 'mod/quiz:viewreports',
+            ),
         ),
         'scorm' => array(
             'actions' => array(
@@ -654,7 +826,54 @@ function block_progress_monitorable_modules() {
                                       AND element = 'cmi.core.lesson_status'
                                       AND {$DB->sql_compare_text('value')} = 'passed'"
             ),
-            'defaultAction' => 'attempted'
+            'defaultAction' => 'attempted',
+            'alternatelink' => array(
+                'url' => '/mod/scorm/report/userreport.php?id=:cmid&user=:userid',
+                'capability' => 'mod/scorm:viewreport',
+            ),
+        ),
+        'subcourse' => array(
+            'actions' => array(
+                'graded'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'subcourse'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passed'       => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'subcourse'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'subcourse'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT g.finalgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'subcourse'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
+            ),
+            'defaultAction' => 'graded'
+        ),
+        'survey' => array(
+            'actions' => array(
+                'submitted'    => "SELECT id
+                                     FROM {survey_answers}
+                                    WHERE survey = :eventid
+                                      AND userid = :userid"
+            ),
+            'defaultAction' => 'submitted'
         ),
         'turnitintool' => array(
             'defaultTime' => 'defaultdtdue',
@@ -664,6 +883,17 @@ function block_progress_monitorable_modules() {
                                     WHERE turnitintoolid = :eventid
                                       AND userid = :userid
                                       AND submission_score IS NOT NULL"
+            ),
+            'defaultAction' => 'submitted'
+        ),
+        'turnitintooltwo' => array(
+            'defaultTime' => 'defaultdtdue',
+            'actions' => array(
+                'submitted'     => "SELECT id
+                                      FROM {turnitintooltwo_submissions}
+                                     WHERE turnitintooltwoid = :eventid
+                                       AND userid = :userid
+                                       AND submission_score IS NOT NULL"
             ),
             'defaultAction' => 'submitted'
         ),
@@ -709,6 +939,46 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'viewed'
         ),
+        'videoassessment' => array(
+            'defaultTime' => 'timedue',
+            'actions' => array(
+                'attempted'    => "SELECT id
+                                     FROM {videoassessment_video_assocs}
+                                    WHERE videoassessment = :eventid
+                                      AND associationid = :userid",
+                'graded'       => "SELECT g.rawgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'videoassessment'
+                                      AND i.iteminstance = :eventid
+                                      AND i.itemnumber = 0
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
+                'passed'       => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'videoassessment'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'videoassessment'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT g.finalgrade
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'videoassessment'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
+            ),
+            'defaultAction' => 'attempted'
+        ),
         'vpl' => array(
             'defaultTime' => 'duedate',
             'actions' => array(
@@ -729,15 +999,22 @@ function block_progress_monitorable_modules() {
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
-                'passedby'     => "SELECT g.finalgrade, i.gradepass
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'vpl'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+                'passedby'     => "SELECT g.finalgrade
                                      FROM {grade_grades} g, {grade_items} i
                                     WHERE i.itemmodule = 'vpl'
                                       AND i.iteminstance = :eventid
                                       AND i.id = g.itemid
                                       AND g.userid = :userid
-                                      AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)
-                                      AND g.finalgrade >= i.gradepass",
+                                      AND ((g.finalgrade IS NOT NULL AND g.finalgrade >= i.gradepass) OR g.excluded <> 0)",
             ),
             'defaultAction' => 'marked'
         ),
@@ -783,9 +1060,21 @@ function block_progress_monitorable_modules() {
                                       AND g.userid = :userid
                                       AND (g.finalgrade IS NOT NULL OR g.excluded <> 0)",
             ),
-            'defaultAction' => 'submitted'
+            'defaultAction' => 'graded',
+            'showsubmittedfirst' => true,
         ),
     );
+
+    if ($CFG->version >= 2014072400) {
+        $modules['assign'] = $modules['assign28on'];
+    }
+    unset($modules['assign28on']);
+
+    if ($CFG->version > 2015111604) {
+        $modules['assign']['alternatelink']['url'] = '/mod/assign/view.php?id=:cmid&action=grade&userid=:userid';
+    }
+
+    return $modules;
 }
 
 /**
@@ -948,7 +1237,7 @@ function block_progress_compare_times($a, $b) {
  * @param stdClass $config   The blocks configuration settings
  * @param array    $events   The possible events that can occur for modules
  * @param int      $userid   The user's id
- * @param int      $instance The instance of the block
+ * @param int      $course   The course ID
  * @return array   an describing the user's attempts based on module+instance identifiers
  */
 function block_progress_attempts($modules, $config, $events, $userid, $course) {
@@ -979,10 +1268,10 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
     foreach ($events as $event) {
         $module = $modules[$event['type']];
         $uniqueid = $event['type'].$event['id'];
-        $parameters = array('courseid' => $course, 'courseid1' => $course,
-                            'userid' => $userid, 'userid1' => $userid,
-                            'eventid' => $event['id'], 'eventid1' => $event['id'],
-                            'cmid' => $event['cm']->id, 'cmid1' => $event['cm']->id,
+        $parameters = array('courseid' => $course, 'courseid1' => $course, 'courseid2' => $course,
+                            'userid' => $userid, 'userid1' => $userid, 'userid2' => $userid,
+                            'eventid' => $event['id'], 'eventid1' => $event['id'], 'eventid2' => $event['id'],
+                            'cmid' => $event['cm']->id, 'cmid1' => $event['cm']->id, 'cmid2' => $event['cm']->id,
                       );
 
         // Check for passing grades as unattempted, passed or failed.
@@ -1058,6 +1347,25 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
 
             // Check if the user has attempted the module.
             $attempts[$uniqueid] = $DB->record_exists_sql($query, $parameters) ? true : false;
+
+        }
+
+        // Check if activity requires submission first.
+        if (
+            array_key_exists('showsubmittedfirst', $module) &&
+            $module['showsubmittedfirst'] &&
+            array_key_exists('submitted', $module['actions']) &&
+            isset($config->{'action_'.$uniqueid}) &&
+            $config->{'action_'.$uniqueid} != 'submitted' &&
+            (!isset($config->{'showsubmitted_'.$uniqueid}) || $config->{'showsubmitted_'.$uniqueid}) &&
+            $attempts[$uniqueid] !== true &&
+            $attempts[$uniqueid] !== 'failed'
+        ) {
+            $query = $module['actions']['submitted'];
+            $submitted = $DB->record_exists_sql($query, $parameters) ? true : false;
+            if ($submitted) {
+                $attempts[$uniqueid] = 'submitted';
+            }
         }
     }
 
@@ -1082,7 +1390,8 @@ function block_progress_attempts($modules, $config, $events, $userid, $course) {
  * @return string  Progress Bar HTML content
  */
 function block_progress_bar($modules, $config, $events, $userid, $instance, $attempts, $course, $simple = false) {
-    global $OUTPUT, $CFG;
+    global $OUTPUT, $CFG, $USER;
+    $content = '';
     $now = time();
     $numevents = count($events);
     $dateformat = get_string('strftimerecentfull', 'langconfig');
@@ -1093,17 +1402,13 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     // Get colours and use defaults if they are not set in global settings.
     $colournames = array(
         'attempted_colour' => 'attempted_colour',
+        'submittednotcomplete_colour' => 'submittednotcomplete_colour',
         'notattempted_colour' => 'notAttempted_colour',
         'futurenotattempted_colour' => 'futureNotAttempted_colour'
     );
     $colours = array();
     foreach ($colournames as $name => $stringkey) {
-        if (get_config('block_progress', $name)) {
-            $colours[$name] = get_config('block_progress', $name);
-        }
-        else {
-            $colours[$name] = get_string('block_progress', $stringkey);
-        }
+        $colours[$name] = get_config('block_progress', $name) ?: get_string('block_progress', $stringkey);
     }
 
     $content = '';
@@ -1118,50 +1423,99 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     }
 
     // Place now arrow.
-    if ((!isset($config->orderby) || $config->orderby == 'orderbytime') && $config->displayNow == 1 && !$simple) {
+    if ($orderby == 'orderbytime' && $longbars != 'wrap' && $displaynow == 1 && !$simple) {
 
-        $content .= HTML_WRITER::start_tag('table', $tableoptions);
+      $content .= HTML_WRITER::start_tag('table', $tableoptions);
+      // Get relevant block instance settings or use defaults.
+      $useicons = isset($config->progressBarIcons) ? $config->progressBarIcons : DEFAULT_PROGRESSBARICONS;
+      $orderby = isset($config->orderby) ? $config->orderby : DEFAULT_ORDERBY;
+      $defaultlongbars = get_config('block_progress', 'defaultlongbars') ?: DEFAULT_LONGBARS;
+      $longbars = isset($config->longbars) ? $config->longbars : $defaultlongbars;
+      $displaynow = isset($config->displayNow) ? $config->displayNow : DEFAULT_DISPLAYNOW;
+      $showpercentage = isset($config->showpercentage) ? $config->showpercentage : DEFAULT_SHOWPERCENTAGE;
+      $rowoptions = array();
+      $content .= HTML_WRITER::start_div('barContainer');
+
+      // Determine the segment width.
+      $wrapafter = get_config('block_progress', 'wrapafter') ?: DEFAULT_WRAPAFTER;
+      if ($numevents <= $wrapafter) {
+          $longbars = 'squeeze';
+      }
+      if ($longbars == 'wrap') {
+          $rows = ceil($numevents / $wrapafter);
+          $cellwidth = floor(100 / ceil($numevents / $rows));
+          $cellunit = '%';
+          $celldisplay = 'inline-block';
+      }
+      if ($longbars == 'scroll') {
+          $cellwidth = DEFAULT_SCROLLCELLWIDTH;
+          $cellunit = 'px';
+          $celldisplay = 'inline-block';
+          $rowoptions['style'] = 'white-space: nowrap;';
+          $leftpoly = HTML_WRITER::tag('polygon', '', array('points' => '30,0 0,15 30,30', 'class' => 'triangle-polygon'));
+          $rightpoly = HTML_WRITER::tag('polygon', '', array('points' => '0,0 30,15 0,30', 'class' => 'triangle-polygon'));
+          $content .= HTML_WRITER::tag('svg', $leftpoly, array('class' => 'left-arrow-svg', 'height' => '30', 'width' => '30'));
+          $content .= HTML_WRITER::tag('svg', $rightpoly, array('class' => 'right-arrow-svg', 'height' => '30', 'width' => '30'));
+      }
+      if ($longbars == 'squeeze') {
+          $cellwidth = floor(100 / $numevents);
+          $cellunit = '%';
+          $celldisplay = 'table-cell';
+      }
+
 
         // Find where to put now arrow.
         $nowpos = 0;
         while ($nowpos < $numevents && $now > $events[$nowpos]['expected']) {
             $nowpos++;
         }
-        $content .= HTML_WRITER::start_tag('tr');
+        $content .= HTML_WRITER::start_div('nowRow', $rowoptions);
         $nowstring = get_string('now_indicator', 'block_progress');
         if ($nowpos < $numevents / 2) {
             for ($i = 0; $i < $nowpos; $i++) {
-                $content .= HTML_WRITER::tag('td', '&nbsp;', array('class' => 'progressBarHeader'));
+                $content .= HTML_WRITER::div(null, 'blankDiv', array('style' => "width:$cellwidth$cellunit;"));
             }
-            $celloptions = array('colspan' => $numevents - $nowpos,
-                                 'class' => 'progressBarHeader',
-                                 'style' => 'text-align:left;');
-            $content .= HTML_WRITER::start_tag('td', $celloptions);
-            $content .= $OUTPUT->pix_icon('left', $nowstring, 'block_progress');
+            $celloptions = array('style' => "text-align:left; width:$cellwidth;");
+            $content .= HTML_WRITER::start_div('nowDiv', $celloptions);
+            $content .= $OUTPUT->pix_icon('left', $nowstring, 'block_progress', array('class' => 'nowicon'));
             $content .= $nowstring;
-            $content .= HTML_WRITER::end_tag('td');
+            $content .= HTML_WRITER::end_div();
         } else {
-            $celloptions = array('colspan' => $nowpos,
-                                 'class' => 'progressBarHeader',
-                                 'style' => 'text-align:right;');
-            $content .= HTML_WRITER::start_tag('td', $celloptions);
+            $celloptions = array('style' => 'text-align:right; width:'. ($cellwidth * $nowpos) . $cellunit .';');
+            $content .= HTML_WRITER::start_div('nowdiv', $celloptions);
             $content .= $nowstring;
-            $content .= $OUTPUT->pix_icon('right', $nowstring, 'block_progress');
-            $content .= HTML_WRITER::end_tag('td');
-            for ($i = $nowpos; $i < $numevents; $i++) {
-                $content .= HTML_WRITER::tag('td', '&nbsp;', array('class' => 'progressBarHeader'));
-            }
+            $content .= $OUTPUT->pix_icon('right', $nowstring, 'block_progress', array('class' => 'nowicon'));
+            $content .= HTML_WRITER::end_div();
         }
-        $content .= HTML_WRITER::end_tag('tr');
+        $content .= HTML_WRITER::end_div();
     }
     else {
         $tableoptions['class'] = 'progressBarProgressTable noNow';
         $content .= HTML_WRITER::start_tag('table', $tableoptions);
+      }
+
+    // Determine links to activities.
+    for ($i = 0; $i < $numevents; $i++) {
+        if ($userid != $USER->id &&
+            array_key_exists('alternatelink', $modules[$events[$i]['type']]) &&
+            has_capability($modules[$events[$i]['type']]['alternatelink']['capability'], $events[$i]['cm']->context)
+        ) {
+            $substitutions = array(
+                '/:courseid/' => $course,
+                '/:eventid/'  => $events[$i]['id'],
+                '/:cmid/'     => $events[$i]['cm']->id,
+                '/:userid/'   => $userid,
+            );
+            $link = $modules[$events[$i]['type']]['alternatelink']['url'];
+            $link = preg_replace(array_keys($substitutions), array_values($substitutions), $link);
+            $events[$i]['link'] = $CFG->wwwroot.$link;
+        } else {
+            $events[$i]['link'] = $CFG->wwwroot.'/mod/'.$events[$i]['type'].'/view.php?id='.$events[$i]['cm']->id;
+        }
     }
 
     // Start progress bar.
-    $width = 100 / $numevents;
-    $content .= HTML_WRITER::start_tag('tr');
+    $content .= HTML_WRITER::start_div('barRow', $rowoptions);
     $counter = 1;
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
@@ -1170,57 +1524,65 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                   $modules[$event['type']]['defaultAction'];
 
         // A cell in the progress bar.
+        $showinfojs = 'M.block_progress.showInfo('.$instance.','.$userid.','.$event['cm']->id.');';
         $celloptions = array(
             'class' => 'progressBarCell',
-            'id' => '',
-            'width' => $width.'%',
-            'onmouseover' => 'M.block_progress.showInfo('.$instance.','.$userid.','.$event['cm']->id.');',
-             'style' => 'background-color:');
-        if ($attempted === true) {
+            'ontouchstart' => $showinfojs . ' return false;',
+            'onmouseover' => $showinfojs,
+             'style' => 'display:' . $celldisplay .'; width:' . $cellwidth . $cellunit . ';background-color:');
+        if ($attempted === 'submitted') {
+            $celloptions['style'] .= $colours['submittednotcomplete_colour'].';';
+            $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
+
+        } else if ($attempted === true) {
             $celloptions['style'] .= $colours['attempted_colour'].';';
-            $cellcontent = $OUTPUT->pix_icon(
-                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
-                               'tick' : 'blank', '', 'block_progress');
+            $cellcontent = $OUTPUT->pix_icon($useicons == 1 ? 'tick' : 'blank', '', 'block_progress');
 
         } else if (((!isset($config->orderby) || $config->orderby == 'orderbytime') && $event['expected'] < $now) ||
                  ($attempted === 'failed')) {
             $celloptions['style'] .= $colours['notattempted_colour'].';';
-            $cellcontent = $OUTPUT->pix_icon(
-                               isset($config->progressBarIcons) && $config->progressBarIcons == 1 ?
-                               'cross' : 'blank', '', 'block_progress');
+            $cellcontent = $OUTPUT->pix_icon($useicons == 1 ? 'cross' : 'blank', '', 'block_progress');
 
         } else {
             $celloptions['style'] .= $colours['futurenotattempted_colour'].';';
             $cellcontent = $OUTPUT->pix_icon('blank', '', 'block_progress');
         }
-        if (!empty($event['cm']->available)) {
-            $celloptions['onclick'] = 'document.location=\''.
-                $CFG->wwwroot.'/mod/'.$event['type'].'/view.php?id='.$event['cm']->id.'\';';
+        if (!empty($event['cm']->available) || $simple) {
+            $celloptions['onclick'] = 'document.location=\''.$event['link'].'\';';
+        } else {
+            $celloptions['style'] .= 'cursor: not-allowed;';
         }
-        if ($counter == 1) {
-            $celloptions['id'] .= 'first';
+        if ($longbars != 'wrap' && $counter == 1) {
+            $celloptions['class'] .= ' firstProgressBarCell';
         }
-        if ($counter == $numevents) {
-            $celloptions['id'] .= 'last';
+        if ($longbars != 'wrap' && $counter == $numevents) {
+            $celloptions['class'] .= ' lastProgressBarCell';
         }
         $counter++;
-        $content .= HTML_WRITER::tag('td', $cellcontent, $celloptions);
+        $content .= HTML_WRITER::div($cellcontent, null, $celloptions);
     }
-    $content .= HTML_WRITER::end_tag('tr');
-    $content .= HTML_WRITER::end_tag('table');
+    $content .= HTML_WRITER::end_div();
+    $content .= HTML_WRITER::end_div();
+
+    // Add the percentage below the progress bar.
+    if ($showpercentage == 1 && !$simple) {
+        $progress = block_progress_percentage($events, $attempts);
+        $percentagecontent = get_string('progress', 'block_progress').': '.$progress.'%';
+        $percentageoptions = array('class' => 'progressPercentage');
+        $content .= HTML_WRITER::tag('div', $percentagecontent, $percentageoptions);
+    }
 
     // Add the info box below the table.
     $divoptions = array('class' => 'progressEventInfo',
                         'id' => 'progressBarInfo'.$instance.'-'.$userid.'-info');
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
-        $content .= HTML_WRITER::tag('span', get_string('mouse_over_prompt', 'block_progress'), array('class' => 'mouse_over_prompt'));
+      $content .= HTML_WRITER::tag('span', get_string('mouse_over_prompt', 'block_progress'), array('class' => 'mouse_over_prompt'));
     }
     $content .= HTML_WRITER::end_tag('div');
 
     // Add hidden divs for activity information.
-    $displaydate = (!isset($config->orderby) || $config->orderby == 'orderbytime') &&
-                   (!isset($config->displayNow) || $config->displayNow == 1);
+    $displaydate = $orderby == 'orderbytime' && $displaynow == 1;
     foreach ($events as $event) {
         $attempted = $attempts[$event['type'].$event['id']];
         $action = isset($config->{'action_'.$event['type'].$event['id']}) ?
@@ -1230,7 +1592,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                             'id' => 'progressBarInfo'.$instance.'-'.$userid.'-'.$event['cm']->id,
                             'style' => 'display: none;');
         $content .= HTML_WRITER::start_tag('div', $divoptions);
-        $link = '/mod/'.$event['type'].'/view.php?id='.$event['cm']->id;
+
         $text = '';
         if (method_exists($event['cm'], 'get_icon_url')) {
             $activityicon = $event['cm']->get_icon_url();
@@ -1240,15 +1602,18 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             $text .= $OUTPUT->pix_icon('icon', '', $event['type'], array('class' => 'moduleIcon'));
         }
         $text .= s($event['name']);
-        if (!empty($event['cm']->available)) {
-            $content .= $OUTPUT->action_link($link, $text);
+        if (!empty($event['cm']->available) || $simple) {
+            $content .= $OUTPUT->action_link($event['link'], $text);
         } else {
             $content .= $text;
         }
         $content .= HTML_WRITER::empty_tag('br');
         $content .= get_string($action, 'block_progress').'&nbsp;';
-        $icon = ($attempted && $attempted !== 'failed' ? 'tick' : 'cross');
+        $icon = ($attempted && $attempted !== 'failed' && $attempted !== 'submitted' ? 'tick' : 'cross');
         $content .= $OUTPUT->pix_icon($icon, '', 'block_progress', array('class' => 'iconInInfo'));
+        if ($attempted === 'submitted') {
+            $content .= ' (' . get_string('submitted', 'block_progress') . ')';
+        }
         $content .= HTML_WRITER::empty_tag('br');
         if ($displaydate) {
             $content .= HTML_WRITER::start_tag('div', array('class' => 'expectedBy'));
@@ -1417,8 +1782,7 @@ function block_progress_get_coursemodule($module, $recordid, $courseid, $userid 
 
     if (function_exists('get_fast_modinfo')) {
         return get_fast_modinfo($courseid, $userid)->instances[$module][$recordid];
-    }
-    else {
+    } else {
         return get_coursemodule_from_instance($module, $recordid, $courseid);
     }
 }

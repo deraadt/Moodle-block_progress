@@ -24,7 +24,29 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+require_once($CFG->dirroot.'/blocks/progress/lib.php');
+
 if ($ADMIN->fulltree) {
+
+    $options = array(10 => 10, 12 => 12, 14 => 14, 16 => 16, 18 => 18, 20 => 20);
+    $settings->add(new admin_setting_configselect('block_progress/wrapafter',
+        get_string('wrapafter', 'block_progress'),
+        '',
+        DEFAULT_WRAPAFTER,
+        $options)
+    );
+
+    $options = array(
+        'squeeze' => get_string('config_squeeze', 'block_progress'),
+        'scroll' => get_string('config_scroll', 'block_progress'),
+        'wrap' => get_string('config_wrap', 'block_progress'),
+    );
+    $settings->add(new admin_setting_configselect('block_progress/defaultlongbars',
+        get_string('defaultlongbars', 'block_progress'),
+        '',
+        DEFAULT_LONGBARS,
+        $options)
+    );
 
     $options = array(
         'shortname' => get_string('shortname', 'block_progress'),
@@ -33,7 +55,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('block_progress/coursenametoshow',
         get_string('coursenametoshow', 'block_progress'),
         '',
-        'shortname',
+        DEFAULT_COURSENAMETOSHOW,
         $options)
     );
 
@@ -41,6 +63,13 @@ if ($ADMIN->fulltree) {
         get_string('attempted_colour_title', 'block_progress'),
         get_string('attempted_colour_descr', 'block_progress'),
         get_string('attempted_colour', 'block_progress'),
+        null )
+    );
+
+    $settings->add(new admin_setting_configcolourpicker('block_progress/submittednotcomplete_colour',
+        get_string('submittednotcomplete_colour_title', 'block_progress'),
+        get_string('submittednotcomplete_colour_descr', 'block_progress'),
+        get_string('submittednotcomplete_colour', 'block_progress'),
         null )
     );
 
@@ -61,6 +90,6 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('block_progress/showinactive',
         get_string('showinactive', 'block_progress'),
         '',
-        0)
+        DEFAULT_SHOWINACTIVE)
     );
 }

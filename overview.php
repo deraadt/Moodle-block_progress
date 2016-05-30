@@ -39,6 +39,7 @@ $id       = required_param('progressbarid', PARAM_INT);
 $courseid = required_param('courseid', PARAM_INT);
 $page     = optional_param('page', 0, PARAM_INT); // Which page to show.
 $perpage  = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
+$group    = optional_param('group', 0, PARAM_INT); // Group selected.
 
 // Determine course and context.
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -59,6 +60,7 @@ $PAGE->set_url(
         'courseid' => $courseid,
         'page' => $page,
         'perpage' => $perpage,
+        'group' => $group,
     )
 );
 $PAGE->set_context($context);
@@ -66,9 +68,9 @@ $title = get_string('overview', 'block_progress');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 $PAGE->navbar->add($title);
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('report');
 
-// Check user is logged in and capable of grading.
+// Check user is logged in and capable of accessing the Overview.
 require_login($course, false);
 require_capability('block/progress:overview', $progressblockcontext);
 
@@ -103,12 +105,12 @@ if (empty($events)) {
 $numevents = count($events);
 
 // Determine if a role has been selected.
-$sql = "SELECT DISTINCT r.id, r.name
+$sql = "SELECT DISTINCT r.id, r.name, r.archetype
           FROM {role} r, {role_assignments} a
          WHERE a.contextid = :contextid
            AND r.id = a.roleid
-           AND r.shortname = :shortname";
-$params = array('contextid' => $context->id, 'shortname' => 'student');
+           AND r.archetype = :archetype";
+$params = array('contextid' => $context->id, 'archetype' => 'student');
 $studentrole = $DB->get_record_sql($sql, $params);
 if ($studentrole) {
     $studentroleid = $studentrole->id;
@@ -120,14 +122,25 @@ $rolewhere = $roleselected != 0 ? "AND a.roleid = $roleselected" : '';
 
 // Output group selector if there are groups in the course.
 echo $OUTPUT->container_start('progressoverviewmenus');
-$groupuserid = 0;
-if (!has_capability('moodle/site:accessallgroups', $context)) {
-    $groupuserid = $USER->id;
+$groupselected = 0;
+$groupuserid = $USER->id;
+if (has_capability('moodle/site:accessallgroups', $context)) {
+    $groupuserid = 0;
 }
-$groups = groups_get_all_groups($course->id);
+$groupids = array();
+$groups = groups_get_all_groups($course->id, $groupuserid);
 if (!empty($groups)) {
-    $course->groupmode = 2;
-    groups_print_course_menu($course, $PAGE->url);
+    $groupstodisplay = array(0 => get_string('allparticipants'));
+    foreach ($groups as $groupid => $groupobject) {
+        $groupstodisplay[$groupid] = $groupobject->name;
+        $groupids[] = $groupid;
+    }
+    if (!in_array($group, $groupids)) {
+        $group = 0;
+        $PAGE->url->param('group', $group);
+    }
+    echo get_string('groupsvisible');
+    echo $OUTPUT->single_select($PAGE->url, 'group', $groupstodisplay, $group);
 }
 
 // Output the roles menu.
@@ -148,10 +161,11 @@ echo $OUTPUT->container_end();
 // Apply group restrictions.
 $params = array();
 $groupjoin = '';
-$groupselected = groups_get_course_group($course);
-if ($groupselected && $groupselected != 0) {
+if ($group && $group != 0) {
     $groupjoin = 'JOIN {groups_members} g ON (g.groupid = :groupselected AND g.userid = u.id)';
-    $params['groupselected'] = $groupselected;
+    $params['groupselected'] = $group;
+} else if ($groupuserid != 0 && !empty($groupids)) {
+    $groupjoin = 'JOIN {groups_members} g ON (g.groupid IN ('.implode(',', $groupids).') AND g.userid = u.id)';
 }
 
 // Get the list of users enrolled in the course.
@@ -164,7 +178,7 @@ $sql = "SELECT DISTINCT $picturefields, COALESCE(l.timeaccess, 0) AS lastonlinet
 $params['contextid'] = $context->id;
 $params['courseid'] = $course->id;
 $userrecords = $DB->get_records_sql($sql, $params);
-if (get_config('block_progress', 'showinactive') != 1) {
+if (get_config('block_progress', 'showinactive') !== 1) {
     extract_suspended_users($context, $userrecords);
 }
 $userids = array_keys($userrecords);
@@ -203,8 +217,15 @@ $table->column_style_all('text-align', 'left');
 $table->column_style_all('vertical-align', 'middle');
 $table->column_style('select', 'text-align', 'right');
 $table->column_style('select', 'padding', '5px 0 5px 5px');
-$table->column_style('progressbar', 'width', '200px');
+$table->column_style('select', 'width', '5%');
+$table->column_style('picture', 'width', '5%');
+$table->column_style('fullname', 'width', '10%');
+$table->column_style('lastonline', 'width', '10%');
+$table->column_style('progressbar', 'min-width', '200px');
+$table->column_style('progressbar', 'width', '*');
+$table->column_style('progressbar', 'padding', '0');
 $table->column_style('progress', 'text-align', 'center');
+$table->column_style('progress', 'width', '8%');
 
 $table->no_sorting('select');
 $select = '';
@@ -220,7 +241,7 @@ $table->setup();
 $sort = $table->get_sql_sort();
 $sortbyprogress = strncmp($sort, 'progress', 8) == 0;
 if (!$sort || ($paged && $sortbyprogress)) {
-     $sort = 'lastname DESC';
+     $sort = 'firstname DESC';
 }
 if (!$sortbyprogress) {
     usort($users, 'block_progress_compare_rows');
@@ -324,6 +345,7 @@ $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $mo
 // Organise access to JS for progress bars.
 $jsmodule = array('name' => 'block_progress', 'fullpath' => '/blocks/progress/module.js');
 $arguments = array(array($progressblock->id), $userids);
+$PAGE->requires->js_init_call('M.block_progress.setupScrolling', array(), false, $jsmodule);
 $PAGE->requires->js_init_call('M.block_progress.init', $arguments, false, $jsmodule);
 
 echo $OUTPUT->container_end();
