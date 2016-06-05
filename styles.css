@@ -32,6 +32,7 @@
 
 .block_progress .nowRow .blankDiv {
     display: table-cell;
+    height: 25px;
 }
 
 .block_progress .progressBarCell {
@@ -43,11 +44,54 @@
     cursor: pointer;
     border-left: solid 1px #e3e3e3;
     border-top: solid 1px #e3e3e3;
+    position: relative;
+}
+
+.block_progress .progressBarCell .nowDiv {
+    position: absolute;
+    top: -25px;
+    white-space: nowrap;
+    width: 100px;
+}
+
+.block_progress .progressBarCell .firstNow {
+    left: 0;
+    text-align: left;
+}
+
+.dir-rtl .block_progress .progressBarCell .firstNow {
+    right: 0;
+    text-align: right;
+}
+
+.block_progress .progressBarCell .firstHalfNow {
+    left: 100%;
+    text-align: left;
+}
+
+.dir-rtl .block_progress .progressBarCell .firstHalfNow {
+    right: 100%;
+    text-align: right;
+}
+
+.block_progress .progressBarCell .lastHalfNow {
+    right: 0;
+    text-align: right;
+}
+
+.dir-rtl .block_progress .progressBarCell .lastHalfNow {
+    left: 0;
+    text-align: left;
+}
+
+.block_progress .progressBarCell .nowicon {
+    width: auto;
 }
 
 .block_progress .progressBarCell.firstProgressBarCell {
     border-radius: 4px 0 0 4px;
     border-left: none;
+    border-right: solid 1px #e3e3e3;
 }
 
 .dir-rtl .block_progress .progressBarCell.firstProgressBarCell {
@@ -62,6 +106,7 @@
 .dir-rtl .block_progress .progressBarCell.lastProgressBarCell {
     border-radius: 4px 0px 0px 4px;
     border-left: none;
+    border-right: solid 1px #e3e3e3;
 }
 
 .block_progress .progressBarCell img {

@@ -1393,6 +1393,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     global $OUTPUT, $CFG, $USER;
     $content = '';
     $now = time();
+    $usingrtl = right_to_left();
     $numevents = count($events);
     $dateformat = get_string('strftimerecentfull', 'langconfig');
     $tableoptions = array('class' => 'progressBarProgressTable',
@@ -1419,6 +1420,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
     $displaynow = isset($config->displayNow) ? $config->displayNow : DEFAULT_DISPLAYNOW;
     $showpercentage = isset($config->showpercentage) ? $config->showpercentage : DEFAULT_SHOWPERCENTAGE;
     $rowoptions = array();
+    $rowoptions['style'] = '';
     $content .= HTML_WRITER::start_div('barContainer');
 
     // Determine the segment width.
@@ -1436,7 +1438,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $cellwidth = DEFAULT_SCROLLCELLWIDTH;
         $cellunit = 'px';
         $celldisplay = 'inline-block';
-        $rowoptions['style'] = 'white-space: nowrap;';
+        $rowoptions['style'] .= 'white-space: nowrap;';
         $leftpoly = HTML_WRITER::tag('polygon', '', array('points' => '30,0 0,15 30,30', 'class' => 'triangle-polygon'));
         $rightpoly = HTML_WRITER::tag('polygon', '', array('points' => '0,0 30,15 0,30', 'class' => 'triangle-polygon'));
         $content .= HTML_WRITER::tag('svg', $leftpoly, array('class' => 'left-arrow-svg', 'height' => '30', 'width' => '30'));
@@ -1448,33 +1450,17 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $celldisplay = 'table-cell';
     }
 
-    // Place now arrow.
+    // Find where to put now arrow.
+    $nowpos = -1;
     if ($orderby == 'orderbytime' && $longbars != 'wrap' && $displaynow == 1 && !$simple) {
-
-        // Find where to put now arrow.
         $nowpos = 0;
         while ($nowpos < $numevents && $now > $events[$nowpos]['expected']) {
             $nowpos++;
         }
-        $content .= HTML_WRITER::start_div('nowRow', $rowoptions);
+        $rowoptions['style'] .= 'margin-top: 25px;';
         $nowstring = get_string('now_indicator', 'block_progress');
-        if ($nowpos < $numevents / 2) {
-            for ($i = 0; $i < $nowpos; $i++) {
-                $content .= HTML_WRITER::div(null, 'blankDiv', array('style' => "width:$cellwidth$cellunit;"));
-            }
-            $celloptions = array('style' => "text-align:left; width:$cellwidth;");
-            $content .= HTML_WRITER::start_div('nowDiv', $celloptions);
-            $content .= $OUTPUT->pix_icon('left', $nowstring, 'block_progress', array('class' => 'nowicon'));
-            $content .= $nowstring;
-            $content .= HTML_WRITER::end_div();
-        } else {
-            $celloptions = array('style' => 'text-align:right; width:'. ($cellwidth * $nowpos) . $cellunit .';');
-            $content .= HTML_WRITER::start_div('nowdiv', $celloptions);
-            $content .= $nowstring;
-            $content .= $OUTPUT->pix_icon('right', $nowstring, 'block_progress', array('class' => 'nowicon'));
-            $content .= HTML_WRITER::end_div();
-        }
-        $content .= HTML_WRITER::end_div();
+        $leftarrowimg = $OUTPUT->pix_icon('left', $nowstring, 'block_progress', array('class' => 'nowicon'));
+        $rightarrowimg = $OUTPUT->pix_icon('right', $nowstring, 'block_progress', array('class' => 'nowicon'));
     }
 
     // Determine links to activities.
@@ -1522,7 +1508,7 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             $cellcontent = $OUTPUT->pix_icon($useicons == 1 ? 'tick' : 'blank', '', 'block_progress');
 
         } else if (((!isset($config->orderby) || $config->orderby == 'orderbytime') && $event['expected'] < $now) ||
-                 ($attempted === 'failed')) {
+                  ($attempted === 'failed')) {
             $celloptions['style'] .= $colours['notattempted_colour'].';';
             $cellcontent = $OUTPUT->pix_icon($useicons == 1 ? 'cross' : 'blank', '', 'block_progress');
 
@@ -1541,6 +1527,24 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         if ($longbars != 'wrap' && $counter == $numevents) {
             $celloptions['class'] .= ' lastProgressBarCell';
         }
+
+        // Place the NOW indicator.
+        if ($nowpos >= 0) {
+            if ($nowpos == 0 && $counter == 1) {
+                $nowcontent = $usingrtl ? $rightarrowimg.$nowstring: $leftarrowimg.$nowstring;
+                $cellcontent .= HTML_WRITER::div($nowcontent, 'nowDiv firstNow');
+            }
+            else if ($nowpos == $counter) {
+                if ($nowpos < $numevents / 2) {
+                    $nowcontent = $usingrtl ? $rightarrowimg.$nowstring: $leftarrowimg.$nowstring;
+                    $cellcontent .= HTML_WRITER::div($nowcontent, 'nowDiv firstHalfNow');
+                } else {
+                    $nowcontent = $usingrtl ? $leftarrowimg.$nowstring: $rightarrowimg.$nowstring;
+                    $cellcontent .= HTML_WRITER::div($nowcontent, 'nowDiv lastHalfNow');
+                }
+            }
+        }
+
         $counter++;
         $content .= HTML_WRITER::div($cellcontent, null, $celloptions);
     }
