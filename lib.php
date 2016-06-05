@@ -1536,10 +1536,10 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
             }
             else if ($nowpos == $counter) {
                 if ($nowpos < $numevents / 2) {
-                    $nowcontent = $usingrtl ? $rightarrowimg.$nowstring: $leftarrowimg.$nowstring;
+                    $nowcontent = $usingrtl ? $rightarrowimg.$nowstring : $leftarrowimg.$nowstring;
                     $cellcontent .= HTML_WRITER::div($nowcontent, 'nowDiv firstHalfNow');
                 } else {
-                    $nowcontent = $usingrtl ? $leftarrowimg.$nowstring: $rightarrowimg.$nowstring;
+                    $nowcontent = $usingrtl ? $leftarrowimg.$nowstring : $rightarrowimg.$nowstring;
                     $cellcontent .= HTML_WRITER::div($nowcontent, 'nowDiv lastHalfNow');
                 }
             }
