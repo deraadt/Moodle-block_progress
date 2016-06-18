@@ -1531,15 +1531,14 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         // Place the NOW indicator.
         if ($nowpos >= 0) {
             if ($nowpos == 0 && $counter == 1) {
-                $nowcontent = $usingrtl ? $rightarrowimg.$nowstring: $leftarrowimg.$nowstring;
+                $nowcontent = $usingrtl ? $rightarrowimg.$nowstring : $leftarrowimg.$nowstring;
                 $cellcontent .= HTML_WRITER::div($nowcontent, 'nowDiv firstNow');
-            }
-            else if ($nowpos == $counter) {
+            } else if ($nowpos == $counter) {
                 if ($nowpos < $numevents / 2) {
                     $nowcontent = $usingrtl ? $rightarrowimg.$nowstring : $leftarrowimg.$nowstring;
                     $cellcontent .= HTML_WRITER::div($nowcontent, 'nowDiv firstHalfNow');
                 } else {
-                    $nowcontent = $usingrtl ? $leftarrowimg.$nowstring : $rightarrowimg.$nowstring;
+                    $nowcontent = $usingrtl ? $nowstring.$leftarrowimg : $nowstring.$rightarrowimg;
                     $cellcontent .= HTML_WRITER::div($nowcontent, 'nowDiv lastHalfNow');
                 }
             }

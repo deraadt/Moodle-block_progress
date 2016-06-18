@@ -71,6 +71,7 @@
 
 .dir-rtl .block_progress .progressBarCell .firstHalfNow {
     right: 100%;
+    left: initial;
     text-align: right;
 }
 
@@ -81,6 +82,7 @@
 
 .dir-rtl .block_progress .progressBarCell .lastHalfNow {
     left: 0;
+    right: initial;
     text-align: left;
 }
 
