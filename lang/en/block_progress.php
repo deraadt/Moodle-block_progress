@@ -248,3 +248,4 @@ $string['cachedef_cachedlogs'] = 'Progress Bar log query caching';
 
 // For My home page.
 $string['no_blocks'] = "No Progress Bar blocks are set up for your courses.";
+$string['no_courses'] = "You are not enrolled in any courses. Only bars from enrolled courses will be shown.";

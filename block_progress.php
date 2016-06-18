@@ -135,6 +135,12 @@ class block_progress extends block_base {
                        AND bi.parentcontextid = :contextid
                   ORDER BY region, weight, bi.id";
 
+            // Show a message when the user is not enrolled in any courses.
+            if (($this->page->user_is_editing() || is_siteadmin()) && empty($courses)) {
+                $this->content->text = get_string('no_courses', 'block_progress');
+                return $this->content;
+            }
+
             foreach ($courses as $courseid => $course) {
 
                 // Get specific block config and context.
