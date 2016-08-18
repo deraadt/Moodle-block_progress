@@ -208,6 +208,8 @@ $string['pluginname'] = 'Progress Bar';
 $string['selectitemstobeadded'] = 'Select activities/resources';
 $string['showallinfo'] = 'Show all info';
 $string['time_expected'] = 'Expected';
+$string['tick'] = 'Tick';
+$string['cross'] = 'Cross';
 
 // Global setting strings
 // Default colours that may have different cultural meanings.

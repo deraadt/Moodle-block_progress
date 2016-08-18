@@ -24,8 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version   = 2016061801;
+$plugin->version   = 2016081800;
 $plugin->requires  = 2010121000;
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'Version for Moodle 2.0 onwards';
+$plugin->release   = 'Version for Moodle 2.0 to 3.1 (final)';
 $plugin->component = 'block_progress';

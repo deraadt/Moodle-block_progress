@@ -1602,7 +1602,8 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
         $content .= HTML_WRITER::empty_tag('br');
         $content .= get_string($action, 'block_progress').'&nbsp;';
         $icon = ($attempted && $attempted !== 'failed' && $attempted !== 'submitted' ? 'tick' : 'cross');
-        $content .= $OUTPUT->pix_icon($icon, '', 'block_progress', array('class' => 'iconInInfo'));
+        $alt = get_string($icon, 'block_progress');
+        $content .= $OUTPUT->pix_icon($icon, $alt, 'block_progress', array('class' => 'iconInInfo'));
         if ($attempted === 'submitted') {
             $content .= ' (' . get_string('submitted', 'block_progress') . ')';
         }
