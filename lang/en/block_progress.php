@@ -42,6 +42,7 @@ $string['forum'] = 'Forum';
 $string['glossary'] = 'Glossary';
 $string['hotpot'] = 'Hot Potatoes';
 $string['hsuforum'] = 'Advanced Forum';
+$string['hvp'] = 'Interactive content';
 $string['imscp'] = 'IMS Content Package';
 $string['journal'] = 'Journal';
 $string['lesson'] = 'Lesson';
