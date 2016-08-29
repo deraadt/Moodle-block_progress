@@ -565,6 +565,25 @@ function block_progress_monitorable_modules() {
             ),
             'defaultAction' => 'posted_to'
         ),
+        'hvp' => array(
+            'actions' => array(
+                'passed'       => "SELECT g.finalgrade, i.gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'hvp'
+                                      AND i.iteminstance = :eventid
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid
+                                      AND g.finalgrade IS NOT NULL
+                                    UNION
+                                   SELECT 100 AS finalgrade, 0 AS gradepass
+                                     FROM {grade_grades} g, {grade_items} i
+                                    WHERE i.itemmodule = 'hvp'
+                                      AND i.iteminstance = :eventid1
+                                      AND i.id = g.itemid
+                                      AND g.userid = :userid1
+                                      AND g.excluded <> 0",
+            ),
+        ),
         'imscp' => array(
             'actions' => array(
                 'viewed' => array (
