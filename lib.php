@@ -1201,6 +1201,17 @@ function block_progress_event_information($config, $modules, $course, $userid = 
 }
 
 /**
+ * Fetch section position in course from section id
+ *
+ * @param int  $sectionid id of the section
+ * @return int the position of the specified section
+ */
+function get_section_pos($sectionid) {
+    global $DB;
+    return $DB->get_field("course_sections", "section", array("id"=>$sectionid));
+}
+
+/**
  * Used to compare two activities/resources based on order on course page
  *
  * @param array $a array of event information
@@ -1209,7 +1220,7 @@ function block_progress_event_information($config, $modules, $course, $userid = 
  */
 function block_progress_compare_events($a, $b) {
     if ($a['section'] != $b['section']) {
-        return $a['section'] - $b['section'];
+        return get_section_pos($a['section']) - get_section_pos($b['section']);
     } else {
         return $a['position'] - $b['position'];
     }
