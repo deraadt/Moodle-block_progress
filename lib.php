@@ -754,7 +754,7 @@ function block_progress_monitorable_modules() {
                 'finished'     => "SELECT id
                                      FROM {questionnaire_response}
                                     WHERE complete = 'y'
-                                      AND username = :userid
+                                      AND userid = :userid
                                       AND survey_id = :eventid",
             ),
             'defaultAction' => 'finished'
