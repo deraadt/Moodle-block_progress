@@ -490,6 +490,7 @@ function block_progress_monitorable_modules() {
             'defaultAction' => 'viewed'
         ),
         'forum' => array(
+            'defaultTime' => 'assesstimefinish',
             'actions' => array(
                 'posted_to'    => "SELECT id
                                      FROM {forum_posts}
@@ -564,6 +565,27 @@ function block_progress_monitorable_modules() {
                                     )"
             ),
             'defaultAction' => 'posted_to'
+        ),
+        'hvp' => array(
+            'actions' => array(
+                'viewed' => array (
+                    'logstore_legacy'     => "SELECT id
+                                                FROM {log}
+                                               WHERE course = :courseid
+                                                 AND module = 'hvp'
+                                                 AND action = 'view'
+                                                 AND cmid = :cmid
+                                                 AND userid = :userid",
+                    'sql_internal_reader' => "SELECT id
+                                                FROM {log}
+                                               WHERE courseid = :courseid
+                                                 AND component = 'mod_hvp'
+                                                 AND action = 'viewed'
+                                                 AND objectid = :eventid
+                                                 AND userid = :userid",
+                ),
+            ),
+            'defaultAction' => 'viewed'
         ),
         'imscp' => array(
             'actions' => array(
@@ -1563,6 +1585,11 @@ function block_progress_bar($modules, $config, $events, $userid, $instance, $att
                         'id' => 'progressBarInfo'.$instance.'-'.$userid.'-info');
     $content .= HTML_WRITER::start_tag('div', $divoptions);
     if (!$simple) {
+        if (isset($config->showpercentage) && $config->showpercentage == 1) {
+            $progress = block_progress_percentage($events, $attempts);
+            $content .= get_string('progress', 'block_progress').': ';
+            $content .= $progress.'%'.HTML_WRITER::empty_tag('br');
+        }
         $content .= get_string('mouse_over_prompt', 'block_progress');
         $content .= ' ';
         $attributes = array (
@@ -1712,7 +1739,7 @@ function block_progress_filter_visibility($events, $userid, $coursecontext, $cou
                 if ($coursemodule->uservisible != 1 && empty($coursemodule->availableinfo)) {
                     continue;
                 }
-            } else if (!groups_course_module_visible($coursemodule, $userid)) {
+            } else if (!$coursemodule->uservisible) {
                 continue;
             }
         }
@@ -1728,10 +1755,10 @@ function block_progress_filter_visibility($events, $userid, $coursecontext, $cou
  *
  * @return bool True when on the My home page.
  */
-function block_progress_on_site_page() {
-    global $SCRIPT, $COURSE;
+function block_progress_on_my_page() {
+    global $SCRIPT;
 
-    return $SCRIPT === '/my/index.php' || $COURSE->id == 1;
+    return $SCRIPT === '/my/index.php';
 }
 
 /**
@@ -1744,7 +1771,7 @@ function block_progress_get_course_context($courseid) {
     if (class_exists('context_course')) {
         return context_course::instance($courseid);
     } else {
-        return get_context_instance(CONTEXT_COURSE, $courseid);
+        return context_course::instance($courseid);
     }
 }
 
@@ -1758,7 +1785,7 @@ function block_progress_get_block_context($blockid) {
     if (class_exists('context_block')) {
         return context_block::instance($blockid);
     } else {
-        return get_context_instance(CONTEXT_BLOCK, $blockid);
+        return context_block::instance($blockid);
     }
 }
 
