@@ -40,6 +40,7 @@ $string['flashcardtrainer'] = 'Flashcard trainer';
 $string['folder'] = 'Folder';
 $string['forum'] = 'Forum';
 $string['glossary'] = 'Glossary';
+$string['groupaddnewnote'] = 'Add a common note';
 $string['hotpot'] = 'Hot Potatoes';
 $string['hsuforum'] = 'Advanced Forum';
 $string['imscp'] = 'IMS Content Package';

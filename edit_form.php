@@ -312,7 +312,7 @@ class block_progress_edit_form extends block_edit_form {
             );
 
             foreach ($sections as $i => $section) {
-                if (count($section->sequence) > 0) {
+                if ($section->sequence != null && (count($section->sequence) > 0)) {
 
                     // Output the section header.
                     $sectionname = get_string('section').':&nbsp;'.get_section_name($COURSE, $section);
