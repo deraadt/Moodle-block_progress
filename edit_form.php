@@ -39,6 +39,12 @@ class block_progress_edit_form extends block_edit_form {
         global $CFG, $COURSE, $DB, $OUTPUT, $SCRIPT;
         $loggingenabled = true;
 
+        // Raise the max_execution time to 60 seconds for courses with many modules.
+        core_php_time_limit::raise(60);
+
+        // Also raise memory limit for courses with many modules.
+        raise_memory_limit(MEMORY_EXTRA);
+
         // The My home version is not configurable.
         if (block_progress_on_site_page()) {
             return;
@@ -306,7 +312,7 @@ class block_progress_edit_form extends block_edit_form {
             );
 
             foreach ($sections as $i => $section) {
-                if (count($section->sequence) > 0) {
+                if ($section->sequence != null && (count($section->sequence) > 0)) {
 
                     // Output the section header.
                     $sectionname = get_string('section').':&nbsp;'.get_section_name($COURSE, $section);
