@@ -46,7 +46,7 @@ class block_progress_edit_form extends block_edit_form {
         raise_memory_limit(MEMORY_EXTRA);
 
         // The My home version is not configurable.
-        if (block_progress_on_site_page()) {
+        if (block_progress_on_my_page()) {
             return;
         }
 
