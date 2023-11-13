@@ -14,18 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * Progress Bar block version details
+ * Privacy Subsystem implementation for block_progress.
  *
- * @package    contrib
- * @subpackage block_progress
- * @copyright  2010 Michael de Raadt
+ * @package    block_progress
+ * @copyright  2018 Nathan Nguyen <nathannguyen@catalyst-net.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version   = 2016081801;
-$plugin->requires  = 2010121000;
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'Version for Moodle 2.0 onwards';
-$plugin->component = 'block_progress';
+namespace block_progress\privacy;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * The block_progress plugin does not store any data.
+ *
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}

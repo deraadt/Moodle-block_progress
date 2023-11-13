@@ -325,7 +325,7 @@ if ($CFG->enablenotes || $CFG->messaging) {
     }
     if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context)) {
         $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
-        $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
+        $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'block_progress');
     }
     echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
     echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
@@ -339,7 +339,7 @@ if ($CFG->enablenotes || $CFG->messaging) {
 }
 
 // Organise access to JS for messaging.
-$module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
+$module = array('name' => 'core_user', 'fullpath' => '/blocks/progress/user_module.js');
 $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
 
 // Organise access to JS for progress bars.

@@ -40,8 +40,10 @@ $string['flashcardtrainer'] = 'Flashcard trainer';
 $string['folder'] = 'Folder';
 $string['forum'] = 'Forum';
 $string['glossary'] = 'Glossary';
+$string['groupaddnewnote'] = 'Add a common note';
 $string['hotpot'] = 'Hot Potatoes';
 $string['hsuforum'] = 'Advanced Forum';
+$string['hvp'] = 'Interactive Content';
 $string['imscp'] = 'IMS Content Package';
 $string['journal'] = 'Journal';
 $string['lesson'] = 'Lesson';
@@ -251,3 +253,5 @@ $string['cachedef_cachedlogs'] = 'Progress Bar log query caching';
 // For My home page.
 $string['no_blocks'] = "No Progress Bar blocks are set up for your courses.";
 $string['no_courses'] = "You are not enrolled in any courses. Only bars from enrolled courses will be shown.";
+
+$string['privacy:metadata'] = "Progress block does not store any personal data.";
